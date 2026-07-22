@@ -118,11 +118,11 @@ body {
 }
 .hero-title .bounce {
   display: inline-block;
-  animation: jdkBounce 2.5s ease-in-out infinite;
+  animation: jdkBounce 3s ease-in-out infinite;
 }
 @keyframes jdkBounce {
-  0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-12px); }
+  0%, 50%, 100% { transform: translateY(0) scale(1); }
+  25% { transform: translateY(-18px) scale(1.15); }
 }
 
 .hero-desc {
