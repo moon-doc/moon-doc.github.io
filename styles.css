@@ -116,14 +116,6 @@ body {
   margin-bottom: 16px;
   white-space: nowrap;
 }
-.hero-title .bounce {
-  display: inline-block;
-  animation: jdkBounce 3s ease-in-out infinite;
-}
-@keyframes jdkBounce {
-  0%, 50%, 100% { transform: translateY(0) scale(1); }
-  25% { transform: translateY(-18px) scale(1.15); }
-}
 
 .hero-desc {
   font-size: clamp(14px, 1.6vw, 16px);
