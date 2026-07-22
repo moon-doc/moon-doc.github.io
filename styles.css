@@ -258,11 +258,17 @@ body {
   transition: transform .6s cubic-bezier(.2,.7,.2,1), box-shadow .6s, border-color .6s;
 }
 .show-media:hover .show-frame {
-  transform: rotateX(0deg) rotateY(0deg) scale(1.015);
+  transform: rotateX(0deg) rotateY(0deg) scale(1.05);
   border-color: rgba(201,166,255,.6);
   box-shadow: 0 40px 100px rgba(120,90,220,.45), inset 0 0 0 1px rgba(201,166,255,.35);
 }
-.show-frame img { width: 100%; display: block; }
+.show-frame img {
+  width: 100%; display: block;
+  transition: transform .6s cubic-bezier(.2,.7,.2,1);
+}
+.show-media:hover .show-frame img {
+  transform: scale(1.08);
+}
 
 /* 顶部反光条 */
 .show-frame::after {
