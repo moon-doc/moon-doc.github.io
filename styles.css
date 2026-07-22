@@ -97,12 +97,37 @@ body {
 }
 .hero-inner { max-width: 800px; }
 
+.hero-logo {
+  width: 80px; height: 80px;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 24px rgba(255,233,168,.6));
+  animation: heroLogoFloat 4s ease-in-out infinite;
+}
+@keyframes heroLogoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
 .hero-title {
-  font-size: clamp(48px, 9vw, 100px);
-  line-height: 1.05;
+  font-size: clamp(56px, 10vw, 96px);
+  line-height: 1;
   font-weight: 900;
-  letter-spacing: -2px;
-  margin-bottom: 16px;
+  letter-spacing: 8px;
+  margin-bottom: 12px;
+}
+
+.hero-sub {
+  font-size: clamp(16px, 2vw, 20px);
+  color: var(--ink);
+  letter-spacing: 6px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.hero-desc {
+  font-size: clamp(14px, 1.6vw, 16px);
+  color: var(--ink-dim);
+  letter-spacing: 1px;
 }
 
 .grad {
