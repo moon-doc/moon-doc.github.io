@@ -109,19 +109,11 @@ body {
 }
 
 .hero-title {
-  font-size: clamp(56px, 10vw, 96px);
-  line-height: 1;
+  font-size: clamp(36px, 7vw, 72px);
+  line-height: 1.1;
   font-weight: 900;
-  letter-spacing: 8px;
-  margin-bottom: 12px;
-}
-
-.hero-sub {
-  font-size: clamp(16px, 2vw, 20px);
-  color: var(--ink);
-  letter-spacing: 6px;
-  font-weight: 500;
-  margin-bottom: 8px;
+  letter-spacing: 4px;
+  margin-bottom: 16px;
 }
 
 .hero-desc {
