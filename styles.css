@@ -346,7 +346,7 @@ body {
 /* ===== CTA ===== */
 .cta { text-align: center; }
 .cta-card {
-  max-width: 560px;
+  max-width: 640px;
   margin: 0 auto;
   padding: 52px 40px;
   border-radius: 24px;
@@ -359,7 +359,32 @@ body {
   filter: drop-shadow(0 0 16px rgba(255,233,168,.6));
 }
 .cta-card h2 { font-size: 28px; margin-bottom: 12px; }
-.cta-card p { color: var(--ink-dim); margin-bottom: 28px; font-size: 16px; }
+.cta-card p { color: var(--ink-dim); margin-bottom: 24px; font-size: 16px; }
+
+/* 下载按钮网格 */
+.download-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  width: 100%;
+}
+.download-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 18px 10px; border-radius: 16px;
+  background: var(--card); border: 1px solid var(--card-brd);
+  color: var(--ink); text-decoration: none;
+  transition: transform .25s, border-color .3s, background .3s, box-shadow .3s;
+}
+.download-btn:hover {
+  transform: translateY(-4px);
+  border-color: rgba(201,166,255,.5);
+  background: rgba(255,255,255,.08);
+  box-shadow: 0 12px 30px rgba(120,90,220,.2);
+}
+.dl-icon { font-size: 32px; }
+.dl-text { text-align: center; }
+.dl-text strong { display: block; font-size: 15px; }
+.dl-text small { color: var(--ink-dim); font-size: 12px; }
 
 .hero-actions { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
 
@@ -439,6 +464,7 @@ body {
   .show-index { font-size: 48px; top: -30px; }
   .cta-card { padding: 36px 20px; }
   .cta-card h2 { font-size: 22px; }
+  .download-grid { grid-template-columns: repeat(2, 1fr); }
   .btn { padding: 11px 22px; font-size: 15px; }
   .footer { padding: 28px 16px 24px; }
 }
