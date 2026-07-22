@@ -1,3 +1,24 @@
+// ===== 随机古文劝进 =====
+(function initQuote() {
+  const quotes = [
+    '路漫漫其修远兮，吾将上下而求索',
+    '博学之，审问之，慎思之，明辨之，笃行之',
+    '书山有路勤为径，学海无涯苦作舟',
+    '黑发不知勤学早，白首方悔读书迟',
+    '纸上得来终觉浅，绝知此事要躬行',
+    '三更灯火五更鸡，正是男儿读书时',
+    '古人学问无遗力，少壮工夫老始成',
+    '问渠那得清如许，为有源头活水来',
+    '旧书不厌百回读，熟读深思子自知',
+    '发奋识遍天下字，立志读尽人间书',
+    '读书破万卷，下笔如有神',
+    '学而不思则罔，思而不学则殆',
+  ];
+  const el = document.getElementById('hero-quote');
+  if (!el) return;
+  el.textContent = '「' + quotes[Math.floor(Math.random() * quotes.length)] + '」';
+})();
+
 // ===== 星空 Canvas：明月高悬 · 星光闪耀 =====
 (function initStarfield() {
   const canvas = document.getElementById('starfield');
