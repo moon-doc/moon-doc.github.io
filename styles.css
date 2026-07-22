@@ -73,7 +73,7 @@ body {
   padding: 22px 24px;
 }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); }
-.brand-logo { width: 38px; height: 38px; border-radius: 50%; filter: drop-shadow(0 0 18px rgba(255,233,168,.9)) drop-shadow(0 0 40px rgba(255,233,168,.5)); }
+.brand-logo { width: 38px; height: 38px; border-radius: 50%; filter: drop-shadow(0 0 10px rgba(255,233,168,.4)); }
 .brand-name { font-size: 20px; font-weight: 700; letter-spacing: .5px; }
 .nav-links { display: flex; align-items: center; gap: 26px; }
 .nav-links a { color: var(--ink-dim); text-decoration: none; font-size: 15px; transition: color .25s; }
