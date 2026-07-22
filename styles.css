@@ -60,7 +60,28 @@ body {
 }
 
 /* ===== 通用容器 ===== */
-.hero, .section { position: relative; z-index: 2; }
+.nav, .hero, .section { position: relative; z-index: 2; }
+
+/* ===== 导航 ===== */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 22px 24px;
+}
+.brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); }
+.brand-logo { width: 38px; height: 38px; border-radius: 50%; filter: drop-shadow(0 0 12px rgba(255,233,168,.6)); }
+.brand-name { font-size: 20px; font-weight: 700; letter-spacing: .5px; }
+.nav-links { display: flex; align-items: center; gap: 26px; }
+.nav-links a { color: var(--ink-dim); text-decoration: none; font-size: 15px; transition: color .25s; }
+.nav-links a:hover { color: var(--ink); }
+.nav-cta {
+  padding: 8px 18px; border-radius: 999px;
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  color: #0a0e24 !important; font-weight: 700;
+}
 
 /* ===== Hero：大字 + 图 一屏 ===== */
 .hero {
@@ -108,14 +129,14 @@ body {
     0 30px 80px rgba(0,0,0,.5),
     0 0 0 1px rgba(201,166,255,.15),
     inset 0 0 0 1px rgba(255,255,255,.06);
-  transform: rotateX(3deg);
+  transform: none;
   transform-style: preserve-3d;
   transition: transform .6s cubic-bezier(.2,.7,.2,1), box-shadow .6s;
   width: 100%;
   max-width: 960px;
 }
 .hero-shot-frame:hover {
-  transform: rotateX(0deg) scale(1.02);
+  transform: scale(1.02);
   box-shadow:
     0 50px 120px rgba(120,90,220,.35),
     0 0 0 1px rgba(201,166,255,.4),
@@ -234,13 +255,11 @@ body {
   border: 1px solid var(--card-brd);
   background: var(--card);
   box-shadow: 0 20px 60px rgba(0,0,0,.4), 0 0 0 1px rgba(201,166,255,.1);
-  transform: rotateX(6deg) rotateY(-8deg);
   transform-style: preserve-3d;
   transition: transform .6s cubic-bezier(.2,.7,.2,1), box-shadow .6s, border-color .6s;
 }
-.show-row.reverse .show-frame { transform: rotateX(6deg) rotateY(8deg); }
 .show-media:hover .show-frame {
-  transform: rotateX(0deg) rotateY(0deg) scale(1.05);
+  transform: scale(1.05);
   border-color: rgba(201,166,255,.6);
   box-shadow: 0 40px 100px rgba(120,90,220,.45), inset 0 0 0 1px rgba(201,166,255,.35);
 }
@@ -356,6 +375,8 @@ body {
 }
 @media (max-width: 720px) {
   .moon-glow { top: 6vh; right: 4vw; opacity: .85; }
+  .nav-links { gap: 14px; }
+  .nav-links a:not(.nav-cta) { display: none; }
   .hero { padding: 12vh 24px 6vh; min-height: auto; gap: 32px; }
   .hero-shot-frame { transform: none; }
   .section { padding: 48px 24px; }
