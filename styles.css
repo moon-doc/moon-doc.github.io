@@ -124,7 +124,7 @@ body {
   transform: rotateY(-6deg) rotateX(3deg);
   transform-style: preserve-3d;
   transition: transform .6s cubic-bezier(.2,.7,.2,1), box-shadow .6s;
-  max-width: 560px;
+  max-width: 680px;
   width: 100%;
 }
 .hero-frame:hover {
