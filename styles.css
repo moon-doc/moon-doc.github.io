@@ -83,10 +83,17 @@ body {
   color: #0a0e24 !important; font-weight: 700;
 }
 .nav-email {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 16px; border-radius: 999px;
+  background: var(--card); border: 1px solid var(--card-brd);
   color: var(--ink-dim) !important; font-size: 13px !important;
-  letter-spacing: .5px;
+  letter-spacing: .5px; transition: border-color .3s, color .3s, background .3s;
 }
-.nav-email:hover { color: var(--ink) !important; }
+.nav-email:hover {
+  border-color: rgba(201,166,255,.5);
+  color: var(--ink) !important;
+  background: rgba(255,255,255,.06);
+}
 
 /* ===== Hero：大字 + 图 一屏 ===== */
 .hero {
