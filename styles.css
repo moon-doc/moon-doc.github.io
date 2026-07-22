@@ -43,7 +43,7 @@ body {
   pointer-events: none;
   filter: drop-shadow(0 0 60px rgba(255, 233, 168, 0.55))
           drop-shadow(0 0 140px rgba(180, 160, 255, 0.35));
-  animation: moonFloat 12s ease-in-out infinite;
+  animation: moonFloat 14s ease-in-out infinite, moonHalo 8s ease-in-out infinite;
 }
 .moon-img {
   width: clamp(120px, 18vw, 260px);
@@ -52,47 +52,22 @@ body {
   animation: moonHalo 6s ease-in-out infinite;
 }
 @keyframes moonFloat {
-  0%, 100% { transform: translateY(0) }
-  50% { transform: translateY(-18px) }
+  0%, 100% { transform: translateY(0) rotate(0deg) }
+  33% { transform: translateY(-16px) rotate(0.5deg) }
+  66% { transform: translateY(-8px) rotate(-0.3deg) }
 }
 @keyframes moonHalo {
-  0%, 100% { filter: brightness(1) }
-  50% { filter: brightness(1.12) }
+  0%, 100% { filter: brightness(1) drop-shadow(0 0 20px rgba(255,233,168,.3)) }
+  50% { filter: brightness(1.15) drop-shadow(0 0 35px rgba(255,233,168,.5)) }
 }
 
-/* 流星 */
+/* 流星 — 由 Canvas 绘制，此处保留容器 */
 .shooting-stars {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
-}
-.shooting-stars::before,
-.shooting-stars::after {
-  content: "";
-  position: absolute;
-  width: 130px;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.9), transparent);
-  border-radius: 2px;
-  filter: drop-shadow(0 0 6px #fff);
-  transform: rotate(-24deg);
-  opacity: 0;
-}
-.shooting-stars::before {
-  top: 18%; left: -10%;
-  animation: shoot 7s linear infinite;
-}
-.shooting-stars::after {
-  top: 42%; left: -10%;
-  animation: shoot 9s linear infinite 3.5s;
-}
-@keyframes shoot {
-  0% { transform: translate(0,0) rotate(-24deg); opacity: 0; }
-  6% { opacity: 1; }
-  22% { opacity: 1; }
-  35%, 100% { transform: translate(120vw, 52vh) rotate(-24deg); opacity: 0; }
 }
 
 /* ===== 通用容器 ===== */
@@ -200,16 +175,33 @@ body {
   background: var(--card);
   border: 1px solid var(--card-brd);
   backdrop-filter: blur(10px);
-  transition: transform .3s, border-color .3s, background .3s;
+  transition: transform .3s, border-color .3s, background .3s, box-shadow .3s;
+  position: relative;
+  overflow: hidden;
 }
+.feature-card::before {
+  content: "";
+  position: absolute;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,166,255,.18), transparent 70%);
+  left: var(--ripple-x, 50%);
+  top: var(--ripple-y, 50%);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity .4s;
+  pointer-events: none;
+}
+.feature-card:hover::before { opacity: 1; }
 .feature-card:hover {
   transform: translateY(-6px);
   border-color: rgba(201,166,255,.5);
   background: rgba(255,255,255,.08);
+  box-shadow: 0 20px 50px rgba(120,90,220,.2);
 }
 .feature-icon { font-size: 34px; margin-bottom: 14px; }
-.feature-card h3 { font-size: 20px; margin-bottom: 10px; }
-.feature-card p { color: var(--ink-dim); font-size: 15px; }
+.feature-card h3 { font-size: 20px; margin-bottom: 10px; position: relative; z-index: 1; }
+.feature-card p { color: var(--ink-dim); font-size: 15px; position: relative; z-index: 1; }
 
 /* ===== 截图华丽展示 showcase ===== */
 .showcase { display: flex; flex-direction: column; gap: clamp(60px, 10vh, 120px); }
@@ -345,8 +337,24 @@ body {
 .footer-sub { font-size: 13px; margin-top: 6px; opacity: .75; }
 
 /* ===== 滚动进场动画 ===== */
-.reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s ease, transform .8s ease; }
-.reveal.in { opacity: 1; transform: translateY(0); }
+.reveal {
+  opacity: 0;
+  transform: translateY(36px) scale(0.97);
+  transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1);
+}
+.reveal.in { opacity: 1; transform: translateY(0) scale(1); }
+
+/* 功能卡片依次入场微延迟 */
+.feature-card.reveal.in { transition-delay: calc(var(--card-i, 0) * 80ms); }
+
+/* 截图行入场：左滑/右滑 */
+.show-row.reveal { transform: translateX(-40px) translateY(20px); opacity: 0; }
+.show-row.reverse.reveal { transform: translateX(40px) translateY(20px); opacity: 0; }
+.show-row.reveal.in, .show-row.reverse.reveal.in { transform: translateX(0) translateY(0); opacity: 1; }
+
+/* 标题进场：缩放+淡入 */
+.section-title.reveal { transform: translateY(24px) scale(0.95); }
+.section-title.reveal.in { transform: translateY(0) scale(1); }
 
 /* ===== 响应式 ===== */
 @media (max-width: 900px) {
