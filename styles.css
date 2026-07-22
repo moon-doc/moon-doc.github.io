@@ -35,8 +35,9 @@ body {
   position: fixed;
   top: 3vh; right: 6vw;
   z-index: 0; pointer-events: none;
-  filter: drop-shadow(0 0 60px rgba(255, 233, 168, 0.55))
-          drop-shadow(0 0 140px rgba(180, 160, 255, 0.35));
+  filter: drop-shadow(0 0 80px rgba(255, 233, 168, 0.8))
+          drop-shadow(0 0 160px rgba(180, 160, 255, 0.5))
+          drop-shadow(0 0 240px rgba(255, 233, 168, 0.4));
   animation: moonFloat 14s ease-in-out infinite, moonHalo 8s ease-in-out infinite;
 }
 .moon-img {
@@ -50,8 +51,8 @@ body {
   66% { transform: translateY(-8px) rotate(-0.3deg) }
 }
 @keyframes moonHalo {
-  0%, 100% { filter: brightness(1) drop-shadow(0 0 20px rgba(255,233,168,.3)) }
-  50% { filter: brightness(1.15) drop-shadow(0 0 35px rgba(255,233,168,.5)) }
+  0%, 100% { filter: brightness(1) drop-shadow(0 0 30px rgba(255,233,168,.5)) }
+  50% { filter: brightness(1.2) drop-shadow(0 0 60px rgba(255,233,168,.7)) }
 }
 
 .shooting-stars {
