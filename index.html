@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>小月亮阅读器 · JDK — Just Deep Knowledge</title>
+  <meta name="description" content="小月亮阅读器 · jdk.plus — Just Deep Knowledge。ArXiv 顶会论文一键阅读、双语对照、AI 论文解读智能问答、极致 EPUB 阅读体验。" />
+  <link rel="icon" href="assets/moon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- 星空明月动画背景 -->
+  <canvas id="starfield"></canvas>
+  <div class="moon-glow" aria-hidden="true">
+    <img src="assets/moon.png" alt="明月" class="moon-img" />
+  </div>
+  <div class="shooting-stars" aria-hidden="true"></div>
+
+  <!-- 顶部导航 -->
+  <header class="nav">
+    <a class="brand" href="#top">
+      <img src="assets/moon.png" alt="logo" class="brand-logo" />
+      <span class="brand-name">小月亮阅读器</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#features">功能</a>
+      <a href="#gallery">截图</a>
+      <a href="#themes">主题</a>
+      <a href="#start">开始使用</a>
+      <a class="nav-cta" href="https://jdk.plus" target="_blank" rel="noopener">jdk.plus</a>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section id="top" class="hero">
+    <div class="hero-inner">
+      <p class="hero-eyebrow reveal">jdk.plus · Just Deep Knowledge</p>
+      <h1 class="hero-title reveal">
+        在<span class="grad">星夜</span>之下，<br />遇见更深的<span class="grad">知识</span>
+   </h1>
+      <p class="hero-sub reveal">
+        小月亮阅读器 —— 一款为深度阅读者打造的智能论文与电子书阅读器。<br />
+        ArXiv 顶会一键推荐、双语对照、AI 论文解读智能问答，极致 EPUB 体验。
+      </p>
+      <div class="hero-actions reveal">
+        <a class="btn btn-primary" href="#start">立即开始 →</a>
+        <a class="btn btn-ghost" href="#features">了解功能</a>
+      </div>
+      <div class="hero-tags reveal">
+        <span>📚 ArXiv 论文推荐</span>
+        <span>🌐 双语对照</span>
+        <span>🤖 AI 智能问答</span>
+        <span>📖 EPUB 极致体验</span>
+        <span>🎨 八种主题</span>
+      </div>
+    </div>
+    <div class="scroll-hint" aria-hidden="true"><span></span></div>
+  </section>
+
+  <!-- 功能 -->
+  <section id="features" class="section">
+    <h2 class="section-title reveal">为深度阅读而生</h2>
+    <p class="section-lead reveal">从发现到理解，小月亮陪你走完知识的每一步。</p>
+    <div class="feature-grid">
+      <article class="feature-card reveal">
+        <div class="feature-icon">📡</div>
+        <h3>ArXiv 顶会推荐</h3>
+        <p>首页智能聚合 ArXiv 顶会论文，一键点击即刻沉浸阅读，追踪前沿从未如此轻松。</p>
+      </article>
+      <article class="feature-card reveal">
+        <div class="feature-icon">🌐</div>
+        <h3>双语对照阅读</h3>
+        <p>原文与译文段落级对照呈现，跨越语言的门槛，让每一篇外文论文都清晰可读。</p>
+      </article>
+      <article class="feature-card reveal">
+        <div class="feature-icon">🤖</div>
+        <h3>AI 论文解读问答</h3>
+        <p>选中段落即问即答，AI 帮你拆解公式、梳理脉络、总结贡献，读懂难点不再孤单。</p>
+      </article>
+      <article class="feature-card reveal">
+        <div class="feature-icon">📖</div>
+        <h3>极致 EPUB 体验</h3>
+        <p>翻页动效、标注批注、字体排版细节打磨，还原纸书般的沉浸阅读感受。</p>
+      </article>
+      <article class="feature-card reveal">
+        <div class="feature-icon">🎨</div>
+        <h3>八种精美主题</h3>
+        <p>从月夜深空到晨曦暖阳，八种自带主题随心切换，护眼与美感兼得。</p>
+      </article>
+      <article class="feature-card reveal">
+        <div class="feature-icon">✍️</div>
+        <h3>标注与批注</h3>
+        <p>高亮、笔记、划线随手记录，你的思考与灵感被稳稳沉淀。</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- 截图画廊 -->
+  <section id="gallery" class="section">
+    <h2 class="section-title reveal">一览小月亮</h2>
+    <p class="section-lead reveal">真实界面，所见即所得。</p>
+    <div class="gallery">
+      <figure class="shot reveal">
+        <img src="assets/shot-arxiv.png" alt="ArXiv 顶会论文推荐一键阅读" loading="lazy" />
+        <figcaption>ArXiv 顶会论文推荐 · 一键阅读</figcaption>
+      </figure>
+      <figure class="shot reveal">
+        <img src="assets/shot-bilingual.png" alt="双语对照阅读" loading="lazy" />
+        <figcaption>双语对照阅读</figcaption>
+      </figure>
+      <figure class="shot reveal">
+        <img src="assets/shot-qa.png" alt="论文解读智能问答" loading="lazy" />
+        <figcaption>论文解读 · 智能问答</figcaption>
+      </figure>
+      <figure class="shot reveal">
+        <img src="assets/shot-epub.png" alt="极致的 EPUB 阅读体验" loading="lazy" />
+        <figcaption>极致的 EPUB 阅读体验</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 主题 -->
+  <section id="themes" class="section">
+    <h2 class="section-title reveal">八种主题，随心而变</h2>
+    <p class="section-lead reveal">让阅读的每一刻都恰到好处。</p>
+    <figure class="theme-showcase reveal">
+      <img src="assets/shot-themes.png" alt="八种默认自带主题" loading="lazy" />
+    </figure>
+  </section>
+
+  <!-- CTA -->
+  <section id="start" class="section cta">
+    <div class="cta-card reveal">
+      <img src="assets/moon.png" alt="moon" class="cta-moon" />
+      <h2>今夜，从一篇论文开始</h2>
+      <p>访问 <strong>jdk.plus</strong>，让小月亮点亮你的知识星空。</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="https://jdk.plus" target="_blank" rel="noopener">前往 jdk.plus →</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <img src="assets/moon.png" alt="moon" class="footer-moon" />
+    <p><strong>小月亮阅读器</strong> · JDK = <em>Just Deep Knowledge</em></p>
+    <p class="footer-sub">© 2026 jdk.plus · 在星夜之下，遇见更深的知识</p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
