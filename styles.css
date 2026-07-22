@@ -98,13 +98,52 @@ body {
 .hero {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 12vh 24px 14vh;
+  padding: 8vh 24px 6vh;
   min-height: 84vh;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  gap: 48px;
 }
-.hero-inner { max-width: 720px; }
+.hero-inner { max-width: 520px; flex-shrink: 0; }
+
+/* Hero 右侧截图展示 */
+.hero-visual {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  perspective: 1200px;
+}
+.hero-frame {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--card-brd);
+  background: var(--card);
+  box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(201,166,255,.15), inset 0 0 0 1px rgba(255,255,255,.06);
+  transform: rotateY(-6deg) rotateX(3deg);
+  transform-style: preserve-3d;
+  transition: transform .6s cubic-bezier(.2,.7,.2,1), box-shadow .6s;
+  max-width: 560px;
+  width: 100%;
+}
+.hero-frame:hover {
+  transform: rotateY(0deg) rotateX(0deg) scale(1.03);
+  box-shadow: 0 40px 100px rgba(120,90,220,.4), 0 0 0 1px rgba(201,166,255,.4), inset 0 0 0 1px rgba(255,255,255,.08);
+}
+.hero-frame img {
+  width: 100%; display: block;
+  transition: transform .6s cubic-bezier(.2,.7,.2,1);
+}
+.hero-frame:hover img { transform: scale(1.05); }
+
+/* 截图光泽扫过动画 */
+.hero-shine {
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,.08) 45%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.08) 55%, transparent 60%);
+  pointer-events: none;
+}
+.hero-frame:hover .hero-shine { animation: shine 1.2s ease; }
 .hero-eyebrow {
   color: var(--gold);
   letter-spacing: 3px;
@@ -372,7 +411,12 @@ body {
   .nav-links { gap: 14px; }
   .nav-links a:not(.nav-cta) { display: none; }
   .moon-glow { top: 6vh; right: 4vw; opacity: .85; }
-  .hero { padding-top: 8vh; min-height: 76vh; }
+  .hero { flex-direction: column; padding-top: 8vh; min-height: 76vh; }
+  .hero-inner { max-width: 100%; text-align: center; }
+  .hero-actions { justify-content: center; }
+  .hero-tags { justify-content: center; }
+  .hero-frame { transform: none; max-width: 400px; }
+  .hero-visual { width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
   .moon-glow, .moon-img, .shooting-stars::before, .shooting-stars::after, .scroll-hint span { animation: none; }
