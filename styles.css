@@ -124,10 +124,17 @@ body {
 }
 
 .grad {
-  background: linear-gradient(120deg, var(--gold), var(--accent-2), var(--accent));
+  background: linear-gradient(120deg, var(--gold), var(--accent-2), var(--accent), var(--gold), var(--accent-2));
+  background-size: 300% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  animation: gradFlow 6s ease-in-out infinite;
+}
+@keyframes gradFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .hero-sub {
