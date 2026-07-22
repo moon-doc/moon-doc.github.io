@@ -90,3 +90,24 @@
   );
   els.forEach((el) => io.observe(el));
 })();
+
+// ===== 展示图 3D 视差跟随 =====
+(function initTilt() {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion || window.matchMedia('(pointer: coarse)').matches) return;
+  const items = document.querySelectorAll('[data-tilt]');
+  items.forEach((media) => {
+    const frame = media.querySelector('.show-frame');
+    if (!frame) return;
+    media.addEventListener('mousemove', (e) => {
+      const r = media.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - 0.5;
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      frame.style.transform =
+        `rotateX(${(-py * 10).toFixed(2)}deg) rotateY(${(px * 12).toFixed(2)}deg) scale(1.02)`;
+    });
+    media.addEventListener('mouseleave', () => {
+      frame.style.transform = '';
+    });
+  });
+})();
