@@ -319,7 +319,8 @@ body {
   width: 100%; display: block;
   transition: transform .6s cubic-bezier(.2,.7,.2,1);
 }
-.show-media:hover .show-frame img { transform: scale(1.08); }
+.show-frame { cursor: pointer; }
+.show-media:hover .show-frame img { transform: scale(1.12); }
 
 .show-shine {
   position: absolute; inset: 0;
@@ -430,6 +431,39 @@ body {
 .footer-moon { width: 36px; margin-bottom: 10px; opacity: .6; }
 .footer p { font-size: 14px; }
 .footer-sub { color: var(--ink-dim); font-size: 12px; margin-top: 6px; }
+
+/* ===== 图片放大弹层 ===== */
+.lightbox {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(5,6,15,.92);
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .35s, visibility .35s;
+}
+.lightbox.active { opacity: 1; visibility: visible; }
+.lightbox img {
+  max-width: 90vw; max-height: 88vh;
+  border-radius: 16px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08);
+  transform: scale(.92);
+  transition: transform .4s cubic-bezier(.2,.7,.2,1);
+}
+.lightbox.active img { transform: scale(1); }
+.lightbox-close {
+  position: absolute; top: 24px; right: 28px;
+  width: 40px; height: 40px;
+  border: 1px solid rgba(255,255,255,.15); border-radius: 50%;
+  background: rgba(255,255,255,.06);
+  color: var(--ink); font-size: 20px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background .3s, border-color .3s;
+}
+.lightbox-close:hover {
+  background: rgba(255,255,255,.12);
+  border-color: rgba(255,255,255,.3);
+}
 
 /* ===== 滚动进场动画 ===== */
 .reveal {

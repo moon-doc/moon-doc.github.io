@@ -330,6 +330,41 @@
   update();
 })();
 
+// ===== 图片点击放大 =====
+(function initLightbox() {
+  const overlay = document.createElement('div');
+  overlay.className = 'lightbox';
+  overlay.innerHTML = '<img class="lightbox-img" /><button class="lightbox-close" aria-label="关闭">✕</button>';
+  document.body.appendChild(overlay);
+
+  const img = overlay.querySelector('.lightbox-img');
+  const close = overlay.querySelector('.lightbox-close');
+
+  function open(src) {
+    img.src = src;
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeBox() {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('click', (e) => {
+    const target = e.target.closest('img');
+    if (!target) return;
+    // 只对截图类图片放大
+    const src = target.currentSrc || target.src;
+    if (src && (target.closest('.show-media') || target.closest('.hero-shot-frame') || target.closest('.feature-visual') || target.closest('.theme-showcase'))) {
+      open(src);
+    }
+  });
+
+  close.addEventListener('click', closeBox);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeBox(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeBox(); });
+})();
+
 // ===== 鼠标光晕跟随 =====
 (function initCursorGlow() {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
