@@ -254,11 +254,9 @@ body {
   border: 1px solid rgba(255,255,255,.16);
   background: rgba(255,255,255,.04);
   box-shadow: 0 30px 70px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.05);
-  transform: rotateX(6deg) rotateY(-8deg);
   transform-style: preserve-3d;
   transition: transform .6s cubic-bezier(.2,.7,.2,1), box-shadow .6s, border-color .6s;
 }
-.show-row.reverse .show-frame { transform: rotateX(6deg) rotateY(8deg); }
 .show-media:hover .show-frame {
   transform: rotateX(0deg) rotateY(0deg) scale(1.015);
   border-color: rgba(201,166,255,.6);
