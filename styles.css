@@ -82,6 +82,11 @@ body {
   background: linear-gradient(120deg, var(--accent), var(--accent-2));
   color: #0a0e24 !important; font-weight: 700;
 }
+.nav-email {
+  color: var(--ink-dim) !important; font-size: 13px !important;
+  letter-spacing: .5px;
+}
+.nav-email:hover { color: var(--ink) !important; }
 
 /* ===== Hero：大字 + 图 一屏 ===== */
 .hero {
