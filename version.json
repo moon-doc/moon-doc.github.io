@@ -5,9 +5,9 @@
   "downloadUrl": "https://moon.jdk.plus#start",
   "minimumRequired": "1.0.0",
   "downloads": {
-    "macos": "https://github.com/moon-doc/moon-reader/releases/download/v1.0.12/_1.0.12_universal.dmg",
-    "windows": "https://github.com/moon-doc/moon-reader/releases/download/v1.0.12/_1.0.12_x64-setup.exe",
-    "android": "https://github.com/moon-doc/moon-reader/releases/download/v1.0.12/app-universal-release-unsigned.apk",
+    "macos": "https://moon.jdk.plus/downloads/1.0.12/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.12_macos_universal.dmg",
+    "windows": "https://moon.jdk.plus/downloads/1.0.12/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.12_windows_x64-setup.exe",
+    "android": "https://moon.jdk.plus/downloads/1.0.12/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.12_android_universal.apk",
     "linux": "",
     "ios": ""
   }
