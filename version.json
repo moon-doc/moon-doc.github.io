@@ -1,0 +1,14 @@
+{
+  "version": "1.0.12",
+  "releasedAt": "2026-07-22T17:45:49Z",
+  "notes": "Full Changelog: https://github.com/moon-doc/moon-reader/compare/1.0.12...v1.0.12 ",
+  "downloadUrl": "https://moon.jdk.plus#start",
+  "minimumRequired": "1.0.0",
+  "downloads": {
+    "macos": "https://github.com/moon-doc/moon-reader/releases/download/v1.0.12/_1.0.12_universal.dmg",
+    "windows": "https://github.com/moon-doc/moon-reader/releases/download/v1.0.12/_1.0.12_x64-setup.exe",
+    "android": "https://github.com/moon-doc/moon-reader/releases/download/v1.0.12/app-universal-release-unsigned.apk",
+    "linux": "",
+    "ios": ""
+  }
+}
