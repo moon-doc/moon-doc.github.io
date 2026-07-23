@@ -1,13 +1,13 @@
 {
   "version": "1.0.14",
-  "releasedAt": "2026-07-23T08:19:28Z",
-  "notes": "Full Changelog: https://github.com/moon-doc/moon-reader/compare/v1.0.12...v1.0.13 Full Changelog: https://github.com/moon-doc/moon-reader/compare/v1.0.12...v1.0.13 ",
+  "releasedAt": "2026-07-23T09:46:46Z",
+  "notes": "Full Changelog: https://github.com/moon-doc/moon-reader/compare/v1.0.13...v1.0.14 ",
   "downloadUrl": "https://moon.jdk.plus#start",
   "minimumRequired": "1.0.0",
   "downloads": {
-    "macos": "https://moon.jdk.plus/downloads/1.0.13/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.13_macos_universal.dmg",
-    "windows": "https://moon.jdk.plus/downloads/1.0.13/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.13_windows_x64-setup.exe",
-    "android": "https://moon.jdk.plus/downloads/1.0.13/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.13_android_universal.apk",
+    "macos": "https://moon.jdk.plus/downloads/1.0.14/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.14_macos_universal.dmg",
+    "windows": "https://moon.jdk.plus/downloads/1.0.14/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.14_windows_x64-setup.exe",
+    "android": "https://moon.jdk.plus/downloads/1.0.14/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.14_android_universal.apk",
     "linux": "",
     "ios": ""
   }
