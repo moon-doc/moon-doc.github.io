@@ -96,6 +96,16 @@ body {
   background: rgba(255,255,255,.06);
 }
 
+/* 菜单末尾：GitHub 图标 */
+.nav-github {
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--ink-dim) !important;
+  transition: color .25s, transform .2s;
+}
+.nav-github .github-icon { display: block; }
+.nav-github:hover { color: var(--ink) !important; }
+.nav-github:hover .github-icon { transform: scale(1.12); }
+
 /* ===== Hero：大字 + 图 一屏 ===== */
 .hero {
   max-width: var(--maxw);
@@ -491,7 +501,7 @@ body {
   .brand-logo { width: 30px; height: 30px; }
   .brand-name { font-size: 16px; }
   .nav-links { gap: 14px; }
-  .nav-links a:not(.nav-cta) { display: none; }
+  .nav-links a:not(.nav-cta):not(.nav-github) { display: none; }
   .hero { padding: 10vh 16px 4vh; min-height: auto; gap: 24px; }
   .hero-title { font-size: clamp(26px, 8vw, 42px); letter-spacing: 1px; white-space: normal; }
   .hero-quote { font-size: clamp(12px, 3.5vw, 15px); }
