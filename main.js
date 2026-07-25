@@ -55,12 +55,12 @@
   el.textContent = '「' + quotes[Math.floor(Math.random() * quotes.length)] + '」';
 })();
 
-// ===== 星空 Canvas：明月高悬 · 星光闪耀 =====
+// ===== 星空 Canvas：明月高悬 · 璀璨银河 =====
 (function initStarfield() {
   const canvas = document.getElementById('starfield');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  let w, h, stars = [];
+  let w, h, stars = [], brightStars = [], nebulae = [];
   const DPR = Math.min(window.devicePixelRatio || 1, 2);
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -70,27 +70,297 @@
     h = canvas.height = window.innerHeight * DPR;
     canvas.style.width = window.innerWidth + 'px';
     canvas.style.height = window.innerHeight + 'px';
+    milkyWayCanvas = null; // 重建银河
     buildStars();
   }
 
+  // 色温更丰富：蓝白、暖黄、淡紫、微红
+  function randomHue() {
+    const r = Math.random();
+    if (r < 0.30) return 220;       // 蓝白
+    if (r < 0.50) return 260;       // 淡紫
+    if (r < 0.65) return 45;        // 暖黄
+    if (r < 0.78) return 15;        // 微红
+    if (r < 0.88) return 190;       // 青蓝
+    return 340;                      // 浅粉
+  }
+
   function buildStars() {
-    const count = Math.round((window.innerWidth * window.innerHeight) / 4000);
+    const area = window.innerWidth * window.innerHeight;
+    // 三层星空：远景小星(多)、中景(中)、近景亮星(少)
+    const farCount = Math.round(area / 2200);
+    const midCount = Math.round(area / 5000);
+    const brightCount = Math.round(area / 18000);
+
     stars = [];
-    for (let i = 0; i < count; i++) {
+    // 远景：密、小、暗
+    for (let i = 0; i < farCount; i++) {
       stars.push({
         x: Math.random() * w,
         y: Math.random() * h,
-        r: (Math.random() * 1.4 + 0.3) * DPR,
-        base: Math.random() * 0.5 + 0.3,
+        r: (Math.random() * 0.8 + 0.2) * DPR,
+        base: Math.random() * 0.35 + 0.15,
         phase: Math.random() * Math.PI * 2,
-        speed: Math.random() * 0.02 + 0.006,
-        hue: Math.random() < 0.15 ? 45 : (Math.random() < 0.5 ? 220 : 260),
+        speed: Math.random() * 0.012 + 0.004,
+        hue: randomHue(),
+        layer: 0,
+      });
+    }
+    // 中景：适中
+    for (let i = 0; i < midCount; i++) {
+      stars.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: (Math.random() * 1.2 + 0.5) * DPR,
+        base: Math.random() * 0.45 + 0.35,
+        phase: Math.random() * Math.PI * 2,
+        speed: Math.random() * 0.02 + 0.008,
+        hue: randomHue(),
+        layer: 1,
+      });
+    }
+
+    // 近景亮星：大、亮、有十字星芒
+    brightStars = [];
+    for (let i = 0; i < brightCount; i++) {
+      brightStars.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: (Math.random() * 1.8 + 1.2) * DPR,
+        base: Math.random() * 0.3 + 0.65,
+        phase: Math.random() * Math.PI * 2,
+        speed: Math.random() * 0.025 + 0.01,
+        hue: randomHue(),
+        spikeLen: (Math.random() * 12 + 8) * DPR,
+        spikeAngle: Math.random() * Math.PI,
+        spikeSpeed: Math.random() * 0.015 + 0.005,
+      });
+    }
+
+    // 星云/气体云
+    nebulae = [];
+    const nebulaCount = Math.round(area / 80000) + 2;
+    for (let i = 0; i < nebulaCount; i++) {
+      nebulae.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        rx: (Math.random() * 300 + 150) * DPR,
+        ry: (Math.random() * 180 + 80) * DPR,
+        hue: [220, 260, 280, 300, 200, 45][Math.floor(Math.random() * 6)],
+        alpha: Math.random() * 0.04 + 0.015,
+        phase: Math.random() * Math.PI * 2,
+        speed: Math.random() * 0.003 + 0.001,
       });
     }
   }
 
-  function draw() {
+  // ── 银河带：模拟真实银河从右下地平线升起、斜贯左上 ──
+  // 预渲染到离屏 canvas，避免每帧重绘密集星尘
+  let milkyWayCanvas = null;
+  function buildMilkyWayCanvas() {
+    milkyWayCanvas = document.createElement('canvas');
+    milkyWayCanvas.width = w;
+    milkyWayCanvas.height = h;
+    const mctx = milkyWayCanvas.getContext('2d');
+
+    // 银河走向：约 -30° 从右下→左上，中心偏右下（银心）
+    const angle = -32 * Math.PI / 180;
+    // 银心位置：右侧偏下
+    const cx = w * 0.68;
+    const cy = h * 0.62;
+
+    mctx.save();
+    mctx.translate(cx, cy);
+    mctx.rotate(angle);
+
+    // 银河主体长度和基础宽度
+    const bandLen = Math.max(w, h) * 1.6;
+    const baseWidth = h * 0.18;
+
+    // ── 银河绘制策略：沿短轴用径向渐变控制宽度扩散 ──
+    // ── 沿长轴用线性渐变控制银心→两端衰减 ──
+    // 两层叠加才能得到自然的带状效果
+
+    const bandLayers = [
+      // 外层弥散光晕
+      { w: bandLen, h: baseWidth * 2.2, alpha: 0.03, hue: 240, sat: 40 },
+      // 主光带
+      { w: bandLen, h: baseWidth * 1.3, alpha: 0.055, hue: 255, sat: 50 },
+      // 核心亮带
+      { w: bandLen * 0.8, h: baseWidth * 0.55, alpha: 0.08, hue: 248, sat: 55 },
+      // 银心附近暖色核心
+      { w: bandLen * 0.4, h: baseWidth * 0.45, alpha: 0.07, hue: 38, sat: 60 },
+      // 银心最亮核
+      { w: bandLen * 0.18, h: baseWidth * 0.3, alpha: 0.09, hue: 30, sat: 65 },
+    ];
+
+    for (const l of bandLayers) {
+      const halfH = l.h * 0.5;
+      const halfW = l.w * 0.5;
+
+      // 短轴：径向渐变，中心亮向上下两边渐灭
+      const yGrad = mctx.createRadialGradient(0, 0, 0, 0, 0, halfH);
+      yGrad.addColorStop(0, `hsla(${l.hue}, ${l.sat}%, 72%, ${l.alpha})`);
+      yGrad.addColorStop(0.5, `hsla(${l.hue}, ${l.sat}%, 65%, ${l.alpha * 0.55})`);
+      yGrad.addColorStop(0.8, `hsla(${l.hue}, ${l.sat - 10}%, 55%, ${l.alpha * 0.18})`);
+      yGrad.addColorStop(1, 'transparent');
+
+      mctx.save();
+      // 长轴裁剪：用线性渐变做 mask，银心处亮、两端渐灭
+      mctx.beginPath();
+      mctx.rect(-halfW, -halfH, l.w, l.h);
+      mctx.clip();
+
+      mctx.fillStyle = yGrad;
+      // 拉伸径向渐变覆盖长轴区域
+      mctx.save();
+      mctx.scale(halfW / halfH, 1);
+      mctx.beginPath();
+      mctx.arc(0, 0, halfH, 0, Math.PI * 2);
+      mctx.fillStyle = yGrad;
+      mctx.fill();
+      mctx.restore();
+
+      // 长轴衰减：叠加一个横向线性渐变做透明度遮罩
+      const xMask = mctx.createLinearGradient(-halfW, 0, halfW, 0);
+      xMask.addColorStop(0, 'rgba(5,6,15,0.95)');
+      xMask.addColorStop(0.15, 'rgba(5,6,15,0.4)');
+      xMask.addColorStop(0.4, 'rgba(5,6,15,0)');
+      xMask.addColorStop(0.6, 'rgba(5,6,15,0)');
+      xMask.addColorStop(0.85, 'rgba(5,6,15,0.4)');
+      xMask.addColorStop(1, 'rgba(5,6,15,0.95)');
+      mctx.globalCompositeOperation = 'destination-out';
+      mctx.fillStyle = xMask;
+      mctx.fillRect(-halfW, -halfH, l.w, l.h);
+      mctx.globalCompositeOperation = 'source-over';
+
+      mctx.restore();
+    }
+
+    // ── 暗尘带（银河中部的暗纹）──
+    // 一条比银河稍窄的暗带，沿中线偏移
+    const dustGrad = mctx.createLinearGradient(0, -baseWidth * 0.15, 0, baseWidth * 0.15);
+    dustGrad.addColorStop(0, 'transparent');
+    dustGrad.addColorStop(0.35, 'rgba(5, 6, 15, 0.12)');
+    dustGrad.addColorStop(0.5, 'rgba(5, 6, 15, 0.18)');
+    dustGrad.addColorStop(0.65, 'rgba(5, 6, 15, 0.12)');
+    dustGrad.addColorStop(1, 'transparent');
+    mctx.fillStyle = dustGrad;
+    mctx.fillRect(-bandLen * 0.45, -baseWidth * 0.15, bandLen * 0.9, baseWidth * 0.3);
+
+    mctx.restore();
+
+    // ── 银河中的密集星尘 ──
+    // 沿银河走向分布，高斯分布集中在中轴线上
+    mctx.save();
+    mctx.translate(cx, cy);
+    mctx.rotate(angle);
+
+    const dustCount = Math.round(w * h / 6000);
+    // 银河星尘颜色：蓝白为主，少量暖色
+    const dustHues = [220, 230, 240, 250, 260, 45, 30];
+    for (let i = 0; i < dustCount; i++) {
+      // 长轴位置：银心附近更密
+      const longPos = (Math.random() + Math.random() - 1) * bandLen * 0.48;
+      // 横向：高斯分布，中心最密
+      const gauss3 = (Math.random() + Math.random() + Math.random() - 1.5) / 1.5;
+      const latPos = gauss3 * baseWidth * 0.55;
+      // 银心附近星星更亮更密
+      const distFromCenter = Math.abs(longPos) / (bandLen * 0.48);
+      const brightBias = Math.max(0, 1 - distFromCenter * 1.2);
+
+      const sr = (Math.random() * 0.7 + 0.15 + brightBias * 0.3) * DPR;
+      const sa = (Math.random() * 0.35 + 0.1 + brightBias * 0.2);
+      const shue = dustHues[Math.floor(Math.random() * dustHues.length)];
+
+      mctx.beginPath();
+      mctx.arc(longPos, latPos, sr, 0, Math.PI * 2);
+      mctx.fillStyle = `hsla(${shue}, 65%, 86%, ${sa})`;
+      mctx.fill();
+    }
+
+    // 银心附近的亮星团
+    const clusterCount = Math.round(dustCount * 0.04);
+    for (let i = 0; i < clusterCount; i++) {
+      const longPos = (Math.random() - 0.5) * bandLen * 0.15;
+      const latPos = (Math.random() + Math.random() - 1) * baseWidth * 0.2;
+      const sr = (Math.random() * 1.2 + 0.8) * DPR;
+      const sa = Math.random() * 0.4 + 0.4;
+      mctx.beginPath();
+      mctx.arc(longPos, latPos, sr, 0, Math.PI * 2);
+      mctx.fillStyle = `hsla(40, 60%, 90%, ${sa})`;
+      mctx.fill();
+    }
+
+    mctx.restore();
+  }
+
+  function drawMilkyWay() {
+    if (!milkyWayCanvas) buildMilkyWayCanvas();
+    ctx.drawImage(milkyWayCanvas, 0, 0);
+  }
+
+  // 绘制星云
+  function drawNebulae(t) {
+    for (const n of nebulae) {
+      const pulse = Math.sin(t * n.speed + n.phase) * 0.15 + 1;
+      const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.rx * pulse);
+      grad.addColorStop(0, `hsla(${n.hue}, 55%, 60%, ${n.alpha * 1.2})`);
+      grad.addColorStop(0.4, `hsla(${n.hue}, 45%, 50%, ${n.alpha * 0.6})`);
+      grad.addColorStop(1, 'transparent');
+      ctx.save();
+      ctx.scale(1, n.ry / n.rx);
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y * (n.rx / n.ry), n.rx * pulse, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  // 绘制十字星芒
+  function drawSpike(x, y, len, angle, alpha, hue) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    const grad1 = ctx.createLinearGradient(-len, 0, len, 0);
+    grad1.addColorStop(0, 'transparent');
+    grad1.addColorStop(0.4, `hsla(${hue}, 80%, 92%, ${alpha * 0.4})`);
+    grad1.addColorStop(0.5, `hsla(${hue}, 80%, 95%, ${alpha * 0.8})`);
+    grad1.addColorStop(0.6, `hsla(${hue}, 80%, 92%, ${alpha * 0.4})`);
+    grad1.addColorStop(1, 'transparent');
+    ctx.strokeStyle = grad1;
+    ctx.lineWidth = 1.2 * DPR;
+    ctx.beginPath();
+    ctx.moveTo(-len, 0);
+    ctx.lineTo(len, 0);
+    ctx.stroke();
+
+    const grad2 = ctx.createLinearGradient(0, -len * 0.6, 0, len * 0.6);
+    grad2.addColorStop(0, 'transparent');
+    grad2.addColorStop(0.4, `hsla(${hue}, 80%, 92%, ${alpha * 0.3})`);
+    grad2.addColorStop(0.5, `hsla(${hue}, 80%, 95%, ${alpha * 0.6})`);
+    grad2.addColorStop(0.6, `hsla(${hue}, 80%, 92%, ${alpha * 0.3})`);
+    grad2.addColorStop(1, 'transparent');
+    ctx.strokeStyle = grad2;
+    ctx.lineWidth = 0.8 * DPR;
+    ctx.beginPath();
+    ctx.moveTo(0, -len * 0.6);
+    ctx.lineTo(0, len * 0.6);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function draw(t) {
     ctx.clearRect(0, 0, w, h);
+
+    // 银河带
+    drawMilkyWay();
+
+    // 星云
+    drawNebulae(t);
+
+    // 普通星星（远景 + 中景）
     for (const s of stars) {
       s.phase += s.speed;
       const twinkle = s.base + Math.sin(s.phase) * 0.35;
@@ -98,11 +368,44 @@
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
       ctx.fillStyle = `hsla(${s.hue}, 80%, 88%, ${alpha})`;
-      ctx.shadowBlur = 6 * DPR;
-      ctx.shadowColor = `hsla(${s.hue}, 90%, 85%, ${alpha * 0.8})`;
+      if (s.layer === 1) {
+        ctx.shadowBlur = 5 * DPR;
+        ctx.shadowColor = `hsla(${s.hue}, 90%, 85%, ${alpha * 0.6})`;
+      }
       ctx.fill();
+      ctx.shadowBlur = 0;
     }
-    ctx.shadowBlur = 0;
+
+    // 亮星 + 十字星芒
+    for (const s of brightStars) {
+      s.phase += s.speed;
+      s.spikeAngle += s.spikeSpeed;
+      const twinkle = s.base + Math.sin(s.phase) * 0.3;
+      const alpha = Math.max(0, Math.min(1, twinkle));
+
+      // 外层光晕
+      const haloGrad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 5);
+      haloGrad.addColorStop(0, `hsla(${s.hue}, 70%, 92%, ${alpha * 0.5})`);
+      haloGrad.addColorStop(0.3, `hsla(${s.hue}, 60%, 80%, ${alpha * 0.2})`);
+      haloGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = haloGrad;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r * 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 十字星芒
+      drawSpike(s.x, s.y, s.spikeLen * (0.8 + Math.sin(s.phase * 1.5) * 0.2), s.spikeAngle, alpha, s.hue);
+
+      // 星点本体
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${s.hue}, 80%, 94%, ${alpha})`;
+      ctx.shadowBlur = 10 * DPR;
+      ctx.shadowColor = `hsla(${s.hue}, 90%, 88%, ${alpha * 0.9})`;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
     if (!reduceMotion) requestAnimationFrame(draw);
   }
 
@@ -110,15 +413,24 @@
   resize();
   if (reduceMotion) {
     for (const s of stars) s.phase = Math.PI / 2;
+    for (const s of brightStars) s.phase = Math.PI / 2;
     ctx.clearRect(0, 0, w, h);
+    drawMilkyWay();
+    drawNebulae(0);
     for (const s of stars) {
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
       ctx.fillStyle = `hsla(${s.hue}, 80%, 88%, ${s.base})`;
       ctx.fill();
     }
+    for (const s of brightStars) {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${s.hue}, 80%, 94%, ${s.base})`;
+      ctx.fill();
+    }
   } else {
-    draw();
+    requestAnimationFrame(draw);
   }
 })();
 

@@ -18,7 +18,11 @@ html { scroll-behavior: smooth; }
 body {
   font-family: "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, "Segoe UI", sans-serif;
   color: var(--ink);
-  background: radial-gradient(120% 90% at 50% -10%, #17204d 0%, var(--bg-1) 40%, var(--bg-0) 100%);
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 80%, rgba(60, 40, 120, 0.18), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 20%, rgba(40, 80, 140, 0.15), transparent),
+    radial-gradient(ellipse 50% 35% at 50% 40%, rgba(100, 60, 160, 0.1), transparent),
+    radial-gradient(120% 90% at 50% -10%, #17204d 0%, var(--bg-1) 40%, var(--bg-0) 100%);
   min-height: 100vh;
   overflow-x: hidden;
   line-height: 1.7;
@@ -35,9 +39,10 @@ body {
   position: fixed;
   top: 3vh; right: 6vw;
   z-index: 0; pointer-events: none;
-  filter: drop-shadow(0 0 80px rgba(255, 233, 168, 0.8))
-          drop-shadow(0 0 160px rgba(180, 160, 255, 0.5))
-          drop-shadow(0 0 240px rgba(255, 233, 168, 0.4));
+  filter: drop-shadow(0 0 100px rgba(255, 233, 168, 0.9))
+          drop-shadow(0 0 180px rgba(180, 160, 255, 0.6))
+          drop-shadow(0 0 280px rgba(255, 233, 168, 0.45))
+          drop-shadow(0 0 400px rgba(140, 120, 200, 0.2));
   animation: moonFloat 14s ease-in-out infinite, moonHalo 8s ease-in-out infinite;
 }
 .moon-img {
@@ -51,8 +56,8 @@ body {
   66% { transform: translateY(-8px) rotate(-0.3deg) }
 }
 @keyframes moonHalo {
-  0%, 100% { filter: brightness(1) drop-shadow(0 0 30px rgba(255,233,168,.5)) }
-  50% { filter: brightness(1.2) drop-shadow(0 0 60px rgba(255,233,168,.7)) }
+  0%, 100% { filter: brightness(1) drop-shadow(0 0 40px rgba(255,233,168,.55)) drop-shadow(0 0 80px rgba(140,120,200,.25)) }
+  50% { filter: brightness(1.25) drop-shadow(0 0 70px rgba(255,233,168,.75)) drop-shadow(0 0 120px rgba(140,120,200,.35)) }
 }
 
 .shooting-stars {
