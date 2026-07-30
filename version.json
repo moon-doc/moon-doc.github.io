@@ -1,13 +1,13 @@
 {
-  "version": "1.0.45",
-  "releasedAt": "2026-07-29T17:15:51Z",
-  "notes": "Full Changelog: https://github.com/moon-doc/moon-reader/compare/v1.0.44...v1.0.45 ",
+  "version": "1.0.47",
+  "releasedAt": "2026-07-30T17:20:06Z",
+  "notes": "Full Changelog: https://github.com/moon-doc/moon-reader/compare/v1.0.45...v1.0.47 ",
   "downloadUrl": "https://moon.jdk.plus#start",
   "minimumRequired": "1.0.0",
   "downloads": {
-    "macos": "https://moon.jdk.plus/downloads/1.0.45/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.45_macos_universal.dmg",
+    "macos": "https://moon.jdk.plus/downloads/1.0.47/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.47_macos_universal.dmg",
     "windows": "https://moon.jdk.plus#start",
-    "android": "https://moon.jdk.plus/downloads/1.0.45/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.45_android_universal.apk",
+    "android": "https://moon.jdk.plus#start",
     "linux": "https://moon.jdk.plus#start",
     "ios": ""
   },
