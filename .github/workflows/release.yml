@@ -1,0 +1,537 @@
+name: Build Release Apps
+
+on:
+  repository_dispatch:
+    types: [build-release]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to build (e.g. v1.2.0)"
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+  CI: true
+
+jobs:
+  android:
+    name: Android
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout moon-reader (private)
+        uses: actions/checkout@v4
+        with:
+          repository: moon-doc/moon-reader
+          token: ${{ steps.app-token.outputs.token }}
+          ref: ${{ github.event.client_payload.tag || github.event.inputs.tag }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            web/package-lock.json
+
+      - name: Install npm dependencies
+        run: |
+          npm ci
+          npm ci --prefix web
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK components
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager --install "platform-tools" "build-tools;35.0.0" "platforms;android-35" "ndk;27.1.12297006"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - name: Restore Android keystore
+        env:
+          MDOC_ANDROID_KEYSTORE_BASE64: ${{ secrets.MDOC_ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$MDOC_ANDROID_KEYSTORE_BASE64" ]; then
+            echo "$MDOC_ANDROID_KEYSTORE_BASE64" | base64 --decode > android-release.keystore
+          fi
+
+      - name: Initialize Android project
+        run: npx tauri android init --ci --skip-targets-install
+
+      - name: Build Android APK and AAB
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+          NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/27.1.12297006
+          ANDROID_NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/27.1.12297006
+          JAVA_HOME: ${{ env.JAVA_HOME }}
+          MDOC_STORE_PASSWORD: ${{ secrets.MDOC_STORE_PASSWORD }}
+          MDOC_KEY_PASSWORD: ${{ secrets.MDOC_KEY_PASSWORD }}
+        run: |
+          npm run android:build:apk
+          npm run android:build
+
+      - name: Upload Android artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mdoc-android
+          if-no-files-found: error
+          path: |
+            src-tauri/gen/android/app/build/outputs/**/*.apk
+            src-tauri/gen/android/app/build/outputs/**/*.aab
+
+  ios:
+    name: iOS
+    runs-on: macos-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout moon-reader (private)
+        uses: actions/checkout@v4
+        with:
+          repository: moon-doc/moon-reader
+          token: ${{ steps.app-token.outputs.token }}
+          ref: ${{ github.event.client_payload.tag || github.event.inputs.tag }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            web/package-lock.json
+
+      - name: Install npm dependencies
+        run: |
+          npm ci
+          npm ci --prefix web
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - name: Initialize iOS project
+        run: npx tauri ios init --ci --skip-targets-install
+
+      - name: Build unsigned iOS archive
+        run: npm run build:web && npx tauri ios build --ci --no-sign --archive-only
+
+      - name: Package iOS artifacts
+        run: |
+          mkdir -p release
+          find src-tauri/gen/apple/build -name "*.xcarchive" -print0 | while IFS= read -r -d '' archive; do
+            ditto -c -k --sequesterRsrc --keepParent "$archive" "release/$(basename "$archive").zip"
+          done
+          find src-tauri/gen/apple/build -name "*.ipa" -exec cp {} release/ \;
+
+      - name: Upload iOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mdoc-ios
+          if-no-files-found: error
+          path: release/*
+
+  macos:
+    name: macOS
+    runs-on: macos-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout moon-reader (private)
+        uses: actions/checkout@v4
+        with:
+          repository: moon-doc/moon-reader
+          token: ${{ steps.app-token.outputs.token }}
+          ref: ${{ github.event.client_payload.tag || github.event.inputs.tag }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            web/package-lock.json
+
+      - name: Install npm dependencies
+        run: |
+          npm ci
+          npm ci --prefix web
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - name: Build macOS app
+        run: npm run build:web && npx tauri build --ci --target universal-apple-darwin --bundles app,dmg --no-sign
+
+      - name: Package macOS artifacts
+        run: |
+          mkdir -p release
+          find src-tauri/target/universal-apple-darwin/release/bundle -name "*.app" -print0 | while IFS= read -r -d '' app; do
+            ditto -c -k --sequesterRsrc --keepParent "$app" "release/$(basename "$app").zip"
+          done
+          find src-tauri/target/universal-apple-darwin/release/bundle -name "*.dmg" -exec cp {} release/ \;
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mdoc-macos
+          if-no-files-found: error
+          path: release/*
+
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout moon-reader (private)
+        uses: actions/checkout@v4
+        with:
+          repository: moon-doc/moon-reader
+          token: ${{ steps.app-token.outputs.token }}
+          ref: ${{ github.event.client_payload.tag || github.event.inputs.tag }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            web/package-lock.json
+
+      - name: Install npm dependencies
+        shell: bash
+        run: |
+          npm ci
+          npm ci --prefix web
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - name: Build Windows app
+        run: npm run build:web && npx tauri build --ci --bundles nsis
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mdoc-windows
+          if-no-files-found: error
+          path: |
+            src-tauri/target/release/bundle/nsis/**/*.exe
+
+  linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout moon-reader (private)
+        uses: actions/checkout@v4
+        with:
+          repository: moon-doc/moon-reader
+          token: ${{ steps.app-token.outputs.token }}
+          ref: ${{ github.event.client_payload.tag || github.event.inputs.tag }}
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            web/package-lock.json
+
+      - name: Install npm dependencies
+        run: |
+          npm ci
+          npm ci --prefix web
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - name: Build Linux app (deb + rpm + AppImage)
+        run: npm run build:web && npx tauri build --ci --bundles deb,rpm,appimage
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mdoc-linux
+          if-no-files-found: error
+          path: |
+            src-tauri/target/release/bundle/deb/**/*.deb
+            src-tauri/target/release/bundle/rpm/**/*.rpm
+            src-tauri/target/release/bundle/appimage/**/*.AppImage
+
+  release:
+    name: Publish GitHub Release
+    if: github.event_name == 'repository_dispatch' || github.event_name == 'workflow_dispatch'
+    needs:
+      - android
+      - ios
+      - macos
+      - windows
+      - linux
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Publish release assets to moon-reader
+        uses: softprops/action-gh-release@v2
+        with:
+          repository: moon-doc/moon-reader
+          token: ${{ steps.app-token.outputs.token }}
+          tag_name: ${{ github.event.client_payload.tag || github.event.inputs.tag }}
+          files: release-artifacts/**/*
+          generate_release_notes: true
+
+      - name: Publish version.json & installers to Pages site
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APP_TOKEN: ${{ steps.app-token.outputs.token }}
+          PAGES_REPO: moon-doc/moon-doc.github.io
+          PAGES_BASE: https://moon.jdk.plus
+          DEPLOY_KEY: ${{ secrets.MOONDOC_PAGES_DEPLOY_KEY }}
+          PRIVATE_REPO: moon-doc/moon-reader
+        run: |
+          set -e
+          TAG="${{ github.event.client_payload.tag || github.event.inputs.tag }}"
+          VERSION="${TAG#v}"
+
+          # 1) 读取 Release notes（脱敏为纯文本，截断 500 字）与发布时间
+          #    使用 APP_TOKEN 因为 moon-reader 是私有仓库
+          NOTES=$(gh release view "$TAG" -R "$PRIVATE_REPO" --json body -q '.body' \
+            | sed 's/[`#*]//g' | tr -s ' \n' ' ' | cut -c1-500)
+          RELEASED_AT=$(gh release view "$TAG" -R "$PRIVATE_REPO" --json publishedAt -q '.publishedAt // ""')
+          # 2) 直接使用 CI 已下载的 artifacts（跳过从 Release 重复下载）
+          #    moon-reader 为私有仓库，Release 直链对终端用户 404；
+          #    故把安装包镜像到公开的 Pages 仓库 downloads/<version>/ 下。
+          mkdir -p "downloads/${VERSION}"
+          find release-artifacts -type f -exec cp {} "downloads/${VERSION}/" \;
+
+          # 3) 剔除终端用户用不到的资产（.aab 给 Play 商店、*.xcarchive.zip 给 Xcode）
+          rm -f "downloads/${VERSION}"/*.aab "downloads/${VERSION}"/*.xcarchive.zip
+
+          # 4) 按文件名后缀匹配各平台，重命名为友好名并生成 Pages 直链
+          MAC=""; WIN=""; AND=""; LIN_DEB=""; LIN_RPM=""; LIN_APP=""; LIN=""
+          cd "downloads/${VERSION}"
+          for f in *; do
+            [ -z "$f" ] && continue
+            case "$f" in
+              *.dmg)
+                new="小月亮阅读器_${VERSION}_macos_universal.dmg"; mv -f -- "$f" "$new"
+                MAC="${PAGES_BASE}/downloads/${VERSION}/$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$new")" ;;
+              *.exe)
+                new="小月亮阅读器_${VERSION}_windows_x64-setup.exe"; mv -f -- "$f" "$new"
+                WIN="${PAGES_BASE}/downloads/${VERSION}/$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$new")" ;;
+              *.apk)
+                new="小月亮阅读器_${VERSION}_android_universal.apk"; mv -f -- "$f" "$new"
+                AND="${PAGES_BASE}/downloads/${VERSION}/$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$new")" ;;
+              *.deb)
+                new="小月亮阅读器_${VERSION}_linux_amd64.deb"; mv -f -- "$f" "$new"
+                LIN_DEB="${PAGES_BASE}/downloads/${VERSION}/$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$new")" ;;
+              *.rpm)
+                new="小月亮阅读器_${VERSION}_linux_x86_64.rpm"; mv -f -- "$f" "$new"
+                LIN_RPM="${PAGES_BASE}/downloads/${VERSION}/$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$new")" ;;
+              *.AppImage)
+                new="小月亮阅读器_${VERSION}_linux_x86_64.AppImage"; mv -f -- "$f" "$new"
+                LIN_APP="${PAGES_BASE}/downloads/${VERSION}/$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$new")" ;;
+              *) rm -f -- "$f" ;;
+            esac
+          done
+          cd - >/dev/null
+
+          # 5) 组装 version.json（LIN 取 deb 优先，无 deb 取 rpm，无 rpm 取 AppImage）
+          LIN="${LIN_DEB:-${LIN_RPM:-${LIN_APP:-}}}"
+          # 无产物平台回退：空 URL 会导致客户端无法更新、index.html 空 href 按钮无响应
+          FALLBACK_URL="${PAGES_BASE}#start"
+          [ -n "$MAC" ]     || MAC="$FALLBACK_URL"
+          [ -n "$WIN" ]     || WIN="$FALLBACK_URL"
+          [ -n "$AND" ]     || AND="$FALLBACK_URL"
+          [ -n "$LIN_DEB" ] || LIN_DEB="$FALLBACK_URL"
+          [ -n "$LIN_RPM" ] || LIN_RPM="$FALLBACK_URL"
+          [ -n "$LIN_APP" ] || LIN_APP="$FALLBACK_URL"
+          [ -n "$LIN" ]     || LIN="$FALLBACK_URL"
+          jq -n --arg v "$VERSION" --arg n "$NOTES" --arg t "$RELEASED_AT" \
+                --arg mac "$MAC" --arg win "$WIN" --arg and "$AND" --arg lin "$LIN" \
+                --arg lin_deb "$LIN_DEB" --arg lin_rpm "$LIN_RPM" --arg lin_app "$LIN_APP" \
+            '{version:$v, releasedAt:$t, notes:$n,
+              downloadUrl:"https://moon.jdk.plus#start", minimumRequired:"1.0.0",
+              downloads:{macos:$mac, windows:$win, android:$and, linux:$lin, ios:""},
+              linuxDownloads:{deb:$lin_deb, rpm:$lin_rpm, appimage:$lin_app}}' \
+            > version.json
+          echo "Generated version.json:"
+          cat version.json
+
+          # 6) 用 deploy key 通过 SSH 推送到 moon-doc.github.io 仓库
+          #    deploy key（ed25519）对 moon-doc.github.io 有 write 权限，
+          #    私钥存在 moon-doc.github.io 仓库的 MOONDOC_PAGES_DEPLOY_KEY secret。
+          #    策略：只保留最新版本——每次发版先清空 downloads/ 旧版本目录，再放本次。
+          if [ -z "$DEPLOY_KEY" ]; then
+            echo "::warning::MOONDOC_PAGES_DEPLOY_KEY 未配置，跳过推送"
+            exit 0
+          fi
+          # 写私钥到临时文件，配置 SSH
+          mkdir -p ~/.ssh
+          echo "$DEPLOY_KEY" > ~/.ssh/pages_deploy_key
+          chmod 600 ~/.ssh/pages_deploy_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/pages_deploy_key -o IdentitiesOnly=yes"
+
+          git clone --depth 1 "git@github.com:${PAGES_REPO}.git" pages
+          # 清空旧版本下载目录（只保留最新）
+          rm -rf pages/downloads
+          mkdir -p "pages/downloads/${VERSION}"
+          cp -r "downloads/${VERSION}/." "pages/downloads/${VERSION}/"
+          cp version.json pages/version.json
+
+          # 7) 替换 index.html 中的下载按钮 href 和版本标签
+          #    6 个 .download-btn 的 href 依次对应 macOS / Windows / Android / Linux(DEB) / Linux(RPM) / iOS
+          #    同时把 <small> 里的版本号+格式标签更新
+          #    注意：用 re.sub 替换 href 属性，而非 html.replace(旧href值)——
+          #    旧 href 为空串时 str.replace("",url) 会在文件头插入 url，导致明文泄露。
+          if [ -f pages/index.html ]; then
+            python3 - <<PYEOF
+          import re
+          v = "${VERSION}"
+          mac = "${MAC}"
+          win = "${WIN}"
+          android_url = "${AND}"
+          lin_deb_url = "${LIN_DEB}"
+          lin_rpm_url = "${LIN_RPM}"
+          pages_base = "${PAGES_BASE}"
+          with open("pages/index.html", "r", encoding="utf-8") as f:
+              html = f.read()
+          # 清除历史遗留：旧版脚本在文件头堆积的明文 URL
+          html = re.sub(r"^(https?://[^\s<]+)+", "", html)
+          fallback = pages_base + "#start"
+          urls = [mac or fallback, win or fallback, android_url or fallback,
+                  lin_deb_url or fallback, lin_rpm_url or fallback, fallback]
+          btn_pattern = re.compile(r'(<a\s+class="download-btn"\s+href=")([^"]*)(")')
+          counter = [0]
+          def replacer(m):
+              idx = counter[0]
+              new_url = urls[idx] if idx < len(urls) else m.group(2)
+              counter[0] += 1
+              return m.group(1) + new_url + m.group(3)
+          html = btn_pattern.sub(replacer, html)
+          smalls = list(re.finditer(r'<small>([^<]*)</small>', html))
+          labels = [f"v{v} · DMG", f"v{v} · EXE", f"v{v} · APK", f"v{v} · DEB", f"v{v} · RPM", "即将上线"]
+          for i, s in enumerate(smalls[:6]):
+              if i < len(labels):
+                  html = html.replace(s.group(0), f"<small>{labels[i]}</small>", 1)
+          with open("pages/index.html", "w", encoding="utf-8") as f:
+              f.write(html)
+          print(f"✓ Updated index.html download buttons to v{v}")
+          PYEOF
+          fi
+
+          cd pages
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: publish v${VERSION} installers + version.json + update download buttons" || {
+            echo "::notice::No changes to commit"
+            exit 0
+          }
+          git push
