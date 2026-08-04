@@ -383,16 +383,7 @@ jobs:
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           repositories: moon-reader,moon-doc.github.io
 
-      - name: Publish release assets to moon-reader
-        uses: softprops/action-gh-release@v2
-        with:
-          repository: moon-doc/moon-reader
-          token: ${{ steps.app-token.outputs.token }}
-          tag_name: ${{ github.event.client_payload.tag || github.event.inputs.tag }}
-          files: release-artifacts/**/*
-          generate_release_notes: true
-
-      - name: Publish version.json & installers to Pages site
+      - name: Publish release assets & update Pages
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           PAGES_REPO: moon-doc/moon-doc.github.io
@@ -403,16 +394,11 @@ jobs:
           TAG="${{ github.event.client_payload.tag || github.event.inputs.tag }}"
           VERSION="${TAG#v}"
 
-          # 1) 读取 Release notes 与发布时间
-          NOTES=$(gh release view "$TAG" -R "$PRIVATE_REPO" --json body -q '.body' \
-            | sed 's/[`#*]//g' | tr -s ' \n' ' ' | cut -c1-500)
-          RELEASED_AT=$(gh release view "$TAG" -R "$PRIVATE_REPO" --json publishedAt -q '.publishedAt // ""')
-
-          # 2) 重命名安装包（用 ASCII 文件名避免 locale/gh CLI 中文截断）
+          # 1) 重命名安装包（ASCII 文件名，避免 locale/gh CLI 截断）
           mkdir -p staging
           find release-artifacts -type f -print0 | while IFS= read -r -d '' f; do
             case "$f" in
-              *.aab|*.xcarchive.zip) continue ;;
+              *.aab|*.xcarchive.zip|*.app.zip) continue ;;
             esac
             base=$(basename "$f")
             case "$base" in
@@ -426,18 +412,42 @@ jobs:
             esac
           done
 
-          # 3) 在公开仓库创建 tag + draft Release（安装包托管在 Release，绕过 Git 100MB 限制）
+          echo "=== Staged files ==="
+          ls -lh staging/
+
+          # 2) 在公开仓库创建 tag + Release（安装包托管在 Release，绕过 Git 100MB 限制）
           #    先手动创建 tag（gh release create 自动创建 tag 会被组织规则拦截）
           PAGES_SHA=$(gh api "repos/${PAGES_REPO}/commits/main" -q '.sha')
-          gh api "repos/${PAGES_REPO}/git/refs" \
-            -f "ref=refs/tags/${TAG}" -f "sha=${PAGES_SHA}" || true
-          gh release create "$TAG" -R "$PAGES_REPO" --draft \
-            --title "v${VERSION}" --notes "$NOTES" || true
-          gh release upload "$TAG" -R "$PAGES_REPO" --clobber staging/*
-          gh release edit "$TAG" -R "$PAGES_REPO" --draft=false
+          if ! gh api "repos/${PAGES_REPO}/git/refs/tags/${TAG}" > /dev/null 2>&1; then
+            echo "Creating tag ${TAG} on ${PAGES_REPO}..."
+            gh api "repos/${PAGES_REPO}/git/refs" \
+              -f "ref=refs/tags/${TAG}" -f "sha=${PAGES_SHA}"
+          fi
 
-          # 4) 生成下载直链（GitHub Releases 公开直链）
-          FALLBACK_URL="${PAGES_BASE}#start"
+          # 3) 创建 draft Release → 上传 → 发布
+          if gh release view "$TAG" -R "$PAGES_REPO" > /dev/null 2>&1; then
+            echo "Release exists, uploading assets..."
+            gh release upload "$TAG" -R "$PAGES_REPO" --clobber staging/*
+          else
+            echo "Creating draft release..."
+            gh release create "$TAG" -R "$PAGES_REPO" --draft \
+              --title "v${VERSION}" --notes "小月亮阅读器 v${VERSION} - 跨平台专业文档阅读器"
+            gh release upload "$TAG" -R "$PAGES_REPO" --clobber staging/*
+            gh release edit "$TAG" -R "$PAGES_REPO" --draft=false
+          fi
+
+          # 4) 同时上传到 moon-reader 私有仓库（保留完整发布记录）
+          if gh release view "$TAG" -R "$PRIVATE_REPO" > /dev/null 2>&1; then
+            gh release upload "$TAG" -R "$PRIVATE_REPO" --clobber staging/*
+          else
+            gh release create "$TAG" -R "$PRIVATE_REPO" \
+              --title "v${VERSION}" --notes "小月亮阅读器 v${VERSION} - 跨平台专业文档阅读器" \
+              staging/*
+          fi
+
+          # 5) 生成下载直链（指向公开仓库 Release）
+          RELEASED_AT=$(gh release view "$TAG" -R "$PAGES_REPO" --json publishedAt -q '.publishedAt // ""')
+          NOTES="小月亮阅读器 v${VERSION} - 跨平台专业文档阅读器"
           RELEASE_BASE="https://github.com/${PAGES_REPO}/releases/download/${TAG}"
           encode() { python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$1"; }
 
@@ -455,6 +465,7 @@ jobs:
           done
 
           LIN="${LIN_DEB:-${LIN_RPM:-${LIN_APP:-}}}"
+          FALLBACK_URL="${PAGES_BASE}#start"
           [ -n "$MAC" ]     || MAC="$FALLBACK_URL"
           [ -n "$WIN" ]     || WIN="$FALLBACK_URL"
           [ -n "$AND" ]     || AND="$FALLBACK_URL"
@@ -463,12 +474,12 @@ jobs:
           [ -n "$LIN_APP" ] || LIN_APP="$FALLBACK_URL"
           [ -n "$LIN" ]     || LIN="$FALLBACK_URL"
 
-          # 5) 计算最低支持版本（本次版本往前 10 个小版本，不低于 1.0.0）
+          # 6) 计算最低支持版本
           MIN_PATCH=$(( $(echo "$VERSION" | cut -d. -f3) - 10 ))
           [ "$MIN_PATCH" -lt 0 ] && MIN_PATCH=0
           MIN_REQUIRED="$(echo "$VERSION" | cut -d. -f1-2).${MIN_PATCH}"
 
-          # 6) 组装 version.json
+          # 7) 组装 version.json
           jq -n --arg v "$VERSION" --arg n "$NOTES" --arg t "$RELEASED_AT" \
                 --arg mac "$MAC" --arg win "$WIN" --arg and "$AND" --arg lin "$LIN" \
                 --arg lin_deb "$LIN_DEB" --arg lin_rpm "$LIN_RPM" --arg lin_app "$LIN_APP" \
@@ -481,13 +492,12 @@ jobs:
           echo "Generated version.json:"
           cat version.json
 
-          # 导出变量供内嵌 Python 脚本使用
+          # 8) 推送 version.json + 更新 index.html 到 Pages 仓库
           export VERSION MAC WIN AND LIN_DEB LIN_RPM PAGES_BASE
-          # 7) 推送 version.json + 更新 index.html 到 Pages 仓库（只推小文件）
           git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${PAGES_REPO}.git" pages
           cp version.json pages/version.json
 
-          # 8) 替换 index.html 中的下载按钮 href 和版本标签
+          # 9) 替换 index.html 中的下载按钮 href 和版本标签
           if [ -f pages/index.html ]; then
             python3 - <<'PYEOF2'
           import re, os
