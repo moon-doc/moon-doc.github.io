@@ -469,22 +469,9 @@ jobs:
           echo "Generated version.json:"
           cat version.json
 
-          # 6) 用 deploy key 通过 SSH 推送到 moon-doc.github.io 仓库
-          #    deploy key（ed25519）对 moon-doc.github.io 有 write 权限，
-          #    私钥存在 moon-doc.github.io 仓库的 MOONDOC_PAGES_DEPLOY_KEY secret。
+          # 6) 用 GH_TOKEN (app token) 通过 HTTPS 推送到 moon-doc.github.io 仓库
           #    策略：只保留最新版本——每次发版先清空 downloads/ 旧版本目录，再放本次。
-          if [ -z "$DEPLOY_KEY" ]; then
-            echo "::warning::MOONDOC_PAGES_DEPLOY_KEY 未配置，跳过推送"
-            exit 0
-          fi
-          # 写私钥到临时文件，配置 SSH
-          mkdir -p ~/.ssh
-          echo "$DEPLOY_KEY" > ~/.ssh/pages_deploy_key
-          chmod 600 ~/.ssh/pages_deploy_key
-          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
-          export GIT_SSH_COMMAND="ssh -i ~/.ssh/pages_deploy_key -o IdentitiesOnly=yes"
-
-          git clone --depth 1 "git@github.com:${PAGES_REPO}.git" pages
+          git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${PAGES_REPO}.git" pages
           # 清空旧版本下载目录（只保留最新）
           rm -rf pages/downloads
           mkdir -p "pages/downloads/${VERSION}"
