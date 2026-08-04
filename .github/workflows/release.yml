@@ -458,9 +458,14 @@ jobs:
           [ -n "$LIN_APP" ] || LIN_APP="$FALLBACK_URL"
           [ -n "$LIN" ]     || LIN="$FALLBACK_URL"
 
+          # 5) 计算最低支持版本（本次版本往前 10 个小版本，不低于 1.0.0）
+          MIN_PATCH=$(( $(echo "$VERSION" | cut -d. -f3) - 10 ))
+          [ "$MIN_PATCH" -lt 0 ] && MIN_PATCH=0
+          MIN_REQUIRED="$(echo "$VERSION" | cut -d. -f1-2).${MIN_PATCH}"
           # 5) 组装 version.json
-          jq -n --arg v "$VERSION" --arg n "$NOTES" --arg t "$RELEASED_AT"                 --arg mac "$MAC" --arg win "$WIN" --arg and "$AND" --arg lin "$LIN"                 --arg lin_deb "$LIN_DEB" --arg lin_rpm "$LIN_RPM" --arg lin_app "$LIN_APP"             '{version:$v, releasedAt:$t, notes:$n,
-              downloadUrl:"https://moon.jdk.plus#start", minimumRequired:"1.0.0",
+          jq -n --arg v "$VERSION" --arg n "$NOTES" --arg t "$RELEASED_AT"                 --arg mac "$MAC" --arg win "$WIN" --arg and "$AND" --arg lin "$LIN"                 --arg lin_deb "$LIN_DEB" --arg lin_rpm "$LIN_RPM" --arg lin_app "$LIN_APP" \
+                --arg mr "$MIN_REQUIRED"             '{version:$v, releasedAt:$t, notes:$n,
+              downloadUrl:"https://moon.jdk.plus#start", minimumRequired:$mr,
               downloads:{macos:$mac, windows:$win, android:$and, linux:$lin, ios:""},
               linuxDownloads:{deb:$lin_deb, rpm:$lin_rpm, appimage:$lin_app}}'             > version.json
           echo "Generated version.json:"
