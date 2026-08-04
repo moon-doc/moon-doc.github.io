@@ -380,7 +380,7 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          repositories: moon-reader
+          repositories: moon-reader,moon-doc.github.io
 
       - name: Publish release assets to moon-reader
         uses: softprops/action-gh-release@v2
