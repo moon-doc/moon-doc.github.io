@@ -394,7 +394,6 @@ jobs:
       - name: Publish version.json & installers to Pages site
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          APP_TOKEN: ${{ steps.app-token.outputs.token }}
           PAGES_REPO: moon-doc/moon-doc.github.io
           PAGES_BASE: https://moon.jdk.plus
           PRIVATE_REPO: moon-doc/moon-reader
@@ -411,7 +410,7 @@ jobs:
           mkdir -p staging
           find release-artifacts -type f | while read -r f; do
             case "$f" in
-              *.aab|*.xcarchive.zip) continue ;;   # 剔除终端用户用不到的资产
+              *.aab|*.xcarchive.zip) continue ;;
             esac
             base=$(basename "$f")
             case "$base" in
@@ -425,27 +424,26 @@ jobs:
             esac
           done
 
-          # 3) 上传安装包到 moon-doc.github.io 的公开 Release（绕过 Git 100MB 限制）
-          #    moon-reader 是私有仓库，Release 直链对终端用户 404；
-          #    故将安装包镜像到公开仓库的 Release，用户可正常下载。
-          gh release create "$TAG" -R "$PAGES_REPO" --title "v${VERSION}" --notes "$NOTES" || true
-          gh release upload "$TAG" -R "$PAGES_REPO" --clobber staging/*
+          # 3) Clone Pages 仓库，复制安装包到 downloads/<VERSION>/
+          git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${PAGES_REPO}.git" pages
+          mkdir -p "pages/downloads/${VERSION}"
+          cp staging/* "pages/downloads/${VERSION}/"
 
-          # 4) 生成各平台的下载直链（GitHub Releases 公开直链）
+          # 4) 生成下载直链（Pages 站点托管）
           FALLBACK_URL="${PAGES_BASE}#start"
-          RELEASE_BASE="https://github.com/${PAGES_REPO}/releases/download/${TAG}"
+          DL_BASE="${PAGES_BASE}/downloads/${VERSION}"
           encode() { python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$1"; }
 
           MAC=""; WIN=""; AND=""; LIN_DEB=""; LIN_RPM=""; LIN_APP=""; LIN=""
           for f in staging/*; do
             [ -z "$f" ] && continue
             case "$f" in
-              *.dmg)      MAC="${RELEASE_BASE}/$(encode "$(basename "$f")")" ;;
-              *.exe)      WIN="${RELEASE_BASE}/$(encode "$(basename "$f")")" ;;
-              *.apk)      AND="${RELEASE_BASE}/$(encode "$(basename "$f")")" ;;
-              *.deb)      LIN_DEB="${RELEASE_BASE}/$(encode "$(basename "$f")")" ;;
-              *.rpm)      LIN_RPM="${RELEASE_BASE}/$(encode "$(basename "$f")")" ;;
-              *.AppImage) LIN_APP="${RELEASE_BASE}/$(encode "$(basename "$f")")" ;;
+              *.dmg)      MAC="${DL_BASE}/$(encode "$(basename "$f")")" ;;
+              *.exe)      WIN="${DL_BASE}/$(encode "$(basename "$f")")" ;;
+              *.apk)      AND="${DL_BASE}/$(encode "$(basename "$f")")" ;;
+              *.deb)      LIN_DEB="${DL_BASE}/$(encode "$(basename "$f")")" ;;
+              *.rpm)      LIN_RPM="${DL_BASE}/$(encode "$(basename "$f")")" ;;
+              *.AppImage) LIN_APP="${DL_BASE}/$(encode "$(basename "$f")")" ;;
             esac
           done
 
@@ -462,22 +460,23 @@ jobs:
           MIN_PATCH=$(( $(echo "$VERSION" | cut -d. -f3) - 10 ))
           [ "$MIN_PATCH" -lt 0 ] && MIN_PATCH=0
           MIN_REQUIRED="$(echo "$VERSION" | cut -d. -f1-2).${MIN_PATCH}"
-          # 5) 组装 version.json
-          jq -n --arg v "$VERSION" --arg n "$NOTES" --arg t "$RELEASED_AT"                 --arg mac "$MAC" --arg win "$WIN" --arg and "$AND" --arg lin "$LIN"                 --arg lin_deb "$LIN_DEB" --arg lin_rpm "$LIN_RPM" --arg lin_app "$LIN_APP" \
-                --arg mr "$MIN_REQUIRED"             '{version:$v, releasedAt:$t, notes:$n,
+
+          # 6) 组装 version.json
+          jq -n --arg v "$VERSION" --arg n "$NOTES" --arg t "$RELEASED_AT" \
+                --arg mac "$MAC" --arg win "$WIN" --arg and "$AND" --arg lin "$LIN" \
+                --arg lin_deb "$LIN_DEB" --arg lin_rpm "$LIN_RPM" --arg lin_app "$LIN_APP" \
+                --arg mr "$MIN_REQUIRED" \
+            '{version:$v, releasedAt:$t, notes:$n,
               downloadUrl:"https://moon.jdk.plus#start", minimumRequired:$mr,
               downloads:{macos:$mac, windows:$win, android:$and, linux:$lin, ios:""},
-              linuxDownloads:{deb:$lin_deb, rpm:$lin_rpm, appimage:$lin_app}}'             > version.json
+              linuxDownloads:{deb:$lin_deb, rpm:$lin_rpm, appimage:$lin_app}}' \
+            > pages/version.json
           echo "Generated version.json:"
-          cat version.json
-
-          # 6) 推送 version.json + 更新 index.html 到 Pages 仓库（只推小文件）
-          git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${PAGES_REPO}.git" pages
-          cp version.json pages/version.json
+          cat pages/version.json
 
           # 7) 替换 index.html 中的下载按钮 href 和版本标签
           if [ -f pages/index.html ]; then
-            python3 - <<PYEOF
+            python3 - <<PYEOF2
           import re
           v = "${VERSION}"
           mac = "${MAC}"
@@ -504,18 +503,18 @@ jobs:
           labels = [f"v{v} · DMG", f"v{v} · EXE", f"v{v} · APK", f"v{v} · DEB", f"v{v} · RPM", "即将上线"]
           for i, s in enumerate(smalls[:6]):
               if i < len(labels):
-                  html = html.replace(s.group(0), f"<small>{labels[i]}</small>", 1)
+                  html = html.replace(s.group(0), f"<small>{{labels[i]}}</small>", 1)
           with open("pages/index.html", "w", encoding="utf-8") as f:
               f.write(html)
-          print(f"✓ Updated index.html download buttons to v{v}")
-          PYEOF
+          print(f"Updated index.html download buttons to v{v}")
+          PYEOF2
           fi
 
           cd pages
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "chore: publish v${VERSION} version.json + update download buttons" || {
+          git commit -m "chore: publish v${VERSION} installers + version.json" || {
             echo "::notice::No changes to commit"
             exit 0
           }
