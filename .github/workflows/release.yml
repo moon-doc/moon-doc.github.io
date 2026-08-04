@@ -87,7 +87,7 @@ jobs:
       - name: Initialize Android project
         run: npx tauri android init --ci --skip-targets-install
 
-      - name: Build Android APK
+      - name: Build Android (APK + AAB, single Rust compile)
         env:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
@@ -97,7 +97,9 @@ jobs:
           MDOC_STORE_PASSWORD: ${{ secrets.MDOC_STORE_PASSWORD }}
           MDOC_KEY_PASSWORD: ${{ secrets.MDOC_KEY_PASSWORD }}
         run: |
-          npm run android:build:apk
+          npm run build:web
+          source android-env.sh
+          npx tauri android build
 
       - name: Upload Android artifacts
         uses: actions/upload-artifact@v4
