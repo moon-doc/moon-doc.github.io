@@ -29,6 +29,7 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          repositories: moon-reader
 
       - name: Checkout moon-reader (private)
         uses: actions/checkout@v4
@@ -120,6 +121,7 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          repositories: moon-reader
 
       - name: Checkout moon-reader (private)
         uses: actions/checkout@v4
@@ -185,6 +187,7 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          repositories: moon-reader
 
       - name: Checkout moon-reader (private)
         uses: actions/checkout@v4
@@ -247,6 +250,7 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          repositories: moon-reader
 
       - name: Checkout moon-reader (private)
         uses: actions/checkout@v4
@@ -301,6 +305,7 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          repositories: moon-reader
 
       - name: Checkout moon-reader (private)
         uses: actions/checkout@v4
@@ -375,6 +380,7 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          repositories: moon-reader
 
       - name: Publish release assets to moon-reader
         uses: softprops/action-gh-release@v2
