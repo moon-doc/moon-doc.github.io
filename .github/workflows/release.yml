@@ -393,7 +393,7 @@ jobs:
 
       - name: Publish version.json & installers to Pages site
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
           APP_TOKEN: ${{ steps.app-token.outputs.token }}
           PAGES_REPO: moon-doc/moon-doc.github.io
           PAGES_BASE: https://moon.jdk.plus
