@@ -408,20 +408,20 @@ jobs:
             | sed 's/[`#*]//g' | tr -s ' \n' ' ' | cut -c1-500)
           RELEASED_AT=$(gh release view "$TAG" -R "$PRIVATE_REPO" --json publishedAt -q '.publishedAt // ""')
 
-          # 2) 重命名安装包为友好名
+          # 2) 重命名安装包（用 ASCII 文件名避免 locale/gh CLI 中文截断）
           mkdir -p staging
-          find release-artifacts -type f | while read -r f; do
+          find release-artifacts -type f -print0 | while IFS= read -r -d '' f; do
             case "$f" in
               *.aab|*.xcarchive.zip) continue ;;
             esac
             base=$(basename "$f")
             case "$base" in
-              *.dmg)       cp "$f" "staging/小月亮阅读器_${VERSION}_macos_universal.dmg" ;;
-              *.exe)       cp "$f" "staging/小月亮阅读器_${VERSION}_windows_x64-setup.exe" ;;
-              *.apk)       cp "$f" "staging/小月亮阅读器_${VERSION}_android_universal.apk" ;;
-              *.deb)       cp "$f" "staging/小月亮阅读器_${VERSION}_linux_amd64.deb" ;;
-              *.rpm)       cp "$f" "staging/小月亮阅读器_${VERSION}_linux_x86_64.rpm" ;;
-              *.AppImage)  cp "$f" "staging/小月亮阅读器_${VERSION}_linux_x86_64.AppImage" ;;
+              *.dmg)       cp "$f" "staging/MoonReader-${VERSION}-macos-universal.dmg" ;;
+              *.exe)       cp "$f" "staging/MoonReader-${VERSION}-windows-x64-setup.exe" ;;
+              *.apk)       cp "$f" "staging/MoonReader-${VERSION}-android-universal.apk" ;;
+              *.deb)       cp "$f" "staging/MoonReader-${VERSION}-linux-amd64.deb" ;;
+              *.rpm)       cp "$f" "staging/MoonReader-${VERSION}-linux-x86_64.rpm" ;;
+              *.AppImage)  cp "$f" "staging/MoonReader-${VERSION}-linux-x86_64.AppImage" ;;
               *)           cp "$f" "staging/$base" ;;
             esac
           done
