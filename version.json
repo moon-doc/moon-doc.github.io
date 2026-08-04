@@ -1,19 +1,19 @@
 {
-  "version": "1.0.47",
-  "releasedAt": "2026-07-30T17:20:06Z",
-  "notes": "Full Changelog: https://github.com/moon-doc/moon-reader/compare/v1.0.45...v1.0.47 ",
+  "version": "1.0.61",
+  "releasedAt": "2026-08-04T09:46:03Z",
+  "notes": "Full Changelog: https://github.com/moon-doc/moon-reader/compare/v1.0.55...v1.0.61 ",
   "downloadUrl": "https://moon.jdk.plus#start",
-  "minimumRequired": "1.0.0",
+  "minimumRequired": "1.0.51",
   "downloads": {
-    "macos": "https://moon.jdk.plus/downloads/1.0.47/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.47_macos_universal.dmg",
-    "windows": "https://moon.jdk.plus#start",
-    "android": "https://moon.jdk.plus#start",
-    "linux": "https://moon.jdk.plus#start",
+    "macos": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.61/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.61_macos_universal.dmg",
+    "windows": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.61/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.61_windows_x64-setup.exe",
+    "android": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.61/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.61_android_universal.apk",
+    "linux": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.61/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.61_linux_amd64.deb",
     "ios": ""
   },
   "linuxDownloads": {
-    "deb": "https://moon.jdk.plus#start",
-    "rpm": "https://moon.jdk.plus#start",
-    "appimage": "https://moon.jdk.plus#start"
+    "deb": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.61/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.61_linux_amd64.deb",
+    "rpm": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.61/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.61_linux_x86_64.rpm",
+    "appimage": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.61/%E5%B0%8F%E6%9C%88%E4%BA%AE%E9%98%85%E8%AF%BB%E5%99%A8_1.0.61_linux_x86_64.AppImage"
   }
 }
