@@ -397,60 +397,59 @@ jobs:
           APP_TOKEN: ${{ steps.app-token.outputs.token }}
           PAGES_REPO: moon-doc/moon-doc.github.io
           PAGES_BASE: https://moon.jdk.plus
-          DEPLOY_KEY: ${{ secrets.MOONDOC_PAGES_DEPLOY_KEY }}
           PRIVATE_REPO: moon-doc/moon-reader
         run: |
           set -e
           TAG="${{ github.event.client_payload.tag || github.event.inputs.tag }}"
           VERSION="${TAG#v}"
 
-          # 1) 读取 Release notes（脱敏为纯文本，截断 500 字）与发布时间
-          #    使用 APP_TOKEN 因为 moon-reader 是私有仓库
-          NOTES=$(gh release view "$TAG" -R "$PRIVATE_REPO" --json body -q '.body' \
-            | sed 's/[`#*]//g' | tr -s ' \n' ' ' | cut -c1-500)
+          # 1) 读取 Release notes 与发布时间
+          NOTES=$(gh release view "$TAG" -R "$PRIVATE_REPO" --json body -q '.body'             | sed 's/[`#*]//g' | tr -s ' \n' ' ' | cut -c1-500)
           RELEASED_AT=$(gh release view "$TAG" -R "$PRIVATE_REPO" --json publishedAt -q '.publishedAt // ""')
-          # 2) 直接使用 CI 已下载的 artifacts（跳过从 Release 重复下载）
-          #    moon-reader 为私有仓库，Release 直链对终端用户 404；
-          #    故把安装包镜像到公开的 Pages 仓库 downloads/<version>/ 下。
-          mkdir -p "downloads/${VERSION}"
-          find release-artifacts -type f -exec cp {} "downloads/${VERSION}/" \;
 
-          # 3) 剔除终端用户用不到的资产（.aab 给 Play 商店、*.xcarchive.zip 给 Xcode）
-          rm -f "downloads/${VERSION}"/*.aab "downloads/${VERSION}"/*.xcarchive.zip
-
-          # 4) 按文件名后缀匹配各平台，重命名为友好名并生成 Pages 直链
-          MAC=""; WIN=""; AND=""; LIN_DEB=""; LIN_RPM=""; LIN_APP=""; LIN=""
-          cd "downloads/${VERSION}"
-          for f in *; do
-            [ -z "$f" ] && continue
+          # 2) 重命名安装包为友好名
+          mkdir -p staging
+          find release-artifacts -type f | while read -r f; do
             case "$f" in
-              *.dmg)
-                new="小月亮阅读器_${VERSION}_macos_universal.dmg"; mv -f -- "$f" "$new"
-                MAC="${PAGES_BASE}/downloads/${VERSION}/$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$new")" ;;
-              *.exe)
-                new="小月亮阅读器_${VERSION}_windows_x64-setup.exe"; mv -f -- "$f" "$new"
-                WIN="${PAGES_BASE}/downloads/${VERSION}/$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$new")" ;;
-              *.apk)
-                new="小月亮阅读器_${VERSION}_android_universal.apk"; mv -f -- "$f" "$new"
-                AND="${PAGES_BASE}/downloads/${VERSION}/$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$new")" ;;
-              *.deb)
-                new="小月亮阅读器_${VERSION}_linux_amd64.deb"; mv -f -- "$f" "$new"
-                LIN_DEB="${PAGES_BASE}/downloads/${VERSION}/$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$new")" ;;
-              *.rpm)
-                new="小月亮阅读器_${VERSION}_linux_x86_64.rpm"; mv -f -- "$f" "$new"
-                LIN_RPM="${PAGES_BASE}/downloads/${VERSION}/$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$new")" ;;
-              *.AppImage)
-                new="小月亮阅读器_${VERSION}_linux_x86_64.AppImage"; mv -f -- "$f" "$new"
-                LIN_APP="${PAGES_BASE}/downloads/${VERSION}/$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$new")" ;;
-              *) rm -f -- "$f" ;;
+              *.aab|*.xcarchive.zip) continue ;;   # 剔除终端用户用不到的资产
+            esac
+            base=$(basename "$f")
+            case "$base" in
+              *.dmg)       cp "$f" "staging/小月亮阅读器_${VERSION}_macos_universal.dmg" ;;
+              *.exe)       cp "$f" "staging/小月亮阅读器_${VERSION}_windows_x64-setup.exe" ;;
+              *.apk)       cp "$f" "staging/小月亮阅读器_${VERSION}_android_universal.apk" ;;
+              *.deb)       cp "$f" "staging/小月亮阅读器_${VERSION}_linux_amd64.deb" ;;
+              *.rpm)       cp "$f" "staging/小月亮阅读器_${VERSION}_linux_x86_64.rpm" ;;
+              *.AppImage)  cp "$f" "staging/小月亮阅读器_${VERSION}_linux_x86_64.AppImage" ;;
+              *)           cp "$f" "staging/$base" ;;
             esac
           done
-          cd - >/dev/null
 
-          # 5) 组装 version.json（LIN 取 deb 优先，无 deb 取 rpm，无 rpm 取 AppImage）
-          LIN="${LIN_DEB:-${LIN_RPM:-${LIN_APP:-}}}"
-          # 无产物平台回退：空 URL 会导致客户端无法更新、index.html 空 href 按钮无响应
+          # 3) 上传安装包到 moon-doc.github.io 的公开 Release（绕过 Git 100MB 限制）
+          #    moon-reader 是私有仓库，Release 直链对终端用户 404；
+          #    故将安装包镜像到公开仓库的 Release，用户可正常下载。
+          gh release create "$TAG" -R "$PAGES_REPO" --title "v${VERSION}" --notes "$NOTES" || true
+          gh release upload "$TAG" -R "$PAGES_REPO" --clobber staging/*
+
+          # 4) 生成各平台的下载直链（GitHub Releases 公开直链）
           FALLBACK_URL="${PAGES_BASE}#start"
+          RELEASE_BASE="https://github.com/${PAGES_REPO}/releases/download/${TAG}"
+          encode() { python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$1"; }
+
+          MAC=""; WIN=""; AND=""; LIN_DEB=""; LIN_RPM=""; LIN_APP=""; LIN=""
+          for f in staging/*; do
+            [ -z "$f" ] && continue
+            case "$f" in
+              *.dmg)      MAC="${RELEASE_BASE}/$(encode "$(basename "$f")")" ;;
+              *.exe)      WIN="${RELEASE_BASE}/$(encode "$(basename "$f")")" ;;
+              *.apk)      AND="${RELEASE_BASE}/$(encode "$(basename "$f")")" ;;
+              *.deb)      LIN_DEB="${RELEASE_BASE}/$(encode "$(basename "$f")")" ;;
+              *.rpm)      LIN_RPM="${RELEASE_BASE}/$(encode "$(basename "$f")")" ;;
+              *.AppImage) LIN_APP="${RELEASE_BASE}/$(encode "$(basename "$f")")" ;;
+            esac
+          done
+
+          LIN="${LIN_DEB:-${LIN_RPM:-${LIN_APP:-}}}"
           [ -n "$MAC" ]     || MAC="$FALLBACK_URL"
           [ -n "$WIN" ]     || WIN="$FALLBACK_URL"
           [ -n "$AND" ]     || AND="$FALLBACK_URL"
@@ -458,31 +457,20 @@ jobs:
           [ -n "$LIN_RPM" ] || LIN_RPM="$FALLBACK_URL"
           [ -n "$LIN_APP" ] || LIN_APP="$FALLBACK_URL"
           [ -n "$LIN" ]     || LIN="$FALLBACK_URL"
-          jq -n --arg v "$VERSION" --arg n "$NOTES" --arg t "$RELEASED_AT" \
-                --arg mac "$MAC" --arg win "$WIN" --arg and "$AND" --arg lin "$LIN" \
-                --arg lin_deb "$LIN_DEB" --arg lin_rpm "$LIN_RPM" --arg lin_app "$LIN_APP" \
-            '{version:$v, releasedAt:$t, notes:$n,
+
+          # 5) 组装 version.json
+          jq -n --arg v "$VERSION" --arg n "$NOTES" --arg t "$RELEASED_AT"                 --arg mac "$MAC" --arg win "$WIN" --arg and "$AND" --arg lin "$LIN"                 --arg lin_deb "$LIN_DEB" --arg lin_rpm "$LIN_RPM" --arg lin_app "$LIN_APP"             '{version:$v, releasedAt:$t, notes:$n,
               downloadUrl:"https://moon.jdk.plus#start", minimumRequired:"1.0.0",
               downloads:{macos:$mac, windows:$win, android:$and, linux:$lin, ios:""},
-              linuxDownloads:{deb:$lin_deb, rpm:$lin_rpm, appimage:$lin_app}}' \
-            > version.json
+              linuxDownloads:{deb:$lin_deb, rpm:$lin_rpm, appimage:$lin_app}}'             > version.json
           echo "Generated version.json:"
           cat version.json
 
-          # 6) 用 GH_TOKEN (app token) 通过 HTTPS 推送到 moon-doc.github.io 仓库
-          #    策略：只保留最新版本——每次发版先清空 downloads/ 旧版本目录，再放本次。
+          # 6) 推送 version.json + 更新 index.html 到 Pages 仓库（只推小文件）
           git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${PAGES_REPO}.git" pages
-          # 清空旧版本下载目录（只保留最新）
-          rm -rf pages/downloads
-          mkdir -p "pages/downloads/${VERSION}"
-          cp -r "downloads/${VERSION}/." "pages/downloads/${VERSION}/"
           cp version.json pages/version.json
 
           # 7) 替换 index.html 中的下载按钮 href 和版本标签
-          #    6 个 .download-btn 的 href 依次对应 macOS / Windows / Android / Linux(DEB) / Linux(RPM) / iOS
-          #    同时把 <small> 里的版本号+格式标签更新
-          #    注意：用 re.sub 替换 href 属性，而非 html.replace(旧href值)——
-          #    旧 href 为空串时 str.replace("",url) 会在文件头插入 url，导致明文泄露。
           if [ -f pages/index.html ]; then
             python3 - <<PYEOF
           import re
@@ -495,7 +483,6 @@ jobs:
           pages_base = "${PAGES_BASE}"
           with open("pages/index.html", "r", encoding="utf-8") as f:
               html = f.read()
-          # 清除历史遗留：旧版脚本在文件头堆积的明文 URL
           html = re.sub(r"^(https?://[^\s<]+)+", "", html)
           fallback = pages_base + "#start"
           urls = [mac or fallback, win or fallback, android_url or fallback,
@@ -523,7 +510,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "chore: publish v${VERSION} installers + version.json + update download buttons" || {
+          git commit -m "chore: publish v${VERSION} version.json + update download buttons" || {
             echo "::notice::No changes to commit"
             exit 0
           }
