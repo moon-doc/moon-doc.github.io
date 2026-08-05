@@ -138,7 +138,9 @@ jobs:
           ref: ${{ github.event.client_payload.tag || github.event.inputs.tag }}
 
       - name: Override Cargo config for CI (remove USTC mirror)
-        run: echo '# CI: use official crates.io' > src-tauri/.cargo/config.toml
+        run: |
+          rm -f src-tauri/.cargo/config.toml
+          touch src-tauri/.cargo/config.toml
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -207,7 +209,9 @@ jobs:
           ref: ${{ github.event.client_payload.tag || github.event.inputs.tag }}
 
       - name: Override Cargo config for CI (remove USTC mirror)
-        run: echo '# CI: use official crates.io' > src-tauri/.cargo/config.toml
+        run: |
+          rm -f src-tauri/.cargo/config.toml
+          touch src-tauri/.cargo/config.toml
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -274,7 +278,9 @@ jobs:
 
       - name: Override Cargo config for CI (remove USTC mirror)
         shell: bash
-        run: echo '# CI: use official crates.io' > src-tauri/.cargo/config.toml
+        run: |
+          rm -f src-tauri/.cargo/config.toml
+          touch src-tauri/.cargo/config.toml
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -332,7 +338,9 @@ jobs:
           ref: ${{ github.event.client_payload.tag || github.event.inputs.tag }}
 
       - name: Override Cargo config for CI (remove USTC mirror)
-        run: echo '# CI: use official crates.io' > src-tauri/.cargo/config.toml
+        run: |
+          rm -f src-tauri/.cargo/config.toml
+          touch src-tauri/.cargo/config.toml
 
       - name: Install Linux dependencies
         run: |
