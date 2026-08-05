@@ -38,6 +38,12 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           ref: ${{ github.event.client_payload.tag || github.event.inputs.tag }}
 
+      - name: Override Cargo config for CI (remove USTC mirror)
+        run: |
+          NDK_BIN="$ANDROID_HOME/ndk/27.1.12297006/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          printf '[target.aarch64-linux-android]\nlinker = "%s/aarch64-linux-android35-clang"\n' "$NDK_BIN" > src-tauri/.cargo/config.toml
+          cat src-tauri/.cargo/config.toml
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -131,6 +137,9 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           ref: ${{ github.event.client_payload.tag || github.event.inputs.tag }}
 
+      - name: Override Cargo config for CI (remove USTC mirror)
+        run: echo '# CI: use official crates.io' > src-tauri/.cargo/config.toml
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -197,6 +206,9 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           ref: ${{ github.event.client_payload.tag || github.event.inputs.tag }}
 
+      - name: Override Cargo config for CI (remove USTC mirror)
+        run: echo '# CI: use official crates.io' > src-tauri/.cargo/config.toml
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -260,6 +272,10 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           ref: ${{ github.event.client_payload.tag || github.event.inputs.tag }}
 
+      - name: Override Cargo config for CI (remove USTC mirror)
+        shell: bash
+        run: echo '# CI: use official crates.io' > src-tauri/.cargo/config.toml
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -314,6 +330,9 @@ jobs:
           repository: moon-doc/moon-reader
           token: ${{ steps.app-token.outputs.token }}
           ref: ${{ github.event.client_payload.tag || github.event.inputs.tag }}
+
+      - name: Override Cargo config for CI (remove USTC mirror)
+        run: echo '# CI: use official crates.io' > src-tauri/.cargo/config.toml
 
       - name: Install Linux dependencies
         run: |
