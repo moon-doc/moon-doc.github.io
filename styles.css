@@ -491,6 +491,133 @@ body {
 .section-title.reveal { transform: translateY(24px) scale(0.95); }
 .section-title.reveal.in { transform: translateY(0) scale(1); }
 
+/* ===== AI 轨道动画展示区 ===== */
+.section-ai {
+  background: linear-gradient(180deg, transparent 0%, rgba(66,185,131,.03) 30%, rgba(66,185,131,.06) 50%, rgba(66,185,131,.03) 70%, transparent 100%);
+  overflow: hidden;
+}
+.ai-orbit {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  aspect-ratio: 16 / 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#ai-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.ai-orbit-center {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.ai-core-icon {
+  font-size: 48px;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(66,185,131,.18) 0%, rgba(66,185,131,.04) 70%, transparent 100%);
+  border: 1.5px solid rgba(66,185,131,.25);
+  box-shadow: 0 0 40px rgba(66,185,131,.15), 0 0 80px rgba(66,185,131,.06);
+  animation: corePulse 3s ease-in-out infinite;
+}
+.ai-core-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-2);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  opacity: .7;
+}
+@keyframes corePulse {
+  0%, 100% { box-shadow: 0 0 40px rgba(66,185,131,.15), 0 0 80px rgba(66,185,131,.06); transform: scale(1); }
+  50% { box-shadow: 0 0 60px rgba(66,185,131,.25), 0 0 120px rgba(66,185,131,.1); transform: scale(1.04); }
+}
+
+.ai-node {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(66,185,131,.15);
+  box-shadow: 0 4px 24px rgba(0,0,0,.15);
+  cursor: default;
+  transition: border-color .3s, box-shadow .3s, transform .3s;
+  white-space: nowrap;
+}
+.ai-node:hover {
+  border-color: rgba(66,185,131,.45);
+  box-shadow: 0 6px 32px rgba(66,185,131,.2);
+  transform: translateY(-4px) scale(1.03);
+}
+.ai-node-icon {
+  font-size: 30px;
+  flex-shrink: 0;
+}
+.ai-node-body h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  color: var(--ink);
+}
+.ai-node-body p {
+  font-size: 12px;
+  color: var(--ink-dim);
+  line-height: 1.4;
+}
+
+/* 四个节点的轨道定位 */
+.ai-node--kb     { top: 8%;  left: 2%; }
+.ai-node--copilot { top: 8%;  right: 2%; }
+.ai-node--qa     { bottom: 8%; left: 2%; }
+.ai-node--search { bottom: 8%; right: 2%; }
+
+/* 节点入场动画 */
+.ai-node {
+  opacity: 0;
+  transform: translateY(20px) scale(.92);
+}
+.ai-orbit.in .ai-node--kb     { animation: nodeIn .6s .2s ease forwards; }
+.ai-orbit.in .ai-node--copilot { animation: nodeIn .6s .35s ease forwards; }
+.ai-orbit.in .ai-node--qa     { animation: nodeIn .6s .5s ease forwards; }
+.ai-orbit.in .ai-node--search { animation: nodeIn .6s .65s ease forwards; }
+@keyframes nodeIn {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* 高亮态——某节点被激活 */
+.ai-node.active {
+  border-color: rgba(66,185,131,.6);
+  box-shadow: 0 0 24px rgba(66,185,131,.3), 0 6px 32px rgba(0,0,0,.15);
+}
+.ai-node.active .ai-node-icon { animation: iconBounce .5s ease; }
+@keyframes iconBounce {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
 /* ===== 响应式 ===== */
 @media (max-width: 900px) {
   .show-row, .show-row.reverse { grid-template-columns: 1fr; gap: 24px; text-align: center; }
@@ -529,6 +656,13 @@ body {
   .download-grid { grid-template-columns: repeat(2, 1fr); }
   .btn { padding: 11px 22px; font-size: 15px; }
   .footer { padding: 28px 16px 24px; }
+  /* AI 轨道区：竖向排列 */
+  .ai-orbit { aspect-ratio: auto; flex-direction: column; gap: 16px; padding: 20px 0; }
+  .ai-orbit-center { margin-bottom: 8px; }
+  .ai-core-icon { width: 60px; height: 60px; font-size: 32px; }
+  #ai-canvas { display: none; }
+  .ai-node { position: static !important; opacity: 1; transform: none; animation: none; }
+  .ai-node-body p { white-space: normal; }
 }
 @media (max-width: 380px) {
   .hero-title { font-size: 24px; }

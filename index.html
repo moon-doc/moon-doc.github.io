@@ -25,9 +25,9 @@
     </a>
     <nav class="nav-links">
       <a href="#features">功能</a>
+      <a href="#ai">AI</a>
       <a href="#gallery">概览</a>
       <a href="#themes">主题</a>
-      <a href="#start">开始使用</a>
       <a class="nav-email" href="mailto:dev@jdk.plus">dev@jdk.plus</a>
       <a class="nav-github" href="https://github.com/moon-doc?view_as=public" target="_blank" rel="noopener" aria-label="GitHub">
         <svg class="github-icon" viewBox="0 0 16 16" width="18" height="18" aria-hidden="true">
@@ -74,19 +74,29 @@
         <p>选中段落即问即答，AI 帮你拆解公式、梳理脉络、总结贡献，读懂难点不再孤单。</p>
       </article>
       <article class="feature-card reveal" style="--card-i:3">
+        <div class="feature-icon">🧠</div>
+        <h3>知识库语义搜索</h3>
+        <p>读过的每一页都被 AI 理解和索引，用自然语言搜索即可跨书跨文档找到任何内容。</p>
+      </article>
+      <article class="feature-card reveal" style="--card-i:4">
         <div class="feature-icon">📖</div>
         <h3>极致 EPUB 体验</h3>
         <p>翻页动效、标注批注、字体排版细节打磨，还原纸书般的沉浸阅读感受。</p>
       </article>
-      <article class="feature-card reveal" style="--card-i:4">
+      <article class="feature-card reveal" style="--card-i:5">
+        <div class="feature-icon">💬</div>
+        <h3>AI 智能副驾</h3>
+        <p>论文专家、文档向导随时待命，按需切换角色，深度解读、总结摘要、提取要点一步到位。</p>
+      </article>
+      <article class="feature-card reveal" style="--card-i:6">
+        <div class="feature-icon">🔍</div>
+        <h3>书架内容搜索</h3>
+        <p>在书架搜索框输入关键词，语义匹配直达书页内容，点击即跳转到精确位置。</p>
+      </article>
+      <article class="feature-card reveal" style="--card-i:7">
         <div class="feature-icon">🎨</div>
         <h3>八种精美主题</h3>
         <p>从月夜深空到晨曦暖阳，八种自带主题随心切换，护眼与美感兼得。</p>
-      </article>
-      <article class="feature-card reveal" style="--card-i:5">
-        <div class="feature-icon">✍️</div>
-        <h3>标注与批注</h3>
-        <p>高亮、笔记、划线随手记录，你的思考与灵感被稳稳沉淀。</p>
       </article>
     </div>
   </section>
@@ -155,6 +165,47 @@
           <p>细腻翻页动效、随手标注批注、精心打磨的排版细节，还原纸书般的沉浸，让阅读回归纯粹。</p>
         </div>
       </article>
+    </div>
+  </section>
+
+  <!-- AI 能力动画展示 -->
+  <section id="ai" class="section section-ai">
+    <h2 class="section-title reveal">AI 原生阅读，知识即服务</h2>
+    <p class="section-lead reveal">不是外挂，不是补丁。AI 深度融入每一步阅读流程——理解、检索、对话、导航。</p>
+    <div class="ai-orbit reveal">
+      <canvas id="ai-canvas"></canvas>
+      <div class="ai-orbit-center">
+        <div class="ai-core-icon">🧠</div>
+        <span class="ai-core-label">AI Core</span>
+      </div>
+      <div class="ai-node ai-node--kb" data-ai="kb">
+        <div class="ai-node-icon">📚</div>
+        <div class="ai-node-body">
+          <h4>知识库</h4>
+          <p>读过的书自动向量化建库，语义搜索跨文档定位</p>
+        </div>
+      </div>
+      <div class="ai-node ai-node--copilot" data-ai="copilot">
+        <div class="ai-node-icon">💬</div>
+        <div class="ai-node-body">
+          <h4>智能副驾</h4>
+          <p>论文专家、文档向导按需切换，解读难点一步到位</p>
+        </div>
+      </div>
+      <div class="ai-node ai-node--qa" data-ai="qa">
+        <div class="ai-node-icon">🤖</div>
+        <div class="ai-node-body">
+          <h4>问答解读</h4>
+          <p>选中段落即问即答，拆解公式、梳理逻辑</p>
+        </div>
+      </div>
+      <div class="ai-node ai-node--search" data-ai="search">
+        <div class="ai-node-icon">🔍</div>
+        <div class="ai-node-body">
+          <h4>内容搜索</h4>
+          <p>书架搜索直达书页内容，点击跳转精确位置</p>
+        </div>
+      </div>
     </div>
   </section>
 

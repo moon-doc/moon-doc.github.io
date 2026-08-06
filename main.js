@@ -762,3 +762,139 @@
     });
   });
 })();
+
+// ===== AI 轨道动画：粒子连线 + 节点脉冲 =====
+(function initAIOrbit() {
+  const canvas = document.getElementById('ai-canvas');
+  const orbit = document.querySelector('.ai-orbit');
+  if (!canvas || !orbit) return;
+
+  const ctx = canvas.getContext('2d');
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let w, h;
+  const nodes = [];    // 四个功能节点中心
+  const particles = []; // 沿轨道的粒子
+  const TRAIL_COUNT = 6;
+  let activeIdx = -1;
+  let lastSwitch = 0;
+  const SWITCH_INTERVAL = 2800;
+
+  function resize() {
+    const rect = orbit.getBoundingClientRect();
+    w = rect.width;
+    h = rect.height;
+    canvas.width = w * DPR;
+    canvas.height = h * DPR;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    computeNodes();
+  }
+
+  function computeNodes() {
+    nodes.length = 0;
+    orbit.querySelectorAll('.ai-node').forEach((el) => {
+      const r = el.getBoundingClientRect();
+      const or = orbit.getBoundingClientRect();
+      nodes.push({
+        x: r.left - or.left + r.width / 2,
+        y: r.top - or.top + r.height / 2,
+        el,
+      });
+    });
+  }
+
+  function buildParticles() {
+    particles.length = 0;
+    // 每条边 4 个粒子
+    const pairs = [[0,1],[1,3],[3,2],[2,0],[0,3],[1,2]];
+    pairs.forEach(([a,b]) => {
+      for (let i = 0; i < TRAIL_COUNT; i++) {
+        particles.push({ a, b, t: i / TRAIL_COUNT, speed: .002 + Math.random() * .0015 });
+      }
+    });
+  }
+
+  // 粒子沿贝塞尔曲线移动
+  function bezierPoint(p0, p1, p2, t) {
+    const u = 1 - t;
+    return { x: u*u*p0.x + 2*u*t*p1.x + t*t*p2.x, y: u*u*p0.y + 2*u*t*p1.y + t*t*p2.y };
+  }
+
+  function getControlPoint(a, b) {
+    // 控制点朝中心偏移，形成弧线
+    const cx = (a.x + b.x) / 2;
+    const cy = (a.y + b.y) / 2;
+    const mx = w / 2, my = h / 2;
+    return { x: cx + (mx - cx) * .4, y: cy + (my - cy) * .4 };
+  }
+
+  function draw(t) {
+    ctx.clearRect(0, 0, w, h);
+    if (!nodes.length) { requestAnimationFrame(draw); return; }
+
+    const now = performance.now();
+
+    // 自动轮播高亮
+    if (now - lastSwitch > SWITCH_INTERVAL) {
+      activeIdx = (activeIdx + 1) % nodes.length;
+      lastSwitch = now;
+      nodes.forEach((n, i) => n.el.classList.toggle('active', i === activeIdx));
+    }
+
+    // 画连线（贝塞尔曲线）
+    const pairs = [[0,1],[1,3],[3,2],[2,0],[0,3],[1,2]];
+    pairs.forEach(([a, b]) => {
+      const na = nodes[a], nb = nodes[b];
+      if (!na || !nb) return;
+      const cp = getControlPoint(na, nb);
+      ctx.beginPath();
+      ctx.moveTo(na.x, na.y);
+      ctx.quadraticCurveTo(cp.x, cp.y, nb.x, nb.y);
+      ctx.strokeStyle = 'rgba(66,185,131,.1)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    });
+
+    // 画粒子
+    particles.forEach((p) => {
+      p.t += p.speed;
+      if (p.t > 1) p.t -= 1;
+      const na = nodes[p.a], nb = nodes[p.b];
+      if (!na || !nb) return;
+      const cp = getControlPoint(na, nb);
+      const pos = bezierPoint(na, cp, nb, p.t);
+      const alpha = .35 + .25 * Math.sin(p.t * Math.PI);
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(66,185,131,${alpha})`;
+      ctx.fill();
+    });
+
+    // 中心到高亮节点的脉冲光线
+    if (activeIdx >= 0 && nodes[activeIdx]) {
+      const an = nodes[activeIdx];
+      const cx = w / 2, cy = h / 2;
+      const progress = ((now - lastSwitch) % SWITCH_INTERVAL) / SWITCH_INTERVAL;
+      const pulsePos = { x: cx + (an.x - cx) * progress, y: cy + (an.y - cy) * progress };
+      const grad = ctx.createRadialGradient(pulsePos.x, pulsePos.y, 0, pulsePos.x, pulsePos.y, 12);
+      grad.addColorStop(0, 'rgba(66,185,131,.6)');
+      grad.addColorStop(1, 'rgba(66,185,131,0)');
+      ctx.beginPath();
+      ctx.arc(pulsePos.x, pulsePos.y, 12, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); buildParticles(); }, { passive: true });
+  resize();
+  buildParticles();
+  if (!reduceMotion) {
+    requestAnimationFrame(draw);
+  }
+})();
