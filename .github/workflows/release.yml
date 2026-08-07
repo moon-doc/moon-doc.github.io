@@ -1,4 +1,5 @@
 name: Build Release Apps
+run-name: Build Release Apps ${{ github.event.client_payload.tag || github.event.inputs.tag }}
 
 on:
   repository_dispatch:
@@ -502,7 +503,7 @@ jobs:
           [ -n "$LIN" ]     || LIN="$FALLBACK_URL"
 
           # 6) 计算最低支持版本
-          MIN_PATCH=$(( $(echo "$VERSION" | cut -d. -f3) - 10 ))
+          MIN_PATCH=$(( $(echo "$VERSION" | cut -d. -f3) - 20 ))
           [ "$MIN_PATCH" -lt 0 ] && MIN_PATCH=0
           MIN_REQUIRED="$(echo "$VERSION" | cut -d. -f1-2).${MIN_PATCH}"
 
