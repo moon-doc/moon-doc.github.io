@@ -493,9 +493,65 @@ body {
 
 /* ===== AI 轨道动画展示区 ===== */
 .section-ai {
-  background: linear-gradient(180deg, transparent 0%, rgba(66,185,131,.03) 30%, rgba(66,185,131,.06) 50%, rgba(66,185,131,.03) 70%, transparent 100%);
+  background:
+    radial-gradient(ellipse 55% 38% at 50% 48%, rgba(66,185,131,.08), transparent 72%),
+    linear-gradient(180deg, transparent 0%, rgba(66,185,131,.03) 30%, rgba(66,185,131,.06) 50%, rgba(66,185,131,.03) 70%, transparent 100%);
   overflow: hidden;
 }
+
+/* Agent 能力条：动画上方的能力元素 */
+.ai-capabilities {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  max-width: 960px;
+  margin: 0 auto 56px;
+}
+.ai-cap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 20px 18px;
+  border-radius: 16px;
+  background: linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+  border: 1px solid var(--card-brd);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform .3s, border-color .3s, box-shadow .3s, background .3s;
+}
+.ai-cap:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--cap-accent) 55%, transparent);
+  box-shadow: 0 14px 34px rgba(0,0,0,.35), 0 0 26px color-mix(in srgb, var(--cap-accent) 16%, transparent);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--cap-accent) 10%, transparent), rgba(255,255,255,.03));
+}
+.ai-cap-icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 21px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--cap-accent) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cap-accent) 30%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--cap-accent) 12%, transparent);
+}
+.ai-cap-body h4 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--ink);
+  letter-spacing: .2px;
+}
+.ai-cap-body p {
+  font-size: 12.5px;
+  color: var(--ink-dim);
+  line-height: 1.6;
+}
+/* ===== AI 轨道动画展示区 ===== */
 .ai-orbit {
   position: relative;
   width: 100%;
@@ -523,18 +579,44 @@ body {
   align-items: center;
   gap: 6px;
 }
+.ai-core-status {
+  margin-top: 4px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .5px;
+  white-space: nowrap;
+  color: #42b983;
+  background: rgba(66,185,131,.1);
+  border: 1px solid rgba(66,185,131,.28);
+  opacity: .9;
+}
+.ai-core-status.flash {
+  animation: statusFlash .5s ease;
+}
+@keyframes statusFlash {
+  0% { transform: scale(.92); opacity: .4; }
+  45% { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); opacity: .9; }
+}
 .ai-core-icon {
-  font-size: 48px;
-  width: 80px;
-  height: 80px;
+  width: 84px;
+  height: 84px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(66,185,131,.18) 0%, rgba(66,185,131,.04) 70%, transparent 100%);
-  border: 1.5px solid rgba(66,185,131,.25);
-  box-shadow: 0 0 40px rgba(66,185,131,.15), 0 0 80px rgba(66,185,131,.06);
+  background: radial-gradient(circle, rgba(66,185,131,.14) 0%, rgba(66,185,131,.03) 70%, transparent 100%);
+  border: 1px solid rgba(66,185,131,.18);
+  box-shadow: 0 0 40px rgba(66,185,131,.1), 0 0 80px rgba(66,185,131,.05);
   animation: corePulse 3s ease-in-out infinite;
+}
+.ai-core-img {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 14px rgba(255,233,168,.55)) drop-shadow(0 0 30px rgba(255,233,168,.25));
 }
 .ai-core-label {
   font-size: 13px;
@@ -555,16 +637,34 @@ body {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 14px 20px;
+  padding: 14px 18px;
   border-radius: 16px;
-  background: rgba(255,255,255,.06);
+  background: linear-gradient(150deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(66,185,131,.15);
-  box-shadow: 0 4px 24px rgba(0,0,0,.15);
+  border: 1px solid rgba(66,185,131,.2);
+  box-shadow: 0 4px 24px rgba(0,0,0,.18), inset 0 0 0 1px rgba(255,255,255,.04);
   cursor: default;
   transition: border-color .3s, box-shadow .3s, transform .3s;
   white-space: nowrap;
+}
+.ai-node-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-left: 2px;
+  background: rgba(255,255,255,.22);
+  box-shadow: 0 0 0 0 rgba(66,185,131,0);
+  transition: background .3s, box-shadow .3s;
+}
+.ai-node.active .ai-node-dot {
+  background: #42b983;
+  animation: dotPulse 1.6s ease-in-out infinite;
+}
+@keyframes dotPulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(66,185,131,.15), 0 0 10px rgba(66,185,131,.7); }
+  50% { box-shadow: 0 0 0 7px rgba(66,185,131,.05), 0 0 18px rgba(66,185,131,.95); }
 }
 .ai-node:hover {
   border-color: rgba(66,185,131,.45);
@@ -587,21 +687,21 @@ body {
   line-height: 1.4;
 }
 
-/* 四个节点的轨道定位 */
-.ai-node--kb     { top: 8%;  left: 2%; }
-.ai-node--copilot { top: 8%;  right: 2%; }
-.ai-node--qa     { bottom: 8%; left: 2%; }
-.ai-node--search { bottom: 8%; right: 2%; }
+/* 四个专家的轨道定位 */
+.ai-node--reader     { top: 8%;  left: 2%; }
+.ai-node--coder      { top: 8%;  right: 2%; }
+.ai-node--translator { bottom: 8%; left: 2%; }
+.ai-node--navigator  { bottom: 8%; right: 2%; }
 
 /* 节点入场动画 */
 .ai-node {
   opacity: 0;
   transform: translateY(20px) scale(.92);
 }
-.ai-orbit.in .ai-node--kb     { animation: nodeIn .6s .2s ease forwards; }
-.ai-orbit.in .ai-node--copilot { animation: nodeIn .6s .35s ease forwards; }
-.ai-orbit.in .ai-node--qa     { animation: nodeIn .6s .5s ease forwards; }
-.ai-orbit.in .ai-node--search { animation: nodeIn .6s .65s ease forwards; }
+.ai-orbit.in .ai-node--reader     { animation: nodeIn .6s .2s ease forwards; }
+.ai-orbit.in .ai-node--coder      { animation: nodeIn .6s .35s ease forwards; }
+.ai-orbit.in .ai-node--translator { animation: nodeIn .6s .5s ease forwards; }
+.ai-orbit.in .ai-node--navigator  { animation: nodeIn .6s .65s ease forwards; }
 @keyframes nodeIn {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
@@ -625,6 +725,9 @@ body {
   .show-row.reverse .show-text { order: 1; }
   .show-text { max-width: 100%; }
   .show-frame, .show-row.reverse .show-frame { transform: none; }
+}
+@media (max-width: 980px) {
+  .ai-capabilities { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 720px) {
   .moon-glow { top: 4vh; right: 2vw; opacity: .7; }
@@ -656,10 +759,15 @@ body {
   .download-grid { grid-template-columns: repeat(2, 1fr); }
   .btn { padding: 11px 22px; font-size: 15px; }
   .footer { padding: 28px 16px 24px; }
+  /* AI 能力条：双列 */
+  .ai-capabilities { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 32px; }
+  .ai-cap { flex-direction: column; gap: 8px; padding: 14px 12px; }
+  .ai-cap-icon { width: 36px; height: 36px; font-size: 19px; }
   /* AI 轨道区：竖向排列 */
   .ai-orbit { aspect-ratio: auto; flex-direction: column; gap: 16px; padding: 20px 0; }
   .ai-orbit-center { margin-bottom: 8px; }
-  .ai-core-icon { width: 60px; height: 60px; font-size: 32px; }
+  .ai-core-icon { width: 60px; height: 60px; }
+  .ai-core-img { width: 38px; height: 38px; }
   #ai-canvas { display: none; }
   .ai-node { position: static !important; opacity: 1; transform: none; animation: none; }
   .ai-node-body p { white-space: normal; }

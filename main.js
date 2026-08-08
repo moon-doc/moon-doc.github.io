@@ -763,7 +763,9 @@
   });
 })();
 
-// ===== AI 轨道动画：粒子连线 + 节点脉冲 =====
+
+
+// ===== AI 轨道动画：旋转轨道 + 流光连线 + 节点脉冲 =====
 (function initAIOrbit() {
   const canvas = document.getElementById('ai-canvas');
   const orbit = document.querySelector('.ai-orbit');
@@ -774,12 +776,19 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   let w, h;
-  const nodes = [];    // 四个功能节点中心
-  const particles = []; // 沿轨道的粒子
-  const TRAIL_COUNT = 6;
+  const nodes = [];
+  const particles = [];
+  const TRAIL_COUNT = 5;
   let activeIdx = -1;
   let lastSwitch = 0;
-  const SWITCH_INTERVAL = 2800;
+  const SWITCH_INTERVAL = 3200;
+  const STATUSES = [
+    '正在委派 · 论文解读',
+    '正在委派 · 代码解释',
+    '正在委派 · 翻译',
+    '正在委派 · 文档导航',
+  ];
+  const statusEl = document.getElementById('ai-core-status');
 
   function resize() {
     const rect = orbit.getBoundingClientRect();
@@ -791,6 +800,7 @@
     canvas.style.height = h + 'px';
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     computeNodes();
+    buildParticles();
   }
 
   function computeNodes() {
@@ -806,25 +816,25 @@
     });
   }
 
+  // 环绕粒子：沿节点间贝塞尔曲线成队流动（原版结构，压低亮度）
   function buildParticles() {
     particles.length = 0;
-    // 每条边 4 个粒子
     const pairs = [[0,1],[1,3],[3,2],[2,0],[0,3],[1,2]];
-    pairs.forEach(([a,b]) => {
+    pairs.forEach(([a, b]) => {
       for (let i = 0; i < TRAIL_COUNT; i++) {
         particles.push({ a, b, t: i / TRAIL_COUNT, speed: .002 + Math.random() * .0015 });
       }
     });
   }
 
-  // 粒子沿贝塞尔曲线移动
+  // 贝塞尔曲线点
   function bezierPoint(p0, p1, p2, t) {
     const u = 1 - t;
     return { x: u*u*p0.x + 2*u*t*p1.x + t*t*p2.x, y: u*u*p0.y + 2*u*t*p1.y + t*t*p2.y };
   }
 
+  // 控制点朝中心偏移，形成环绕弧线
   function getControlPoint(a, b) {
-    // 控制点朝中心偏移，形成弧线
     const cx = (a.x + b.x) / 2;
     const cy = (a.y + b.y) / 2;
     const mx = w / 2, my = h / 2;
@@ -832,19 +842,40 @@
   }
 
   function draw(t) {
+    // 布局变化（如 reveal 缩放、窗口尺寸、字体）后重算几何
+    const rw = orbit.getBoundingClientRect().width;
+    if (Math.abs(rw - w) > 0.5) { resize(); }
     ctx.clearRect(0, 0, w, h);
     if (!nodes.length) { requestAnimationFrame(draw); return; }
 
     const now = performance.now();
+    const cx = w / 2, cy = h / 2;
 
     // 自动轮播高亮
     if (now - lastSwitch > SWITCH_INTERVAL) {
       activeIdx = (activeIdx + 1) % nodes.length;
       lastSwitch = now;
       nodes.forEach((n, i) => n.el.classList.toggle('active', i === activeIdx));
+      if (statusEl && STATUSES[activeIdx]) {
+        statusEl.textContent = STATUSES[activeIdx];
+        statusEl.classList.remove('flash');
+        void statusEl.offsetWidth; // 重启动画
+        statusEl.classList.add('flash');
+      }
     }
 
-    // 画连线（贝塞尔曲线）
+    // 1) 中心呼吸光晕
+    const pulse = .5 + .5 * Math.sin(now / 800);
+    const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(w, h) * .3);
+    halo.addColorStop(0, `rgba(66,185,131,${.4 + pulse * .2})`);
+    halo.addColorStop(.5, `rgba(138,180,255,${.16 + pulse * .1})`);
+    halo.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = halo;
+    ctx.beginPath();
+    ctx.arc(cx, cy, Math.min(w, h) * .3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 2) 环绕连线：四角节点间的贝塞尔曲线（原版结构，压低亮度）
     const pairs = [[0,1],[1,3],[3,2],[2,0],[0,3],[1,2]];
     pairs.forEach(([a, b]) => {
       const na = nodes[a], nb = nodes[b];
@@ -853,12 +884,12 @@
       ctx.beginPath();
       ctx.moveTo(na.x, na.y);
       ctx.quadraticCurveTo(cp.x, cp.y, nb.x, nb.y);
-      ctx.strokeStyle = 'rgba(66,185,131,.1)';
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = 'rgba(66,185,131,.085)';
+      ctx.lineWidth = 1.4;
       ctx.stroke();
     });
 
-    // 画粒子
+    // 3) 环绕粒子：沿曲线成队流动
     particles.forEach((p) => {
       p.t += p.speed;
       if (p.t > 1) p.t -= 1;
@@ -866,21 +897,20 @@
       if (!na || !nb) return;
       const cp = getControlPoint(na, nb);
       const pos = bezierPoint(na, cp, nb, p.t);
-      const alpha = .35 + .25 * Math.sin(p.t * Math.PI);
+      const alpha = .22 + .16 * Math.sin(p.t * Math.PI);
       ctx.beginPath();
-      ctx.arc(pos.x, pos.y, 2.5, 0, Math.PI * 2);
+      ctx.arc(pos.x, pos.y, 1.8, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(66,185,131,${alpha})`;
       ctx.fill();
     });
 
-    // 中心到高亮节点的脉冲光线
+    // 4) 中心到高亮节点的脉冲光点
     if (activeIdx >= 0 && nodes[activeIdx]) {
       const an = nodes[activeIdx];
-      const cx = w / 2, cy = h / 2;
       const progress = ((now - lastSwitch) % SWITCH_INTERVAL) / SWITCH_INTERVAL;
       const pulsePos = { x: cx + (an.x - cx) * progress, y: cy + (an.y - cy) * progress };
       const grad = ctx.createRadialGradient(pulsePos.x, pulsePos.y, 0, pulsePos.x, pulsePos.y, 12);
-      grad.addColorStop(0, 'rgba(66,185,131,.6)');
+      grad.addColorStop(0, 'rgba(66,185,131,.55)');
       grad.addColorStop(1, 'rgba(66,185,131,0)');
       ctx.beginPath();
       ctx.arc(pulsePos.x, pulsePos.y, 12, 0, Math.PI * 2);
@@ -891,9 +921,12 @@
     requestAnimationFrame(draw);
   }
 
-  window.addEventListener('resize', () => { resize(); buildParticles(); }, { passive: true });
+  window.addEventListener('resize', resize, { passive: true });
+  // 节点入场动画结束后重算位置（动画会平移节点，宽度检测抓不到）
+  orbit.querySelectorAll('.ai-node').forEach((el) => {
+    el.addEventListener('animationend', computeNodes, { once: true });
+  });
   resize();
-  buildParticles();
   if (!reduceMotion) {
     requestAnimationFrame(draw);
   }
