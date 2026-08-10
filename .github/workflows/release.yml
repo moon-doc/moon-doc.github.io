@@ -576,7 +576,7 @@ jobs:
         run: |
           KEEP=10
           echo "Pruning workflow runs, keeping latest ${KEEP}..."
-          RUNS=$(gh run list --workflow release.yml --limit 100 --json databaseId,status --jq '
+          RUNS=$(gh run list -R moon-doc/moon-doc.github.io --workflow release.yml --limit 100 --json databaseId,status --jq '
             [.[] | select(.status == "completed")]
             | . as $all
             | ($all | length) as $total
@@ -589,7 +589,7 @@ jobs:
           else
             COUNT=$(echo "$RUNS" | wc -l | tr -d ' ')
             echo "Deleting ${COUNT} old runs..."
-            echo "$RUNS" | xargs -I{} gh run delete {}
+            echo "$RUNS" | xargs -I{} gh run delete {} -R moon-doc/moon-doc.github.io
             echo "✓ Pruned ${COUNT} old runs, kept latest ${KEEP}"
           fi
         env:
