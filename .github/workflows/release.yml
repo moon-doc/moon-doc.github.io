@@ -569,3 +569,28 @@ jobs:
             exit 0
           }
           git push
+
+      - name: Prune old workflow runs (keep latest 10)
+        if: always()
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          KEEP=10
+          echo "Pruning workflow runs in moon-doc/moon-doc.github.io, keeping latest ${KEEP}..."
+          # List all completed runs for this workflow, sorted oldest-first
+          RUNS=$(gh run list -R moon-doc/moon-doc.github.io --workflow release.yml --limit 100 --json databaseId,status --jq '
+            [.[] | select(.status == "completed")]
+            | . as $all
+            | ($all | length) as $total
+            | if $total <= '"$KEEP"' then []
+              else $all[:($total - '"$KEEP"')][] | .databaseId
+            end
+          ')
+          if [ -z "$RUNS" ]; then
+            echo "No runs to prune (≤ ${KEEP} completed runs)"
+          else
+            COUNT=$(echo "$RUNS" | wc -l | tr -d ' ')
+            echo "Deleting ${COUNT} old runs..."
+            echo "$RUNS" | xargs -I{} gh run delete {} -R moon-doc/moon-doc.github.io
+            echo "✓ Pruned ${COUNT} old runs, kept latest ${KEEP}"
+          fi
