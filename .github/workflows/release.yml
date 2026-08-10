@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 env:
   CARGO_TERM_COLOR: always
@@ -572,13 +573,10 @@ jobs:
 
       - name: Prune old workflow runs (keep latest 10)
         if: always()
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           KEEP=10
-          echo "Pruning workflow runs in moon-doc/moon-doc.github.io, keeping latest ${KEEP}..."
-          # List all completed runs for this workflow, sorted oldest-first
-          RUNS=$(gh run list -R moon-doc/moon-doc.github.io --workflow release.yml --limit 100 --json databaseId,status --jq '
+          echo "Pruning workflow runs, keeping latest ${KEEP}..."
+          RUNS=$(gh run list --workflow release.yml --limit 100 --json databaseId,status --jq '
             [.[] | select(.status == "completed")]
             | . as $all
             | ($all | length) as $total
@@ -591,6 +589,8 @@ jobs:
           else
             COUNT=$(echo "$RUNS" | wc -l | tr -d ' ')
             echo "Deleting ${COUNT} old runs..."
-            echo "$RUNS" | xargs -I{} gh run delete {} -R moon-doc/moon-doc.github.io
+            echo "$RUNS" | xargs -I{} gh run delete {}
             echo "✓ Pruned ${COUNT} old runs, kept latest ${KEEP}"
           fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
