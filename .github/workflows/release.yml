@@ -580,7 +580,7 @@ jobs:
             [.[] | select(.status == "completed")]
             | . as $all
             | ($all | length) as $total
-            | if $total <= '"$KEEP"' then []
+            | if $total <= '"$KEEP"' then empty
               else $all[:($total - '"$KEEP"')][] | .databaseId
             end
           ')
