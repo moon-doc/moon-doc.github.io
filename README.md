@@ -135,11 +135,13 @@
 
 | | |
 | --- | --- |
-| 📡 **ArXiv 顶会论文推荐 · 一键阅读** | <img src="assets/shot-arxiv.png" width="460" alt="ArXiv 推荐" /> |
-| 🌐 **双语对照阅读** | <img src="assets/shot-bilingual.png" width="460" alt="双语对照" /> |
-| 🤖 **论文解读 · 智能问答** | <img src="assets/shot-qa.png" width="460" alt="AI 问答" /> |
-| 📖 **极致的 EPUB 阅读体验** | <img src="assets/shot-epub.png" width="460" alt="EPUB" /> |
-| 🎨 **八种主题，随心而变** | <img src="assets/shot-themes.png" width="460" alt="主题" /> |
+| 📡 **ArXiv 顶会论文推荐 · 一键阅读** | <img src="assets/shot-arxiv.webp" width="460" alt="ArXiv 推荐" /> |
+| 🌐 **双语对照阅读** | <img src="assets/shot-bilingual.webp" width="460" alt="双语对照" /> |
+| 🤖 **论文解读 · 智能问答** | <img src="assets/shot-qa.webp" width="460" alt="AI 问答" /> |
+| 📖 **极致的 EPUB 阅读体验** | <img src="assets/shot-epub.webp" width="460" alt="EPUB" /> |
+| 📚 **精美书架 · 私人书房** | <img src="assets/shot-bookshelf.webp" width="460" alt="书架" /> |
+| 🧬 **书架向量化 · 知识库语义检索** | <img src="assets/shot-rag.webp" width="460" alt="书架向量化" /> |
+| 🎨 **八种主题，随心而变** | <img src="assets/shot-themes.webp" width="460" alt="主题" /> |
 
 </div>
 
