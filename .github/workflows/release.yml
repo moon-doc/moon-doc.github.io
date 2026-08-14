@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 env:
   CARGO_TERM_COLOR: always
@@ -569,3 +570,27 @@ jobs:
             exit 0
           }
           git push
+
+      - name: Prune old workflow runs (keep latest 10)
+        if: always()
+        run: |
+          KEEP=10
+          echo "Pruning workflow runs, keeping latest ${KEEP}..."
+          RUNS=$(gh run list -R moon-doc/moon-doc.github.io --workflow release.yml --limit 100 --json databaseId,status --jq '
+            [.[] | select(.status == "completed")]
+            | . as $all
+            | ($all | length) as $total
+            | if $total <= '"$KEEP"' then empty
+              else $all[:($total - '"$KEEP"')][] | .databaseId
+            end
+          ')
+          if [ -z "$RUNS" ]; then
+            echo "No runs to prune (≤ ${KEEP} completed runs)"
+          else
+            COUNT=$(echo "$RUNS" | wc -l | tr -d ' ')
+            echo "Deleting ${COUNT} old runs..."
+            echo "$RUNS" | xargs -I{} gh run delete {} -R moon-doc/moon-doc.github.io
+            echo "✓ Pruned ${COUNT} old runs, kept latest ${KEEP}"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
