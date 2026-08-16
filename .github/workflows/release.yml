@@ -577,16 +577,15 @@ jobs:
         run: |
           KEEP=10
           echo "Pruning workflow runs, keeping latest ${KEEP}..."
-          RUNS=$(gh run list -R moon-doc/moon-doc.github.io --workflow release.yml --limit 100 --json databaseId,status --jq '
-            [.[] | select(.status == "completed")]
-            | . as $all
+          RUNS=$(gh run list -R moon-doc/moon-doc.github.io --workflow release.yml --limit 100 --json databaseId --jq '
+            . as $all
             | ($all | length) as $total
             | if $total <= '"$KEEP"' then empty
               else $all[:($total - '"$KEEP"')][] | .databaseId
             end
           ')
           if [ -z "$RUNS" ]; then
-            echo "No runs to prune (≤ ${KEEP} completed runs)"
+            echo "No runs to prune (≤ ${KEEP} total runs)"
           else
             COUNT=$(echo "$RUNS" | wc -l | tr -d ' ')
             echo "Deleting ${COUNT} old runs..."
