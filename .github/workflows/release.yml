@@ -575,6 +575,7 @@ jobs:
       - name: Prune old workflow runs (keep latest 10)
         if: always()
         run: |
+          # --- Prune old workflow runs (keep latest 10) ---
           KEEP=10
           echo "Pruning workflow runs, keeping latest ${KEEP}..."
           RUNS=$(gh run list -R moon-doc/moon-doc.github.io --workflow release.yml --limit 100 --json databaseId --jq '
@@ -591,6 +592,35 @@ jobs:
             echo "Deleting ${COUNT} old runs..."
             echo "$RUNS" | xargs -I{} gh run delete {} -R moon-doc/moon-doc.github.io
             echo "✓ Pruned ${COUNT} old runs, kept latest ${KEEP}"
+          fi
+
+          # --- Prune old caches (keep total under 8 GiB) ---
+          CACHE_LIMIT=$((8 * 1024))  # MiB
+          echo "Pruning caches, keeping total under 8 GiB..."
+          CACHES=$(gh cache list -R moon-doc/moon-doc.github.io --limit 100 --json id,sizeInBytes,createdAt --jq 'sort_by(.createdAt)')
+          if [ "$CACHES" = "[]" ] || [ -z "$CACHES" ]; then
+            echo "No caches to prune"
+          else
+            TOTAL=0
+            DELETE_IDS=""
+            while IFS= read -r line; do
+              ID=$(echo "$line" | cut -f1)
+              SIZE_MIB=$(( $(echo "$line" | cut -f2) / 1024 / 1024 ))
+              TOTAL=$((TOTAL + SIZE_MIB))
+              if [ $TOTAL -gt $CACHE_LIMIT ]; then
+                DELETE_IDS="$DELETE_IDS $ID"
+              fi
+            done < <(echo "$CACHES" | jq -r '.[] | "\(.id)\t\(.sizeInBytes)"')
+            if [ -z "$DELETE_IDS" ]; then
+              echo "Total cache ≈ $((TOTAL / 1024)) GiB, within limit"
+            else
+              COUNT=$(echo "$DELETE_IDS" | wc -w | tr -d ' ')
+              echo "Deleting ${COUNT} old caches (total would exceed 8 GiB)..."
+              for id in $DELETE_IDS; do
+                echo -n "  Deleting $id... "
+                gh cache delete "$id" -R moon-doc/moon-doc.github.io && echo "✓"
+              done
+            fi
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
