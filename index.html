@@ -55,77 +55,17 @@
   <section id="features" class="section">
     <h2 class="section-title reveal">为深度阅读而生</h2>
     <p class="section-lead reveal">从发现到理解，小月亮陪你走完知识的每一步。</p>
-    <div class="feature-grid">
-      <article class="feature-card reveal" style="--card-i:0">
-        <div class="feature-icon">📡</div>
-        <h3>ArXiv 顶会推荐</h3>
-        <p>首页智能聚合 ArXiv 顶会论文，一键点击即刻沉浸阅读，追踪前沿从未如此轻松。</p>
-      </article>
-      <article class="feature-card reveal" style="--card-i:1">
-        <div class="feature-icon">🌐</div>
-        <h3>双语对照阅读</h3>
-        <p>原文与译文段落级对照呈现，跨越语言的门槛，让每一篇外文论文都清晰可读。</p>
-      </article>
-      <article class="feature-card reveal" style="--card-i:2">
-        <div class="feature-icon">💬</div>
-        <h3>AI 共读</h3>
-        <p>OpenClaw 式阅读 Agent：深度解读、总结摘要、提取要点一步到位，不止问答，更懂你的阅读。</p>
-      </article>
-      <article class="feature-card reveal" style="--card-i:3">
-        <div class="feature-icon">🕸️</div>
-        <h3>多智能体编排</h3>
-        <p>论文解读、代码解释、翻译、文档导航四大专家随时待命，Leader 实时委派分工协作。</p>
-      </article>
-      <article class="feature-card reveal" style="--card-i:4">
-        <div class="feature-icon">🧠</div>
-        <h3>持久记忆</h3>
-        <p>画像、文档、情景、偏好四类记忆跨会话自动提取，新对话按需检索注入，越读越懂你。</p>
-      </article>
-      <article class="feature-card reveal" style="--card-i:5">
-        <div class="feature-icon">🛡️</div>
-        <h3>行动审批</h3>
-        <p>默认读放行、写审批：加批注、写记忆、建任务前弹卡确认，60 秒未响应自动拒绝。</p>
-      </article>
-      <article class="feature-card reveal" style="--card-i:6">
-        <div class="feature-icon">🔌</div>
-        <h3>MCP 外部工具</h3>
-        <p>HTTP / stdio 双传输接入任意 MCP 服务器，工具以 mcp__ 前缀注入对话，能力无限扩展。</p>
-      </article>
-      <article class="feature-card reveal" style="--card-i:7">
-        <div class="feature-icon">🚀</div>
-        <h3>文档任务</h3>
-        <p>逐章摘要、每章笔记、生成闪卡，翻章自动运行 AI，可暂停、恢复、重试，阅读即产出。</p>
-      </article>
-      <article class="feature-card reveal" style="--card-i:8">
-        <div class="feature-icon">🔍</div>
-        <h3>知识库语义搜索</h3>
-        <p>读过的每一页都被 AI 向量化索引，自然语言检索跨书跨文档，书架搜索直达书页精确位置。</p>
-      </article>
-      <article class="feature-card reveal" style="--card-i:9">
-        <div class="feature-icon">🤖</div>
-        <h3>选中即问即答</h3>
-        <p>选中段落即问即答，AI 帮你拆解公式、梳理脉络、总结贡献，读懂难点不再孤单。</p>
-      </article>
-      <article class="feature-card reveal" style="--card-i:10">
-        <div class="feature-icon">📖</div>
-        <h3>极致 EPUB 体验</h3>
-        <p>翻页动效、标注批注、字体排版细节打磨，还原纸书般的沉浸阅读感受。</p>
-      </article>
-      <article class="feature-card reveal" style="--card-i:11">
-        <div class="feature-icon">🎨</div>
-        <h3>八种精美主题</h3>
-        <p>从月夜深空到晨曦暖阳，八种自带主题随心切换，护眼与美感兼得。</p>
-      </article>
-      <article class="feature-card reveal" style="--card-i:12">
-        <div class="feature-icon">📚</div>
-        <h3>精美书架</h3>
-        <p>封面式书架陈列，导入即归位，拖拽整理一目了然；书架搜索直达书页，让每一本书都有安放之处。</p>
-      </article>
-      <article class="feature-card reveal" style="--card-i:13">
-        <div class="feature-icon">🧬</div>
-        <h3>书架向量化</h3>
-        <p>书架内容自动向量化建库，跨书跨文档语义检索，自然语言提问直达原文精确位置，越读越懂你。</p>
-      </article>
+    <div class="carousel" id="featureCarousel">
+      <div class="carousel-viewport">
+        <div class="carousel-track" id="carouselTrack"></div>
+      </div>
+      <button class="carousel-arrow carousel-prev" id="carouselPrev" aria-label="上一个">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <button class="carousel-arrow carousel-next" id="carouselNext" aria-label="下一个">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+      <div class="carousel-dots" id="carouselDots"></div>
     </div>
   </section>
 

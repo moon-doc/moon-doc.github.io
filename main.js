@@ -931,3 +931,184 @@
     requestAnimationFrame(draw);
   }
 })();
+
+// ===== 3D 木马轮播 =====
+(function initCarousel() {
+  const root = document.getElementById('featureCarousel');
+  const track = document.getElementById('carouselTrack');
+  const prevBtn = document.getElementById('carouselPrev');
+  const nextBtn = document.getElementById('carouselNext');
+  const dotsWrap = document.getElementById('carouselDots');
+  if (!root || !track || !prevBtn || !nextBtn || !dotsWrap) return;
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // 14 项功能，按 4 大场景分组（discover / ai / read / knowledge）
+  const items = [
+    { group: 'discover', icon: '📡', tag: '内容发现', title: 'ArXiv 顶会推荐', img: 'assets/shot-arxiv.webp',
+      desc: '首页智能聚合 ArXiv 顶会论文，按兴趣排序推荐，一键点击即刻沉浸阅读。',
+      hl: [['🏆','顶会精选'], ['⚡','实时更新'], ['🎯','个性推荐']] },
+    { group: 'discover', icon: '🔍', tag: '内容发现', title: '语义搜索',
+      desc: '自然语言跨书跨文档检索，语义匹配而非关键词，直达书页精确位置。',
+      hl: [['📚','跨书检索'], ['🧬','语义匹配'], ['📍','页级定位']] },
+    { group: 'discover', icon: '🤖', tag: '内容发现', title: '选中即问',
+      desc: '选中任意段落即可提问，AI 拆解公式、梳理脉络，上下文自动携带。',
+      hl: [['✨','即选即问'], ['📐','公式拆解'], ['🔗','上下文携带']] },
+    { group: 'ai', icon: '💬', tag: 'AI 共读', title: 'AI 深度共读', img: 'assets/shot-qa.webp',
+      desc: '边读边聊，深度解读、总结摘要、提取要点一步到位，支持多轮追问。',
+      hl: [['💬','多轮对话'], ['📝','智能摘要'], ['💡','要点提取']] },
+    { group: 'ai', icon: '🕸️', tag: 'AI 共读', title: '多智能体编排',
+      desc: '四大专家随时待命，Leader 实时委派分工协作，复杂问题自动拆解执行。',
+      hl: [['🤖','四专家协同'], ['🎩','Leader 委派'], ['🔧','自动拆解']] },
+    { group: 'ai', icon: '🧠', tag: 'AI 共读', title: '持久记忆',
+      desc: '四类记忆跨会话自动提取注入，长期偏好、阅读进度、知识图谱越读越懂你。',
+      hl: [['🧠','四类记忆'], ['🔄','跨会话'], ['📈','渐进学习']] },
+    { group: 'ai', icon: '🛡️', tag: 'AI 共读', title: '行动审批',
+      desc: 'AI 写操作弹卡确认，60 秒未响应自动拒绝，每个动作可控可审计。',
+      hl: [['🔒','写操作确认'], ['⏱️','60s 超时'], ['📜','全程审计']] },
+    { group: 'ai', icon: '🔌', tag: 'AI 共读', title: 'MCP 外部工具',
+      desc: 'HTTP / stdio 双传输接入外部工具，搜文献、查数据、调 API 能力无限扩展。',
+      hl: [['🌐','HTTP/stdio'], ['🧰','工具生态'], ['🚀','无限扩展']] },
+    { group: 'read', icon: '🌐', tag: '阅读体验', title: '双语对照阅读', img: 'assets/shot-bilingual.webp',
+      desc: '原文与译文段落级对照，支持自定义翻译引擎，跨越语言门槛无障碍阅读。',
+      hl: [['🔤','段落对照'], ['⚙️','自定义引擎'], ['🎯','精准对齐']] },
+    { group: 'read', icon: '📖', tag: '阅读体验', title: '极致 EPUB', img: 'assets/shot-epub.webp',
+      desc: '翻页动效、标注批注、字体排版细节打磨，多种排版模式自由切换。',
+      hl: [['📄','翻页动效'], ['🖍️','标注批注'], ['✍️','字体排版']] },
+    { group: 'read', icon: '🚀', tag: '阅读体验', title: '文档任务',
+      desc: '翻章自动运行 AI，逐章生成摘要、笔记和闪卡，学习效率翻倍提升。',
+      hl: [['⚡','自动运行'], ['📋','逐章摘要'], ['🎴','闪卡生成']] },
+    { group: 'read', icon: '🎨', tag: '阅读体验', title: '八种主题', img: 'assets/shot-themes.webp',
+      desc: '从月夜深空到晨曦暖阳，八种精心调色主题，护眼与美感兼得。',
+      hl: [['🌙','月夜深空'], ['☀️','晨曦暖阳'], ['👀','护眼模式']] },
+    { group: 'knowledge', icon: '📚', tag: '知识管理', title: '精美书架', img: 'assets/shot-bookshelf.webp',
+      desc: '封面式陈列管理，拖拽整理一目了然，支持分组、标签和快速检索。',
+      hl: [['🖼️','封面陈列'], ['🖱️','拖拽整理'], ['🏷️','标签分组']] },
+    { group: 'knowledge', icon: '🧬', tag: '知识管理', title: '书架向量化', img: 'assets/shot-rag.webp',
+      desc: '整架书自动向量化索引，自然语言提问跨书检索，直达原文精确位置。',
+      hl: [['🔎','跨书搜索'], ['📐','向量索引'], ['💡','智能问答']] },
+  ];
+  const N = items.length;
+  let current = 0;
+  let autoTimer = null;
+
+  // 创建 DOM
+  const cards = items.map((item, i) => {
+    const el = document.createElement('div');
+    el.className = 'carousel-card';
+    el.setAttribute('data-group', item.group);
+    const hlHtml = item.hl.map(h =>
+      '<span class="cc-hl"><span class="cc-hl-icon">' + h[0] + '</span>' + h[1] + '</span>'
+    ).join('');
+    const imgHtml = item.img
+      ? '<div class="cc-shot"><img src="' + item.img + '" alt="' + item.title + '" loading="lazy" decoding="async" /><span class="cc-shot-shine"></span></div>'
+      : '<div class="cc-shot cc-shot--placeholder"><span class="cc-shot-icon">' + item.icon + '</span><span class="cc-shot-shine"></span></div>';
+    el.innerHTML =
+      imgHtml +
+      '<div class="cc-inner">' +
+        '<span class="cc-tag">' + item.tag + '</span>' +
+        '<span class="cc-icon">' + item.icon + '</span>' +
+        '<div class="cc-title">' + item.title + '</div>' +
+        '<div class="cc-desc">' + item.desc + '</div>' +
+        '<div class="cc-highlights">' + hlHtml + '</div>' +
+      '</div>';
+    el.addEventListener('click', () => goTo(i));
+    track.appendChild(el);
+    return el;
+  });
+  const dots = items.map((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'carousel-dot';
+    d.setAttribute('aria-label', '第 ' + (i + 1) + ' 项');
+    d.addEventListener('click', () => goTo(i));
+    dotsWrap.appendChild(d);
+    return d;
+  });
+
+  // 定位
+  function layout() {
+    const angleStep = 360 / N;
+    // 根据视口宽度调整半径
+    const vw = root.offsetWidth;
+    const radius = Math.max(200, Math.min(420, vw * 0.38));
+
+    cards.forEach((card, i) => {
+      const angle = angleStep * (i - current);
+      const rad = angle * Math.PI / 180;
+      const x = Math.sin(rad) * radius;
+      const z = Math.cos(rad) * radius;
+      const isActive = i === current;
+      const opacity = isActive ? 1 : Math.max(0.25, 0.4 + 0.6 * Math.cos(rad));
+      const scale = isActive ? 1 : 0.75 + 0.25 * Math.cos(rad);
+
+      card.style.transform =
+        'translate(-50%, -50%)' +
+        ' translateX(' + x + 'px)' +
+        ' translateZ(' + z + 'px)' +
+        ' scale(' + scale + ')';
+      card.style.opacity = opacity;
+      card.style.zIndex = Math.round(z + 500);
+      card.style.pointerEvents = Math.abs(angle) < 30 ? 'auto' : 'none';
+      card.classList.toggle('is-active', isActive);
+    });
+
+    dots.forEach((d, i) => d.classList.toggle('is-active', i === current));
+  }
+
+  function goTo(idx, fromAuto) {
+    current = ((idx % N) + N) % N;
+    layout();
+    if (!fromAuto) resetAuto();
+  }
+
+  function prev() { goTo(current - 1); }
+  function next() { goTo(current + 1); }
+
+  // 自动轮播
+  function startAuto() {
+    if (reduceMotion) return;
+    autoTimer = setInterval(() => goTo(current + 1, true), 3500);
+  }
+  function resetAuto() {
+    clearInterval(autoTimer);
+    startAuto();
+  }
+  function stopAuto() { clearInterval(autoTimer); }
+
+  prevBtn.addEventListener('click', prev);
+  nextBtn.addEventListener('click', next);
+  root.addEventListener('pointerenter', stopAuto);
+  root.addEventListener('pointerleave', startAuto);
+
+  // 触摸拖拽
+  let startX = 0, dragging = false;
+  track.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    startX = e.clientX; dragging = true;
+    track.setPointerCapture(e.pointerId);
+    stopAuto();
+  });
+  track.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const dx = e.clientX - startX;
+    if (Math.abs(dx) > 50) {
+      dragging = false;
+      dx > 0 ? prev() : next();
+    }
+  });
+  track.addEventListener('pointerup', () => { dragging = false; startAuto(); });
+  track.addEventListener('pointercancel', () => { dragging = false; startAuto(); });
+
+  // 键盘
+  root.setAttribute('tabindex', '0');
+  root.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') { prev(); e.preventDefault(); }
+    if (e.key === 'ArrowRight') { next(); e.preventDefault(); }
+  });
+
+  // resize
+  window.addEventListener('resize', () => layout(), { passive: true });
+
+  layout();
+  startAuto();
+})();
