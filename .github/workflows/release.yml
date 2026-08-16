@@ -456,8 +456,13 @@ jobs:
 
           # 3) 创建 draft Release → 上传 → 发布
           if gh release view "$TAG" -R "$PAGES_REPO" > /dev/null 2>&1; then
-            echo "Release exists, uploading assets..."
-            gh release upload "$TAG" -R "$PAGES_REPO" --clobber staging/*
+            IS_DRAFT=$(gh release view "$TAG" -R "$PAGES_REPO" --json isDraft --jq '.isDraft')
+            if [ "$IS_DRAFT" = "true" ]; then
+              echo "Release exists (draft), uploading assets..."
+              gh release upload "$TAG" -R "$PAGES_REPO" --clobber staging/*
+            else
+              echo "Release already published, skipping upload"
+            fi
           else
             echo "Creating draft release..."
             gh release create "$TAG" -R "$PAGES_REPO" --draft \
@@ -468,7 +473,13 @@ jobs:
 
           # 4) 同时上传到 moon-reader 私有仓库（保留完整发布记录）
           if gh release view "$TAG" -R "$PRIVATE_REPO" > /dev/null 2>&1; then
-            gh release upload "$TAG" -R "$PRIVATE_REPO" --clobber staging/*
+            IS_DRAFT=$(gh release view "$TAG" -R "$PRIVATE_REPO" --json isDraft --jq '.isDraft')
+            if [ "$IS_DRAFT" = "true" ]; then
+              echo "Release exists (draft), uploading assets..."
+              gh release upload "$TAG" -R "$PRIVATE_REPO" --clobber staging/*
+            else
+              echo "Release already published, skipping upload"
+            fi
           else
             gh release create "$TAG" -R "$PRIVATE_REPO" \
               --title "v${VERSION}" --notes "小月亮阅读器 v${VERSION} - 跨平台专业文档阅读器" \
