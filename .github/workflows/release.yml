@@ -590,7 +590,9 @@ jobs:
           else
             COUNT=$(echo "$RUNS" | wc -l | tr -d ' ')
             echo "Deleting ${COUNT} old runs..."
-            echo "$RUNS" | xargs -I{} gh run delete {} -R moon-doc/moon-doc.github.io
+            for run_id in $RUNS; do
+              gh run delete "$run_id" -R moon-doc/moon-doc.github.io || true
+            done
             echo "✓ Pruned ${COUNT} old runs, kept latest ${KEEP}"
           fi
 
@@ -618,9 +620,9 @@ jobs:
               echo "Deleting ${COUNT} old caches (total would exceed 8 GiB)..."
               for id in $DELETE_IDS; do
                 echo -n "  Deleting $id... "
-                gh cache delete "$id" -R moon-doc/moon-doc.github.io && echo "✓"
+                gh cache delete "$id" -R moon-doc/moon-doc.github.io && echo "✓" || true
               done
             fi
           fi
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
