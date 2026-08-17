@@ -110,7 +110,7 @@
 <td width="33%"><div align="center"><b>🤖 AI 论文解读</b><br><sub>选中即问即答，拆解公式脉络</sub></div></td>
 </tr>
 <tr>
-<td width="33%"><div align="center"><b>🧠 知识库语义搜索</b><br><sub>跨书跨文档自然语言检索</sub></div></td>
+<td width="33%"><div align="center"><b>💎 知识库语义搜索</b><br><sub>跨书跨文档自然语言检索</sub></div></td>
 <td width="33%"><div align="center"><b>💬 AI 共读</b><br><sub>论文专家、文档向导按需切换</sub></div></td>
 <td width="33%"><div align="center"><b>🔍 书架内容搜索</b><br><sub>语义匹配直达书页精确位置</sub></div></td>
 </tr>
@@ -152,7 +152,7 @@
 <div align="center">
 <table>
 <tr>
-<td width="50%"><div align="center"><b>🧠 持久记忆</b><br><sub>对话后自动提取事实，高置信度入库，低置信度草稿待确认；新对话按「文档 + 画像」检索注入</sub></div></td>
+<td width="50%"><div align="center"><b>💎 持久记忆</b><br><sub>对话后自动提取事实，高置信度入库，低置信度草稿待确认；新对话按「文档 + 画像」检索注入</sub></div></td>
 <td width="50%"><div align="center"><b>🛡️ 行动审批</b><br><sub>默认读放行、写审批；加批注 / 跳转 / 写记忆 / 建任务前弹卡，60 秒未响应默认拒绝</sub></div></td>
 </tr>
 <tr>
