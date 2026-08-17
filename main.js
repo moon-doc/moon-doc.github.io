@@ -1000,9 +1000,24 @@
     const hlHtml = item.hl.map(h =>
       '<span class="cc-hl"><span class="cc-hl-icon">' + h[0] + '</span>' + h[1] + '</span>'
     ).join('');
+    // 星夜氛围色板：radial-gradient 叠加，模拟星云光晕而非死板色块
+    const gradPalettes = {
+      discover:  { h: 35,  sat: 50, lit: 25, h2: 20,  sat2: 45, lit2: 18 },  // 月光琥珀
+      ai:        { h: 268, sat: 55, lit: 22, h2: 245, sat2: 50, lit2: 16 },  // 星云紫
+      read:      { h: 210, sat: 50, lit: 22, h2: 195, sat2: 45, lit2: 16 },  // 暮光蓝
+      knowledge: { h: 230, sat: 55, lit: 22, h2: 260, sat2: 45, lit2: 16 },  // 银河蓝紫
+    };
+    const pal = gradPalettes[item.group] || gradPalettes.ai;
+    const hOff  = Math.floor(Math.random() * 14 - 7);
+    const hOff2 = Math.floor(Math.random() * 14 - 7);
+    // 两团不同色温的星云光晕 + 暗角底色
+    const gradBg =
+      'radial-gradient(ellipse 90% 80% at 25% 35%, hsl(' + (pal.h + hOff) + ',' + pal.sat + '%,' + pal.lit + '%) 0%, transparent 70%),' +
+      'radial-gradient(ellipse 80% 70% at 75% 65%, hsl(' + (pal.h2 + hOff2) + ',' + pal.sat2 + '%,' + pal.lit2 + '%) 0%, transparent 65%),' +
+      'linear-gradient(170deg, hsl(' + (pal.h2 + hOff2) + ',25%,8%) 0%, hsl(' + (pal.h + hOff) + ',20%,5%) 100%)';
     const imgHtml = item.img
       ? '<div class="cc-shot"><img src="' + item.img + '" alt="' + item.title + '" loading="lazy" decoding="async" /><span class="cc-shot-shine"></span></div>'
-      : '<div class="cc-shot cc-shot--placeholder"><span class="cc-shot-icon">' + item.icon + '</span><span class="cc-shot-shine"></span></div>';
+      : '<div class="cc-shot cc-shot--gradient" style="background:' + gradBg + '"><span class="cc-shot-shine"></span></div>';
     el.innerHTML =
       imgHtml +
       '<div class="cc-inner">' +

@@ -307,19 +307,27 @@ body {
   background: linear-gradient(180deg, transparent 50%, rgba(14,10,28,.7) 100%);
   pointer-events: none;
 }
-/* 无图卡片占位区 */
-.cc-shot--placeholder {
+/* 无图卡片渐变占位区 */
+.cc-shot--gradient {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 40%, var(--cc-glow, rgba(201,166,255,.15)), transparent 70%),
-    linear-gradient(160deg, rgba(28,22,50,.6), rgba(14,10,28,.4));
 }
-.cc-shot-icon {
-  font-size: 56px;
-  filter: drop-shadow(0 0 16px var(--cc-glow, rgba(201,166,255,.4)));
-  opacity: .85;
+/* 星尘点缀：让渐变区像一片微型星空 */
+.cc-shot--gradient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle 1px at 20% 30%, rgba(255,255,255,.6), transparent),
+    radial-gradient(circle 1px at 60% 20%, rgba(200,220,255,.5), transparent),
+    radial-gradient(circle 0.5px at 35% 70%, rgba(255,240,200,.7), transparent),
+    radial-gradient(circle 1px at 80% 75%, rgba(220,210,255,.5), transparent),
+    radial-gradient(circle 0.5px at 50% 50%, rgba(255,255,255,.4), transparent),
+    radial-gradient(circle 0.5px at 15% 80%, rgba(200,220,255,.5), transparent),
+    radial-gradient(circle 1px at 90% 40%, rgba(255,240,200,.5), transparent);
+  pointer-events: none;
 }
 .carousel-card::before {
   content: "";
