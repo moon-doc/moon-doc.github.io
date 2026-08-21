@@ -173,7 +173,9 @@ jobs:
         run: npx tauri ios init --ci --skip-targets-install
 
       - name: Build unsigned iOS archive
-        run: NODE_OPTIONS=--max-old-space-size=8192 npm run build:web && npx tauri ios build --ci --no-sign --archive-only
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: npm run build:web && npx tauri ios build --ci --no-sign --archive-only
 
       - name: Package iOS artifacts
         run: |
@@ -241,7 +243,9 @@ jobs:
           workspaces: src-tauri -> target
 
       - name: Build macOS app
-        run: NODE_OPTIONS=--max-old-space-size=8192 npm run build:web && npx tauri build --ci --target universal-apple-darwin --bundles app,dmg --no-sign
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: npm run build:web && npx tauri build --ci --target universal-apple-darwin --bundles app,dmg --no-sign
 
       - name: Package macOS artifacts
         run: |
@@ -309,7 +313,9 @@ jobs:
           workspaces: src-tauri -> target
 
       - name: Build Windows app
-        run: NODE_OPTIONS=--max-old-space-size=8192 npm run build:web && npx tauri build --ci --bundles nsis
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: npm run build:web && npx tauri build --ci --bundles nsis
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
@@ -373,7 +379,9 @@ jobs:
           workspaces: src-tauri -> target
 
       - name: Build Linux app (deb + rpm + AppImage)
-        run: NODE_OPTIONS=--max-old-space-size=8192 npm run build:web && npx tauri build --ci --bundles deb,rpm,appimage
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: npm run build:web && npx tauri build --ci --bundles deb,rpm,appimage
 
       - name: Upload Linux artifacts
         uses: actions/upload-artifact@v4
