@@ -77,7 +77,7 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-linux-android,armv7-linux-androideabi
+          targets: aarch64-linux-android
 
       - name: Cache Rust build
         uses: Swatinem/rust-cache@v2
@@ -107,7 +107,7 @@ jobs:
         run: |
           npm run build:web
           source android-env.sh
-          npx tauri android build
+          npx tauri android build --target aarch64
 
       - name: Upload Android artifacts
         uses: actions/upload-artifact@v4
@@ -434,7 +434,7 @@ jobs:
             case "$base" in
               *.dmg)       cp "$f" "staging/MoonReader-${VERSION}-macos-universal.dmg" ;;
               *.exe)       cp "$f" "staging/MoonReader-${VERSION}-windows-x64-setup.exe" ;;
-              *.apk)       cp "$f" "staging/MoonReader-${VERSION}-android-universal.apk" ;;
+              *.apk)       cp "$f" "staging/MoonReader-${VERSION}-android-arm64.apk" ;;
               *.deb)       cp "$f" "staging/MoonReader-${VERSION}-linux-amd64.deb" ;;
               *.rpm)       cp "$f" "staging/MoonReader-${VERSION}-linux-x86_64.rpm" ;;
               *.AppImage)  cp "$f" "staging/MoonReader-${VERSION}-linux-x86_64.AppImage" ;;
