@@ -105,6 +105,7 @@ jobs:
           MDOC_STORE_PASSWORD: ${{ secrets.MDOC_STORE_PASSWORD }}
           MDOC_KEY_PASSWORD: ${{ secrets.MDOC_KEY_PASSWORD }}
         run: |
+          export NODE_OPTIONS="--max-old-space-size=8192"
           npm run build:web
           source android-env.sh
           npx tauri android build --target aarch64
@@ -172,7 +173,7 @@ jobs:
         run: npx tauri ios init --ci --skip-targets-install
 
       - name: Build unsigned iOS archive
-        run: npm run build:web && npx tauri ios build --ci --no-sign --archive-only
+        run: NODE_OPTIONS=--max-old-space-size=8192 npm run build:web && npx tauri ios build --ci --no-sign --archive-only
 
       - name: Package iOS artifacts
         run: |
@@ -240,7 +241,7 @@ jobs:
           workspaces: src-tauri -> target
 
       - name: Build macOS app
-        run: npm run build:web && npx tauri build --ci --target universal-apple-darwin --bundles app,dmg --no-sign
+        run: NODE_OPTIONS=--max-old-space-size=8192 npm run build:web && npx tauri build --ci --target universal-apple-darwin --bundles app,dmg --no-sign
 
       - name: Package macOS artifacts
         run: |
@@ -308,7 +309,7 @@ jobs:
           workspaces: src-tauri -> target
 
       - name: Build Windows app
-        run: npm run build:web && npx tauri build --ci --bundles nsis
+        run: NODE_OPTIONS=--max-old-space-size=8192 npm run build:web && npx tauri build --ci --bundles nsis
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
@@ -372,7 +373,7 @@ jobs:
           workspaces: src-tauri -> target
 
       - name: Build Linux app (deb + rpm + AppImage)
-        run: npm run build:web && npx tauri build --ci --bundles deb,rpm,appimage
+        run: NODE_OPTIONS=--max-old-space-size=8192 npm run build:web && npx tauri build --ci --bundles deb,rpm,appimage
 
       - name: Upload Linux artifacts
         uses: actions/upload-artifact@v4
