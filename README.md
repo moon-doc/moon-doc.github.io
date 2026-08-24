@@ -122,7 +122,7 @@
 <tr>
 <td width="33%"><div align="center"><b>🔌 MCP 外部工具</b><br><sub>接入 MCP 服务器，工具箱无限扩展</sub></div></td>
 <td width="33%"><div align="center"><b>🚀 文档任务</b><br><sub>边读边记笔记，翻章自动产出</sub></div></td>
-<td width="33%"><div align="center"><b>📖 极致 EPUB</b><br><sub>翻页动效、标注批注、排版打磨</sub></div></td>
+<td width="33%"><div align="center"><b>📖 极致 EPUB</b><br><sub>神经网络版面识别 · 翻页动效 · 标注批注</sub></div></td>
 </tr>
 </table>
 </div>
