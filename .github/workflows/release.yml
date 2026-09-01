@@ -92,8 +92,31 @@ jobs:
             echo "$MDOC_ANDROID_KEYSTORE_BASE64" | base64 --decode > android-release.keystore
           fi
 
-      - name: Initialize Android project
-        run: npx tauri android init --ci --skip-targets-install
+      - name: Configure Gradle network resilience (timeout/retry + Aliyun mirror)
+        run: |
+          # Maven Central 429 限流（GitHub Actions 共享出口 IP）：调大超时与重试，并前置阿里云镜像兜底。
+          mkdir -p "$HOME/.gradle"
+          cat > "$HOME/.gradle/gradle.properties" <<'EOF'
+          org.gradle.internal.http.connectionTimeout=300000
+          org.gradle.internal.http.socketTimeout=300000
+          org.gradle.internal.repository.max.retries=10
+          org.gradle.internal.repository.initial.backoff=5000
+          EOF
+          cat > "$HOME/.gradle/init.gradle" <<'EOF'
+          settingsEvaluated { settings ->
+              settings.pluginManagement.repositories {
+                  maven { url = uri('https://maven.aliyun.com/repository/gradle-plugin') }
+                  maven { url = uri('https://maven.aliyun.com/repository/public') }
+              }
+              settings.dependencyResolutionManagement.repositories {
+                  maven { url = uri('https://maven.aliyun.com/repository/google') }
+                  maven { url = uri('https://maven.aliyun.com/repository/public') }
+                  maven { url = uri('https://maven.aliyun.com/repository/central') }
+              }
+          }
+          EOF
+          echo "== gradle.properties =="; cat "$HOME/.gradle/gradle.properties"
+          echo "== init.gradle =="; cat "$HOME/.gradle/init.gradle"
 
       - name: Build Android (APK + AAB, single Rust compile)
         env:
