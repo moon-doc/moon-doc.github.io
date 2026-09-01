@@ -84,13 +84,8 @@ jobs:
         with:
           workspaces: src-tauri -> target
 
-      - name: Restore Android keystore
-        env:
-          MDOC_ANDROID_KEYSTORE_BASE64: ${{ secrets.MDOC_ANDROID_KEYSTORE_BASE64 }}
-        run: |
-          if [ -n "$MDOC_ANDROID_KEYSTORE_BASE64" ]; then
-            echo "$MDOC_ANDROID_KEYSTORE_BASE64" | base64 --decode > android-release.keystore
-          fi
+      - name: Initialize Android project
+        run: npx tauri android init --ci --skip-targets-install
 
       - name: Configure Gradle network resilience (timeout/retry + Aliyun mirror)
         run: |
