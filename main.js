@@ -932,198 +932,252 @@
   }
 })();
 
-// ===== 3D 木马轮播 =====
-(function initCarousel() {
-  const root = document.getElementById('featureCarousel');
-  const track = document.getElementById('carouselTrack');
-  const prevBtn = document.getElementById('carouselPrev');
-  const nextBtn = document.getElementById('carouselNext');
-  const dotsWrap = document.getElementById('carouselDots');
-  if (!root || !track || !prevBtn || !nextBtn || !dotsWrap) return;
-
+// ===== 阅读旅程流水线 =====
+(function initJourney() {
+  const pipe = document.getElementById('journeyPipe');
+  if (!pipe) return;
+  const nodes = pipe.querySelectorAll('.journey-node');
+  const arrows = pipe.querySelectorAll('.journey-arrow');
+  const detail = document.getElementById('journeyDetail');
+  const noEl = document.getElementById('jdNo');
+  const kickerEl = document.getElementById('jdKicker');
+  const nameEl = document.getElementById('jdName');
+  const descEl = document.getElementById('jdDesc');
+  const pointsEl = document.getElementById('jdPoints');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // 14 项功能，按 4 大场景分组（discover / ai / read / knowledge）
-  const items = [
-    { group: 'discover', icon: '📡', tag: '内容发现', title: 'ArXiv 顶会推荐', img: 'assets/shot-arxiv.webp',
-      desc: '首页智能聚合 ArXiv 顶会论文，按兴趣排序推荐，一键点击即刻沉浸阅读。',
-      hl: [['🏆','顶会精选'], ['⚡','实时更新'], ['🎯','个性推荐']] },
-    { group: 'discover', icon: '🔍', tag: '内容发现', title: '语义搜索',
-      desc: '自然语言跨书跨文档检索，语义匹配而非关键词，直达书页精确位置。',
-      hl: [['📚','跨书检索'], ['🧬','语义匹配'], ['📍','页级定位']] },
-    { group: 'discover', icon: '🤖', tag: '内容发现', title: '选中即问',
-      desc: '选中任意段落即可提问，AI 拆解公式、梳理脉络，上下文自动携带。',
-      hl: [['✨','即选即问'], ['📐','公式拆解'], ['🔗','上下文携带']] },
-    { group: 'ai', icon: '💬', tag: 'AI 共读', title: 'AI 深度共读', img: 'assets/shot-qa.webp',
-      desc: '边读边聊，深度解读、总结摘要、提取要点一步到位，支持多轮追问。',
-      hl: [['💬','多轮对话'], ['📝','智能摘要'], ['💡','要点提取']] },
-    { group: 'ai', icon: '🕸️', tag: 'AI 共读', title: '多智能体编排',
-      desc: '四大专家随时待命，Leader 实时委派分工协作，复杂问题自动拆解执行。',
-      hl: [['🤖','四专家协同'], ['🎩','Leader 委派'], ['🔧','自动拆解']] },
-    { group: 'ai', icon: '💎', tag: 'AI 共读', title: '持久记忆',
-      desc: '四类记忆跨会话自动提取注入，长期偏好、阅读进度、知识图谱越读越懂你。',
-      hl: [['💎','四类记忆'], ['🔄','跨会话'], ['📈','渐进学习']] },
-    { group: 'ai', icon: '🛡️', tag: 'AI 共读', title: '行动审批',
-      desc: 'AI 写操作弹卡确认，60 秒未响应自动拒绝，每个动作可控可审计。',
-      hl: [['🔒','写操作确认'], ['⏱️','60s 超时'], ['📜','全程审计']] },
-    { group: 'ai', icon: '🔌', tag: 'AI 共读', title: 'MCP 外部工具',
-      desc: 'HTTP / stdio 双传输接入外部工具，搜文献、查数据、调 API 能力无限扩展。',
-      hl: [['🌐','HTTP/stdio'], ['🧰','工具生态'], ['🚀','无限扩展']] },
-    { group: 'read', icon: '🌐', tag: '阅读体验', title: '双语对照阅读', img: 'assets/shot-bilingual.webp',
-      desc: '原文与译文段落级对照，支持自定义翻译引擎，跨越语言门槛无障碍阅读。',
-      hl: [['🔤','段落对照'], ['⚙️','自定义引擎'], ['🎯','精准对齐']] },
-    { group: 'read', icon: '📖', tag: '阅读体验', title: '极致 EPUB', img: 'assets/shot-epub.webp',
-      desc: '翻页动效、标注批注、字体排版细节打磨，多种排版模式自由切换。',
-      hl: [['📄','翻页动效'], ['🖍️','标注批注'], ['✍️','字体排版']] },
-    { group: 'read', icon: '🚀', tag: '阅读体验', title: '文档任务',
-      desc: '翻章自动运行 AI，逐章生成摘要、笔记和闪卡，学习效率翻倍提升。',
-      hl: [['⚡','自动运行'], ['📋','逐章摘要'], ['🎴','闪卡生成']] },
-    { group: 'read', icon: '🎨', tag: '阅读体验', title: '八种主题', img: 'assets/shot-themes.webp',
-      desc: '从月夜深空到晨曦暖阳，八种精心调色主题，护眼与美感兼得。',
-      hl: [['🌙','月夜深空'], ['☀️','晨曦暖阳'], ['👀','护眼模式']] },
-    { group: 'knowledge', icon: '📚', tag: '知识管理', title: '精美书架', img: 'assets/shot-bookshelf.webp',
-      desc: '封面式陈列管理，拖拽整理一目了然，支持分组、标签和快速检索。',
-      hl: [['🖼️','封面陈列'], ['🖱️','拖拽整理'], ['🏷️','标签分组']] },
-    { group: 'knowledge', icon: '🧬', tag: '知识管理', title: '书架向量化', img: 'assets/shot-rag.webp',
-      desc: '整架书自动向量化索引，自然语言提问跨书检索，直达原文精确位置。',
-      hl: [['🔎','跨书搜索'], ['📐','向量索引'], ['💡','智能问答']] },
-  ];
-  const N = items.length;
-  let current = 0;
-  let autoTimer = null;
-
-  // 创建 DOM
-  const cards = items.map((item, i) => {
-    const el = document.createElement('div');
-    el.className = 'carousel-card';
-    el.setAttribute('data-group', item.group);
-    const hlHtml = item.hl.map(h =>
-      '<span class="cc-hl"><span class="cc-hl-icon">' + h[0] + '</span>' + h[1] + '</span>'
-    ).join('');
-    // 星夜氛围色板：radial-gradient 叠加，模拟星云光晕而非死板色块
-    const gradPalettes = {
-      discover:  { h: 35,  sat: 50, lit: 25, h2: 20,  sat2: 45, lit2: 18 },  // 月光琥珀
-      ai:        { h: 268, sat: 55, lit: 22, h2: 245, sat2: 50, lit2: 16 },  // 星云紫
-      read:      { h: 210, sat: 50, lit: 22, h2: 195, sat2: 45, lit2: 16 },  // 暮光蓝
-      knowledge: { h: 230, sat: 55, lit: 22, h2: 260, sat2: 45, lit2: 16 },  // 银河蓝紫
-    };
-    const pal = gradPalettes[item.group] || gradPalettes.ai;
-    const hOff  = Math.floor(Math.random() * 14 - 7);
-    const hOff2 = Math.floor(Math.random() * 14 - 7);
-    // 两团不同色温的星云光晕 + 暗角底色
-    const gradBg =
-      'radial-gradient(ellipse 90% 80% at 25% 35%, hsl(' + (pal.h + hOff) + ',' + pal.sat + '%,' + pal.lit + '%) 0%, transparent 70%),' +
-      'radial-gradient(ellipse 80% 70% at 75% 65%, hsl(' + (pal.h2 + hOff2) + ',' + pal.sat2 + '%,' + pal.lit2 + '%) 0%, transparent 65%),' +
-      'linear-gradient(170deg, hsl(' + (pal.h2 + hOff2) + ',25%,8%) 0%, hsl(' + (pal.h + hOff) + ',20%,5%) 100%)';
-    const imgHtml = item.img
-      ? '<div class="cc-shot"><img src="' + item.img + '" alt="' + item.title + '" loading="lazy" decoding="async" /><span class="cc-shot-shine"></span></div>'
-      : '<div class="cc-shot cc-shot--gradient" style="background:' + gradBg + '"><span class="cc-shot-shine"></span></div>';
-    el.innerHTML =
-      imgHtml +
-      '<div class="cc-inner">' +
-        '<span class="cc-tag">' + item.tag + '</span>' +
-        '<span class="cc-icon">' + item.icon + '</span>' +
-        '<div class="cc-title">' + item.title + '</div>' +
-        '<div class="cc-desc">' + item.desc + '</div>' +
-        '<div class="cc-highlights">' + hlHtml + '</div>' +
-      '</div>';
-    el.addEventListener('click', () => goTo(i));
-    track.appendChild(el);
-    return el;
-  });
-  const dots = items.map((_, i) => {
-    const d = document.createElement('button');
-    d.className = 'carousel-dot';
-    d.setAttribute('aria-label', '第 ' + (i + 1) + ' 项');
-    d.addEventListener('click', () => goTo(i));
-    dotsWrap.appendChild(d);
-    return d;
-  });
-
-  // 定位
-  function layout() {
-    const angleStep = 360 / N;
-    // 根据视口宽度调整半径
-    const vw = root.offsetWidth;
-    const radius = Math.max(200, Math.min(420, vw * 0.38));
-
-    cards.forEach((card, i) => {
-      const angle = angleStep * (i - current);
-      const rad = angle * Math.PI / 180;
-      const x = Math.sin(rad) * radius;
-      const z = Math.cos(rad) * radius;
-      const isActive = i === current;
-      const opacity = isActive ? 1 : Math.max(0.25, 0.4 + 0.6 * Math.cos(rad));
-      const scale = isActive ? 1 : 0.75 + 0.25 * Math.cos(rad);
-
-      card.style.transform =
-        'translate(-50%, -50%)' +
-        ' translateX(' + x + 'px)' +
-        ' translateZ(' + z + 'px)' +
-        ' scale(' + scale + ')';
-      card.style.opacity = opacity;
-      card.style.zIndex = Math.round(z + 500);
-      card.style.pointerEvents = Math.abs(angle) < 30 ? 'auto' : 'none';
-      card.classList.toggle('is-active', isActive);
-    });
-
-    dots.forEach((d, i) => d.classList.toggle('is-active', i === current));
-  }
-
-  function goTo(idx, fromAuto) {
-    current = ((idx % N) + N) % N;
-    layout();
-    if (!fromAuto) resetAuto();
-  }
-
-  function prev() { goTo(current - 1); }
-  function next() { goTo(current + 1); }
-
-  // 自动轮播
-  function startAuto() {
-    if (reduceMotion) return;
-    autoTimer = setInterval(() => goTo(current + 1, true), 3500);
-  }
-  function resetAuto() {
-    clearInterval(autoTimer);
-    startAuto();
-  }
-  function stopAuto() { clearInterval(autoTimer); }
-
-  prevBtn.addEventListener('click', prev);
-  nextBtn.addEventListener('click', next);
-  root.addEventListener('pointerenter', stopAuto);
-  root.addEventListener('pointerleave', startAuto);
-
-  // 触摸拖拽
-  let startX = 0, dragging = false;
-  track.addEventListener('pointerdown', e => {
-    if (e.pointerType === 'mouse' && e.button !== 0) return;
-    startX = e.clientX; dragging = true;
-    track.setPointerCapture(e.pointerId);
-    stopAuto();
-  });
-  track.addEventListener('pointermove', e => {
-    if (!dragging) return;
-    const dx = e.clientX - startX;
-    if (Math.abs(dx) > 50) {
-      dragging = false;
-      dx > 0 ? prev() : next();
+  // 5 步阅读旅程：随步切换的能力详情（与节点文案同源）
+  const cardData = [
+    null,
+    {
+      rgb: '226, 210, 162',
+      no: 'STEP 1 / 5',
+      kicker: '发现 · DISCOVER',
+      name: '从海量论文中，找到值得深读的那一篇',
+      desc: 'ArXiv 与顶会论文实时聚合，自然语言语义检索直达心仪段落——你的学术雷达永不眠。',
+      points: ['顶会论文实时收录，新文零延迟', '语义检索，不止于关键词', '按你的研究方向持续推送']
+    },
+    {
+      rgb: '94, 186, 145',
+      no: 'STEP 2 / 5',
+      kicker: 'AI 共读 · CO-READ',
+      name: '选中段落即问，小月亮拆解到读懂',
+      desc: '遇到不懂的段落，选中即可提问——小月亮顺着上下文逐层拆解，多轮追问直到想通。',
+      points: ['选中即问，无需切换上下文', '多轮追问，层层深入', '读完自动小结，留存理解']
+    },
+    {
+      rgb: '144, 173, 223',
+      no: 'STEP 3 / 5',
+      kicker: '双语精读 · BILINGUAL',
+      name: '原文译文逐段对照，难点即时消解',
+      desc: '中英段落级对照排版，生词长难句即点即译，沉浸阅读不再被工具打断。',
+      points: ['中英段落级对照排版', '生词长难句即点即解', '沉浸式阅读，专注不跳走']
+    },
+    {
+      rgb: '182, 156, 222',
+      no: 'STEP 4 / 5',
+      kicker: '收纳沉淀 · COLLECT',
+      name: '翻页间自动沉淀，知识随手成卡',
+      desc: '阅读中的每一步都自动留下笔记——摘要、金句一键成卡，温故时信手拈来。',
+      points: ['段落摘要自动沉淀', '金句一键成闪卡', '全部笔记可按书检索']
+    },
+    {
+      rgb: '215, 220, 234',
+      no: 'STEP 5 / 5',
+      kicker: '向量检索 · RETRIEVE',
+      name: '整架书在问，一句直达原文',
+      desc: '全部藏书完成向量化索引，跨书提问直接命中原文段落——你的第二大脑随时待命。',
+      points: ['跨书向量检索，全文语义匹配', '相似段落联想，顺藤摸瓜', '命中即高亮定位原文']
     }
+  ];
+
+  // 交互状态：
+  //   curStep —— 当前展示步(0=未启动)
+  //   looping —— 自动流水在跑
+  //   paused  —— 用户点击跳步后停留阅读，流水已停
+  //   loopTimer —— 唯一主推进句柄(每步等待/重启等待)，clearLoop() 即断链暂停
+  //   gen 计数 —— 跳步/重启时 ++，使在途的节点/箭头渐亮 setTimeout 回调作废
+  let curStep = 0;
+  let looping = false;
+  let paused = false;
+  let gen = 0;
+  let loopTimer = null;
+
+  function clearLoop() {
+    if (loopTimer) { clearTimeout(loopTimer); loopTimer = null; }
+  }
+
+  function pauseHint(show) {
+    nodes.forEach(function (n) {
+      n.classList.toggle('paused-here', !!(show && !reduceMotion && parseInt(n.dataset.step, 10) === curStep));
+    });
+  }
+
+  // 渲染 step 对应的能力详情卡（重触发逐条点亮入场）
+  function renderDetail(step) {
+    if (!detail || !cardData[step]) return;
+    const d = cardData[step];
+    if (noEl) noEl.textContent = d.no;
+    if (kickerEl) kickerEl.textContent = d.kicker;
+    if (nameEl) nameEl.textContent = d.name;
+    if (descEl) descEl.textContent = d.desc;
+    if (pointsEl) {
+      pointsEl.innerHTML = '';
+      d.points.forEach(function (p) {
+        const li = document.createElement('li');
+        const dot = document.createElement('i');
+        li.appendChild(dot);
+        li.appendChild(document.createTextNode(p));
+        pointsEl.appendChild(li);
+      });
+    }
+    detail.style.setProperty('--jdc', d.rgb);
+    // 重放入场动画：摘 .in → 强制回流 → 再挂 .in，亮点逐条点亮
+    detail.classList.remove('in');
+    void detail.offsetWidth;
+    detail.classList.add('in');
+  }
+
+  // 步进节奏表（拍板硬约束，勿改）：step<=2 → 1200ms；step 5 → 2400ms；其余 2300ms；
+  // 播完全程后 2200ms 自动重启
+  function stepDelay(s) {
+    if (s <= 2) return 1200;
+    if (s === 5) return 2400;
+    return 2300;
+  }
+
+  // 同步点亮 <= step 的节点与 < step 的箭头 + 切详情卡（点击跳步：立即生效）
+  function activateNow(step) {
+    gen++;
+    nodes.forEach(function (n) {
+      n.classList.toggle('active', parseInt(n.dataset.step, 10) <= step);
+    });
+    arrows.forEach(function (a) {
+      a.classList.toggle('flowing', parseInt(a.dataset.arrow, 10) < step);
+    });
+    if (step > 0) renderDetail(step);
+  }
+
+  // 自动推进一格：点亮 next = curStep+1，并按节奏表排下一次
+  function tickOnce() {
+    const next = curStep + 1;
+    if (next > 5) {
+      // 播完：停 2200ms 后重启新一轮
+      clearLoop();
+      loopTimer = setTimeout(function () {
+        looping = false;
+        clearLoop();
+        runPipeline();
+      }, 2200);
+      return;
+    }
+    const myGen = gen;
+    nodes.forEach(function (n) {
+      const s = parseInt(n.dataset.step, 10);
+      if (s <= next) {
+        const d = (s - 1) * 80;
+        setTimeout(function () { if (gen === myGen) n.classList.add('active'); }, d);
+      }
+    });
+    arrows.forEach(function (a) {
+      const s = parseInt(a.dataset.arrow, 10);
+      if (s < next) {
+        const d = s * 120;
+        setTimeout(function () { if (gen === myGen) a.classList.add('flowing'); }, d);
+      }
+    });
+    curStep = next;
+    renderDetail(curStep);
+    clearLoop();
+    loopTimer = setTimeout(tickOnce, stepDelay(curStep));
+  }
+
+  // 主循环：从 0 清场，1 → 5 逐节点推进
+  function runPipeline() {
+    if (looping) return;
+    looping = true;
+    paused = false;
+    pauseHint(false);
+    curStep = 0;
+    gen++;
+    clearLoop();
+    nodes.forEach(function (n) { n.classList.remove('active'); });
+    arrows.forEach(function (a) { a.classList.remove('flowing'); });
+    loopTimer = setTimeout(tickOnce, 500);
+  }
+
+  // 点击跳步：立即激活该节点与详情卡，暂停自动流水（读完由用户续播）
+  function jumpTo(step) {
+    gen++;          // 作废任何在途渐亮
+    clearLoop();    // 断掉主推进/重启等待
+    looping = false;
+    paused = true;
+    curStep = step;
+    activateNow(step);
+    pauseHint(true); // 在当前激活节点上打暂停呼吸点
+  }
+
+  // 续播：仅当暂停且点到的是当前激活节点 → 立即推进下一格，后续按节奏表走
+  function resume() {
+    if (!paused || curStep < 1 || curStep > 5) return;
+    if (curStep === 5) {
+      // 已到末步：按播完节奏重启新一轮
+      paused = false;
+      looping = true;
+      pauseHint(false);
+      clearLoop();
+      loopTimer = setTimeout(function () {
+        looping = false;
+        clearLoop();
+        runPipeline();
+      }, 2200);
+      return;
+    }
+    paused = false;
+    looping = true;
+    pauseHint(false);
+    clearLoop();
+    tickOnce(); // 立即点亮 next = curStep+1，其停留时长由节奏表排定
+  }
+
+  // 点击节点
+  nodes.forEach(function (n) {
+    n.addEventListener('click', function () {
+      if (reduceMotion) {
+        // 静态读者：点击仅在静止状态间切换，无循环可续
+        curStep = parseInt(n.dataset.step, 10);
+        activateNow(curStep);
+        return;
+      }
+      const s = parseInt(n.dataset.step, 10);
+      if (paused) {
+        if (s === curStep) { resume(); }
+        else { jumpTo(s); }
+      } else {
+        jumpTo(s); // 运行中点击 = 直接跳步并停
+      }
+    });
+    n.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        n.click();
+      }
+    });
   });
-  track.addEventListener('pointerup', () => { dragging = false; startAuto(); });
-  track.addEventListener('pointercancel', () => { dragging = false; startAuto(); });
 
-  // 键盘
-  root.setAttribute('tabindex', '0');
-  root.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft') { prev(); e.preventDefault(); }
-    if (e.key === 'ArrowRight') { next(); e.preventDefault(); }
-  });
-
-  // resize
-  window.addEventListener('resize', () => layout(), { passive: true });
-
-  layout();
-  startAuto();
+  const obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        obs.unobserve(e.target);
+        if (reduceMotion) {
+          // 静态读者：一次点亮到终点，详情定格末步，不循环
+          curStep = 5;
+          activateNow(5);
+        } else {
+          runPipeline();
+        }
+      }
+    });
+  }, { threshold: 0.2 });
+  obs.observe(pipe);
 })();
