@@ -1,19 +1,19 @@
 {
-  "version": "1.0.152",
-  "releasedAt": "2026-09-01T15:21:38Z",
-  "notes": "小月亮阅读器 v1.0.152 - 跨平台专业文档阅读器",
+  "version": "1.0.153",
+  "releasedAt": "2026-09-03T04:03:00Z",
+  "notes": "小月亮阅读器 v1.0.153 - 跨平台专业文档阅读器",
   "downloadUrl": "https://moon.jdk.plus#start",
-  "minimumRequired": "1.0.132",
+  "minimumRequired": "1.0.133",
   "downloads": {
-    "macos": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.152/MoonReader-1.0.152-macos-universal.dmg",
-    "windows": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.152/MoonReader-1.0.152-windows-x64-setup.exe",
-    "android": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.152/MoonReader-1.0.152-android-arm64.apk",
-    "linux": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.152/MoonReader-1.0.152-linux-amd64.deb",
+    "macos": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.153/MoonReader-1.0.153-macos-universal.dmg",
+    "windows": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.153/MoonReader-1.0.153-windows-x64-setup.exe",
+    "android": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.153/MoonReader-1.0.153-android-arm64.apk",
+    "linux": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.153/MoonReader-1.0.153-linux-amd64.deb",
     "ios": ""
   },
   "linuxDownloads": {
-    "deb": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.152/MoonReader-1.0.152-linux-amd64.deb",
-    "rpm": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.152/MoonReader-1.0.152-linux-x86_64.rpm",
-    "appimage": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.152/MoonReader-1.0.152-linux-x86_64.AppImage"
+    "deb": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.153/MoonReader-1.0.153-linux-amd64.deb",
+    "rpm": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.153/MoonReader-1.0.153-linux-x86_64.rpm",
+    "appimage": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.153/MoonReader-1.0.153-linux-x86_64.AppImage"
   }
 }
