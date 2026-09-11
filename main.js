@@ -667,7 +667,7 @@
     if (!target) return;
     // 只对截图类图片放大
     const src = target.currentSrc || target.src;
-    if (src && (target.closest('.show-media') || target.closest('.hero-shot-frame') || target.closest('.feature-visual') || target.closest('.theme-showcase'))) {
+    if (src && (target.closest('.show-media') || target.closest('.hero-shot-frame') || target.closest('.feature-visual') || target.closest('.theme-showcase') || target.closest('.build-figure'))) {
       open(src);
     }
   });

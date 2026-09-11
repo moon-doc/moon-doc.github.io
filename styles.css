@@ -854,6 +854,25 @@ body {
 }
 .theme-showcase img { width: 100%; height: auto; display: block; }
 
+/* ===== 公版书：站点导航图 ===== */
+.build-figure {
+  margin: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--card-brd);
+  background: var(--card);
+  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+}
+.build-figure img { width: 100%; height: auto; display: block; }
+.build-figure figcaption {
+  padding: 14px 20px;
+  border-top: 1px solid var(--card-brd);
+  color: var(--ink-dim);
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+}
+
 /* ===== CTA ===== */
 .cta { text-align: center; }
 .cta-card {
