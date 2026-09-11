@@ -1,0 +1,98 @@
+name: 书格书目索引
+
+# 把书格官网（shuge.org）的书目索引成一份 JSON，直接发到本仓（本站就是 Pages 站点），
+# 供阅读器书城按需拉取：https://moon.jdk.plus/shuge/books.json
+#
+# 触发方式：
+#   - repository_dispatch: shuge-index  —— moon-reader 每次打 tag 发布时派发（「编译发布时自动索引」）
+#   - schedule                         —— 每周一凌晨兜底刷新一次（两次发布之间也不至于太旧）
+#   - workflow_dispatch                —— 手动跑，可选 --full 忽略 lastmod 全量重抓
+#
+# 合规：只抓官网，且只抓它自己 sitemap 里列出的 /view/ 书籍页，抓取间隔取它 robots.txt 声明的
+# Crawl-delay（10s）。**不抓 shuge.hanjihebi.com 存储镜像**——那边的 robots.txt 是站主自加的
+# `User-agent: * / Disallow: /`（OpenList 也设了 allow_indexed: false）。详见
+# moon-reader/docs/shuge-index.md 的说明与许可申请草稿。
+#
+# 增量：索引文件本身就是缓存，lastmod 没变就不重抓；发布触发的这次通常 1~2 分钟跑完。
+# 冷启动（首次或 --full）要 755 × 10s ≈ 2.1 小时，job 超时给到 240 分钟。
+
+on:
+  repository_dispatch:
+    types: [shuge-index]
+  schedule:
+    - cron: "0 20 * * 0" # 周一 04:00（北京时间）
+  workflow_dispatch:
+    inputs:
+      full:
+        description: "忽略 lastmod，全量重抓（冷启动约 2.1 小时）"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: shuge-index
+  cancel-in-progress: false
+
+jobs:
+  index:
+    name: 生成并提交书格索引
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+
+    steps:
+      - name: Checkout 本仓（索引落点 + 增量缓存）
+        uses: actions/checkout@v4
+        with:
+          path: site
+
+      - name: 生成 GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          repositories: moon-reader
+
+      - name: Checkout moon-reader（只取索引脚本）
+        uses: actions/checkout@v4
+        with:
+          repository: moon-doc/moon-reader
+          token: ${{ steps.app-token.outputs.token }}
+          ref: main
+          path: moon-reader
+
+      - name: 生成书格书目索引
+        working-directory: site
+        run: |
+          python3 ../moon-reader/scripts/gen_shuge_index.py --out shuge/books.json ${{ inputs.full && '--full' || '' }}
+
+      - name: 概要
+        working-directory: site
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          d = json.load(open("shuge/books.json", encoding="utf-8"))
+          books = d["books"]
+          with_cover = sum(1 for b in books if b["cover"])
+          with_summary = sum(1 for b in books if b["summary"])
+          print(f"### 书格书目索引：{d['count']} 本（生成于 {d['generated_at']}）")
+          print()
+          print(f"- 有书影：{with_cover} / {d['count']}")
+          print(f"- 有简介：{with_summary} / {d['count']}")
+          print(f"- 最近更新：{max((b['lastmod'] for b in books if b['lastmod']), default='-')}")
+          PY
+
+      - name: 提交到本仓（Pages 直接可访问）
+        working-directory: site
+        run: |
+          if [ -z "$(git status --porcelain shuge/books.json)" ]; then
+            echo "索引无变化，跳过提交"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add shuge/books.json
+          git commit -m "chore(shuge): 自动更新书格书目索引 $(date -u +%Y-%m-%d)"
+          git push
