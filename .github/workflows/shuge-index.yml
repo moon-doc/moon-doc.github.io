@@ -60,7 +60,9 @@ jobs:
         with:
           repository: moon-doc/moon-reader
           token: ${{ steps.app-token.outputs.token }}
-          ref: main
+          # 不写 ref：对外仓 checkout 默认取它的默认分支（moon-reader 是 master）。
+          # 踩过的坑：写 ref: main → git fetch refs/heads/main* 匹配不到 → 重试 3 次后
+          # 「The process '/usr/bin/git' failed with exit code 1」，看起来像 token 没权限，其实是分支名错。
           path: moon-reader
 
       - name: 生成书格书目索引
