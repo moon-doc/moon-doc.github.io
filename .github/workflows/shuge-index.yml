@@ -97,4 +97,17 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add shuge/books.json
           git commit -m "chore(shuge): 自动更新书格书目索引 $(date -u +%Y-%m-%d)"
-          git push
+          # 同一次发布可能同时跑起三个会写本仓的 workflow（书格索引 / 公版书索引 / release 发布），
+          # 各自 clone 后各推同一个 main：谁先推谁赢，后推的被 `! [rejected] (fetch first)` 打回，
+          # 索引就悄悄没更新（上游那边是 continue-on-error，很容易一直没人发现）。被拒就同步远端再推。
+          for i in 1 2 3 4 5; do
+            if git push; then
+              echo "✓ 已推送到 main（第 ${i} 次尝试）"
+              exit 0
+            fi
+            echo "::warning::push 被拒（第 ${i} 次），同步远端后重试"
+            git pull --rebase --autostash origin main || true
+            sleep $((i * 5))
+          done
+          echo "::error::连续 5 次推送被拒（并发写同一分支），本次提交放弃"
+          exit 1

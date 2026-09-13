@@ -13,8 +13,9 @@ name: 公版书书目索引
 # GitHub 仓库（`zhpelo/wenshuoge`）的目录树与官方导出 CSV，不抓官网页面。两端都不转存正文/图片，
 # 索引里只有书目字段与 URL 模板。详见 moon-reader/docs/book-index.md。
 #
-# 这是一个独立 workflow（没有并进 shuge-index.yml）：书格冷启动要 2.1 小时，会把新索引一起拖住；
-# 而且 concurrency 分组也得独立，否则两边互相取消。本 workflow 实测 2 分钟内跑完。
+# 这是一个独立 workflow（没有并进 shuge-index.yml）：书格冷启动要 2.1 小时，并进同一个 concurrency
+# 分组会让公版书索引排在它后面干等。两者写的是不同文件，推同一个 main 的竞争由 push 重试兜住。
+# 本 workflow 实测 31 秒跑完（CI）。
 
 on:
   repository_dispatch:
@@ -104,4 +105,17 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add gutenberg/books.json wenshuoge/books.json
           git commit -m "chore(book-index): 自动更新公版书书目索引 $(date -u +%Y-%m-%d)"
-          git push
+          # 同一次发布可能同时跑起三个会写本仓的 workflow（书格索引 / 公版书索引 / release 发布），
+          # 各自 clone 后各推同一个 main：谁先推谁赢，后推的被 `! [rejected] (fetch first)` 打回，
+          # 索引就悄悄没更新（上游那边是 continue-on-error，很容易一直没人发现）。被拒就同步远端再推。
+          for i in 1 2 3 4 5; do
+            if git push; then
+              echo "✓ 已推送到 main（第 ${i} 次尝试）"
+              exit 0
+            fi
+            echo "::warning::push 被拒（第 ${i} 次），同步远端后重试"
+            git pull --rebase --autostash origin main || true
+            sleep $((i * 5))
+          done
+          echo "::error::连续 5 次推送被拒（并发写同一分支），本次提交放弃"
+          exit 1
