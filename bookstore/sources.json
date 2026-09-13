@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "sources": [
+    { "id": "wenshuoge", "enabled": true },
+    { "id": "gutenberg", "enabled": true },
+    { "id": "wikisource", "enabled": true },
+    { "id": "shuge", "enabled": true }
+  ]
+}
