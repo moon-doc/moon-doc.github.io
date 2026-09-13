@@ -1,0 +1,107 @@
+name: 公版书书目索引
+
+# 把两个公版书源的书目索引成 JSON，直接发到本仓（本站就是 Pages 站点），供阅读器书城按需拉取：
+#   - https://moon.jdk.plus/gutenberg/books.json    （Project Gutenberg 官方目录全量）
+#   - https://moon.jdk.plus/wenshuoge/books.json    （文硕阁全量，覆盖 App 内嵌快照）
+#
+# 触发方式：
+#   - repository_dispatch: book-index  —— moon-reader 每次打 tag 发布时派发（「编译发布时自动索引」）
+#   - schedule                         —— 每周一凌晨兜底刷新一次（两次发布之间也不至于太旧）
+#   - workflow_dispatch                —— 手动跑
+#
+# 合规：古腾堡只取**官方** `pg_catalog.csv`（一个请求、无速率限制），不碰 gutendex；文硕阁只读上游
+# GitHub 仓库（`zhpelo/wenshuoge`）的目录树与官方导出 CSV，不抓官网页面。两端都不转存正文/图片，
+# 索引里只有书目字段与 URL 模板。详见 moon-reader/docs/book-index.md。
+#
+# 这是一个独立 workflow（没有并进 shuge-index.yml）：书格冷启动要 2.1 小时，会把新索引一起拖住；
+# 而且 concurrency 分组也得独立，否则两边互相取消。本 workflow 实测 2 分钟内跑完。
+
+on:
+  repository_dispatch:
+    types: [book-index]
+  schedule:
+    - cron: "30 20 * * 0" # 周一 04:30（北京时间），错开书格那班（04:00）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: book-index
+  cancel-in-progress: false
+
+jobs:
+  index:
+    name: 生成并提交公版书索引
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout 本仓（索引落点）
+        uses: actions/checkout@v4
+        with:
+          path: site
+
+      - name: 生成 GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          repositories: moon-reader
+
+      - name: Checkout moon-reader（只取索引脚本与官方 CSV）
+        uses: actions/checkout@v4
+        with:
+          repository: moon-doc/moon-reader
+          token: ${{ steps.app-token.outputs.token }}
+          # 不写 ref：对外仓 checkout 默认取它的默认分支（moon-reader 是 master）。
+          # 踩过的坑：写 ref: main → git fetch refs/heads/main* 匹配不到 → 重试 3 次后
+          # 「The process '/usr/bin/git' failed with exit code 1」，看起来像 token 没权限，其实是分支名错。
+          path: moon-reader
+
+      - name: 生成古腾堡书目索引
+        # 自带闸门：CSV 缺列 / Text 行数 < 40000 / 书名缺失 / 编号重复 / URL 模板抽样命中率 < 80%
+        # → exit 2 且一个字节都不写（索引是「派生数据」，宁可这轮不发也不发一份残缺的）。
+        working-directory: site
+        run: |
+          mkdir -p gutenberg
+          python3 ../moon-reader/scripts/gen_gutenberg_index.py --out gutenberg/books.json
+
+      - name: 生成文硕阁书目索引
+        # 上游 CSV 领先实际文件（实测 308 条未上架），脚本默认按上游目录树剔除下载必然 404 的条目。
+        # 那个核对要 clone 一次 blob:none 的目录树（约 2.5 MB / 36 s），`git` 在 ubuntu-latest 自带。
+        working-directory: site
+        run: |
+          mkdir -p wenshuoge
+          python3 ../moon-reader/scripts/gen_book_catalog.py --out wenshuoge/books.json
+
+      - name: 概要
+        working-directory: site
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          for path, label in [("gutenberg/books.json", "古腾堡"), ("wenshuoge/books.json", "文硕阁")]:
+              d = json.load(open(path, encoding="utf-8"))
+              books = d["books"] if isinstance(d, dict) else d
+              print(f"### {label}书目索引：{len(books)} 条")
+              if isinstance(d, dict):
+                  print()
+                  print(f"- 源：{d.get('source_label', '-')}（{d.get('source', '-')}）")
+                  print(f"- 生成于：{d.get('generated_at', '-')}")
+                  print(f"- 主页：{d.get('homepage', '-')}")
+              print()
+          PY
+
+      - name: 提交到本仓（Pages 直接可访问）
+        working-directory: site
+        run: |
+          if [ -z "$(git status --porcelain gutenberg/books.json wenshuoge/books.json)" ]; then
+            echo "索引无变化，跳过提交"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add gutenberg/books.json wenshuoge/books.json
+          git commit -m "chore(book-index): 自动更新公版书书目索引 $(date -u +%Y-%m-%d)"
+          git push
