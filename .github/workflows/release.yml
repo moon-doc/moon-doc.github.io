@@ -67,7 +67,14 @@ jobs:
           java-version: 17
 
       - name: Setup Android SDK
+        # 必须显式给 packages：该动作默认装 "tools platform-tools"，而 Google 已把遗留的
+        # `tools` 包从 repository2-*.xml 索引撤下（2026-09-14 16:26 UTC 的构建还能装；次日起
+        # `sdkmanager tools` 报 "Warning: Failed to find package 'tools'" 并 exit 1），
+        # 用默认值会让整个 Android 作业停在 Setup Android SDK 这一步（31s 即失败）。
+        # 真正需要的组件由下一步显式安装，这里只要 platform-tools。
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
 
       - name: Install Android SDK components
         run: |
