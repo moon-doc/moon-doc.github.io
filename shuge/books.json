@@ -4,8 +4,8 @@
  "source_label": "书格",
  "homepage": "https://www.shuge.org",
  "note": "书目元数据索引，非全文；图片与书籍文件仍在书格官网，版权遵循各书页声明的许可协议",
- "generated_at": "2026-09-15T09:21:30Z",
- "count": 755,
+ "generated_at": "2026-09-15T14:37:26Z",
+ "count": 756,
  "books": [
   {
    "id": "afong_bei_jing_she_ying_ji",
@@ -18169,6 +18169,30 @@
    "license": "",
    "downloads": [
     "https://s.shuge.org/zgzcj"
+   ]
+  },
+  {
+   "id": "zi_jing_bian",
+   "title": "自警编",
+   "url": "https://www.shuge.org/view/zi_jing_bian/",
+   "lastmod": "2026-09-11T11:04:36+00:00",
+   "cover": "https://www.shuge.org/wp-content/uploads/2026/09/zi_jing_bian22.jpg",
+   "summary": "此《自警编》由宋代赵善璙辑。全书共五卷，分八类：学问类、操修类、齐家类、接物类、出处类、事君类（上、下）、政事类、拾遗类。主要辑录了自宋开国至靖康年间（少量涉及南宋初年及朱熹）名臣大儒的嘉言懿行与修身治政事迹。此为宋端平元年九江郡斋刊本。",
+   "categories": [
+    "子部",
+    "宋辽金",
+    "社会科学类"
+   ],
+   "tags": [],
+   "file_name": "自警编. 三册. 宋. 赵善璙. 辑. 宋端平元年九江郡斋刊本",
+   "archive_path": "书格文件\\PDF\\宋刻本\\自警编",
+   "format": "PDF 高清+ PDF 文件包含分卷书签",
+   "size": "1.79G",
+   "size_bw": "70.6M",
+   "source_library": "辽宁省图书馆 藏（国家珍贵古籍名录号 00777）",
+   "license": "未知。商业出版或需馆藏机构授权",
+   "downloads": [
+    "https://s.shuge.org/skbzjb"
    ]
   },
   {
