@@ -94,9 +94,20 @@ jobs:
       - name: Initialize Android project
         run: npx tauri android init --ci --skip-targets-install
 
-      - name: Configure Gradle network resilience (timeout/retry + Aliyun mirror)
+      - name: Configure Gradle repositories & network resilience
+        # Maven Central 会对 GitHub Actions 共享出口 IP 限流（HTTP 429）。v1.0.170 实测：Rust 侧
+        # 编完后 gradle 解析 :buildSrc:compileClasspath 的 kotlin-stdlib 拿到 429 → BUILD FAILED
+        # in 58s → APK 未产出 → needs: [android, ...] 的 Publish GitHub Release 被跳过。
+        #
+        # 镜像必须直接写进「生成的 build.gradle.kts」，不能只靠 init script 注入 settings：
+        #   - Gradle 默认 RepositoriesMode.PREFER_PROJECT：项目自己声明了 repositories 时，
+        #     settings 级 dependencyResolutionManagement 注入的仓库会被忽略；
+        #   - buildSrc（Tauri 模板的 rust plugin）是独立 build，仓库声明在自己的
+        #     buildSrc/build.gradle.kts `repositories { google(); mavenCentral() }` 里，
+        #     ~/.gradle/init.gradle 的 settings 注入对它无效 → 直连 Maven Central 撞 429。
+        # 故把镜像插到两份文件每个 repositories { } 块的最前面；google()/mavenCentral() 留在
+        # 后面兜底（Gradle 按声明顺序尝试，镜像未命中的构件仍可回落官方源）。
         run: |
-          # Maven Central 429 限流（GitHub Actions 共享出口 IP）：调大超时与重试，并前置阿里云镜像兜底。
           mkdir -p "$HOME/.gradle"
           cat > "$HOME/.gradle/gradle.properties" <<'EOF'
           org.gradle.internal.http.connectionTimeout=300000
@@ -110,15 +121,47 @@ jobs:
                   maven { url = uri('https://maven.aliyun.com/repository/gradle-plugin') }
                   maven { url = uri('https://maven.aliyun.com/repository/public') }
               }
-              settings.dependencyResolutionManagement.repositories {
-                  maven { url = uri('https://maven.aliyun.com/repository/google') }
-                  maven { url = uri('https://maven.aliyun.com/repository/public') }
-                  maven { url = uri('https://maven.aliyun.com/repository/central') }
-              }
           }
           EOF
-          echo "== gradle.properties =="; cat "$HOME/.gradle/gradle.properties"
-          echo "== init.gradle =="; cat "$HOME/.gradle/init.gradle"
+          python3 - <<'PY'
+          import pathlib, re, sys
+
+          # GCS 上 Google 托管的 Maven Central 只读镜像：无 429，且 GitHub runner 出口就在 GCP；
+          # 阿里云 google/public 兜住 Google 仓库（AGP/androidx）与 central。顺序即尝试顺序。
+          MIRRORS = [
+              "https://maven-central.storage-download.googleapis.com/maven2/",
+              "https://maven.aliyun.com/repository/google",
+              "https://maven.aliyun.com/repository/public",
+          ]
+          FILES = [
+              "src-tauri/gen/android/build.gradle.kts",
+              "src-tauri/gen/android/buildSrc/build.gradle.kts",
+          ]
+
+          for name in FILES:
+              path = pathlib.Path(name)
+              if not path.exists():
+                  sys.exit(f"[gradle-mirror] 缺少 {name}")
+              src = path.read_text()
+              if MIRRORS[0] in src:
+                  print(f"[gradle-mirror] {name}: 已注入，跳过")
+                  continue
+
+              def insert(match):
+                  indent = match.group(2)
+                  repos = "".join(f'{indent}maven {{ url = uri("{url}") }}\n' for url in MIRRORS)
+                  # group(2) 是紧随 "repositories {" 那一行的缩进，插入后要原样还回去
+                  return match.group(1) + repos + indent
+
+              out, count = re.subn(r"(repositories \{\n)([ \t]+)", insert, src)
+              if count == 0:
+                  sys.exit(f"[gradle-mirror] {name}: 未找到 repositories {{ }} 块")
+              path.write_text(out)
+              print(f"[gradle-mirror] {name}: 注入 {count} 处镜像仓库")
+          PY
+          echo "== 注入结果 =="
+          grep -n "storage-download.googleapis.com\|mavenCentral()\|google()" \
+            src-tauri/gen/android/build.gradle.kts src-tauri/gen/android/buildSrc/build.gradle.kts
 
       - name: Build Android (APK + AAB, single Rust compile)
         env:
