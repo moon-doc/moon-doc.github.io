@@ -4,8 +4,8 @@
  "source_label": "书格",
  "homepage": "https://www.shuge.org",
  "note": "书目元数据索引，非全文；图片与书籍文件仍在书格官网，版权遵循各书页声明的许可协议",
- "generated_at": "2026-09-21T10:06:37Z",
- "count": 756,
+ "generated_at": "2026-09-21T10:44:22Z",
+ "count": 757,
  "books": [
   {
    "id": "afong_bei_jing_she_ying_ji",
@@ -6349,6 +6349,30 @@
    "license": "",
    "downloads": [
     "https://s.shuge.org/kywgqt"
+   ]
+  },
+  {
+   "id": "lagrene-chinese-export-paintings",
+   "title": "拉萼尼藏中国外销画系列",
+   "url": "https://www.shuge.org/view/lagrene-chinese-export-paintings/",
+   "lastmod": "2026-09-21T07:41:52+00:00",
+   "cover": "https://www.shuge.org/wp-content/uploads/2026/09/Monsieur_de_Lagrenee_by_Brian_Searby_Middleton_Album.jpg",
+   "summary": "此《外销画》（系列）是由法国外交官拉萼尼（Théodose de Lagrené，1844 年中法《黄埔条约》的法方代表）收藏。全套共八十三册，绘制时间为十九世纪中叶，题材涉及：市井风俗、农桑耕织、手工器具、加工制造、花鸟鱼虫、商铺港口等等。此套现藏于法国国家图书馆。",
+   "categories": [
+    "清代",
+    "绘画",
+    "艺术类"
+   ],
+   "tags": [],
+   "file_name": "拉萼尼（Marie-Melchior-Joseph-Théodore de Lagrené）收藏中国外销画 *来源共 85 种，此处归档 82 种（排除两种灰度文件及一种非中国相关画谱）",
+   "archive_path": "",
+   "format": "PDF 高清",
+   "size": "3.91G",
+   "size_bw": "",
+   "source_library": "法国国家图书馆 藏",
+   "license": "CC BY 4.0",
+   "downloads": [
+    "https://s.shuge.org/lencwxh"
    ]
   },
   {
