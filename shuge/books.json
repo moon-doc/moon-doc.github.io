@@ -4,8 +4,8 @@
  "source_label": "书格",
  "homepage": "https://www.shuge.org",
  "note": "书目元数据索引，非全文；图片与书籍文件仍在书格官网，版权遵循各书页声明的许可协议",
- "generated_at": "2026-09-22T09:28:10Z",
- "count": 757,
+ "generated_at": "2026-09-22T10:11:30Z",
+ "count": 758,
  "books": [
   {
    "id": "afong_bei_jing_she_ying_ji",
@@ -17756,6 +17756,30 @@
    "downloads": [
     "https://s.shuge.org/zksjtj",
     "https://www.shuge.org/meet/topic/54663/"
+   ]
+  },
+  {
+   "id": "zhong_qiu_shi_juan",
+   "title": "中秋诗卷",
+   "url": "https://www.shuge.org/view/zhong_qiu_shi_juan/",
+   "lastmod": "2026-09-22T17:26:17+00:00",
+   "cover": "https://www.shuge.org/wp-content/uploads/2026/09/zhong_qiu_shi_juan08.jpg",
+   "summary": "此《中秋诗卷》由明代沈周书写。此卷书于明弘治二年（作者时年 63 岁），沈周在双峨楼追忆三年前与浦舒庵、祝允明等人的中秋赏月，将当年旧作《中秋诗》重新用行书写成此卷。诗文通过对比不同年龄段的赏月心境，抒发了作者对时光飞逝与人生无常的感慨。此卷现藏于台北故宫博物院。",
+   "categories": [
+    "书法",
+    "明代",
+    "艺术类"
+   ],
+   "tags": [],
+   "file_name": "中秋诗卷. 明弘治二年沈周书. 纸本行书（31.9x232 厘米）",
+   "archive_path": "书格文件\\PDF\\金石书法\\明沈周书中秋诗卷",
+   "format": "JPG 、 PDF 高清 PDF 文件包含书签注释",
+   "size": "133M",
+   "size_bw": "",
+   "source_library": "台北故宫博物院 藏（故書 000421）",
+   "license": "CC BY 4.0 *本归档文件相对原始文件有适当修改",
+   "downloads": [
+    "https://s.shuge.org/szzqsj"
    ]
   },
   {
