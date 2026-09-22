@@ -313,7 +313,9 @@ jobs:
       - name: Build macOS app
         env:
           NODE_OPTIONS: --max-old-space-size=8192
-        run: npm run build:web && npx tauri build --ci --target universal-apple-darwin --bundles app,dmg --no-sign
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: npm run build:web && npx tauri build --ci --target universal-apple-darwin --bundles app,dmg
 
       - name: Package macOS artifacts
         run: |
@@ -322,6 +324,9 @@ jobs:
             ditto -c -k --sequesterRsrc --keepParent "$app" "release/$(basename "$app").zip"
           done
           find src-tauri/target/universal-apple-darwin/release/bundle -name "*.dmg" -exec cp {} release/ \;
+          # updater 产物（.app.tar.gz + .sig）；macOS updater 只认 .app.tar.gz
+          find src-tauri/target/universal-apple-darwin/release/bundle -name "*.tar.gz" -exec cp {} release/ \;
+          find src-tauri/target/universal-apple-darwin/release/bundle -name "*.sig" -exec cp {} release/ \;
 
       - name: Upload macOS artifacts
         uses: actions/upload-artifact@v4
@@ -383,6 +388,8 @@ jobs:
       - name: Build Windows app
         env:
           NODE_OPTIONS: --max-old-space-size=8192
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: npm run build:web && npx tauri build --ci --bundles nsis
 
       - name: Upload Windows artifacts
@@ -391,7 +398,8 @@ jobs:
           name: mdoc-windows
           if-no-files-found: error
           path: |
-            src-tauri/target/release/bundle/nsis/**/*.exe
+            src-tauri/target/release/bundle/nsis/*.exe
+            src-tauri/target/release/bundle/nsis/*.sig
 
   linux:
     name: Linux
@@ -449,6 +457,8 @@ jobs:
       - name: Build Linux app (deb + rpm + AppImage)
         env:
           NODE_OPTIONS: --max-old-space-size=8192
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: npm run build:web && npx tauri build --ci --bundles deb,rpm,appimage
 
       - name: Upload Linux artifacts
@@ -457,9 +467,10 @@ jobs:
           name: mdoc-linux
           if-no-files-found: error
           path: |
-            src-tauri/target/release/bundle/deb/**/*.deb
-            src-tauri/target/release/bundle/rpm/**/*.rpm
-            src-tauri/target/release/bundle/appimage/**/*.AppImage
+            src-tauri/target/release/bundle/deb/*.deb
+            src-tauri/target/release/bundle/rpm/*.rpm
+            src-tauri/target/release/bundle/appimage/*.AppImage
+            src-tauri/target/release/bundle/appimage/*.AppImage.sig
 
   release:
     name: Publish GitHub Release
@@ -515,7 +526,11 @@ jobs:
               *.deb)       cp "$f" "staging/MoonReader-${VERSION}-linux-amd64.deb" ;;
               *.rpm)       cp "$f" "staging/MoonReader-${VERSION}-linux-x86_64.rpm" ;;
               *.AppImage)  cp "$f" "staging/MoonReader-${VERSION}-linux-x86_64.AppImage" ;;
-              *)           cp "$f" "staging/$base" ;;
+              # updater 产物与签名（Tauri v2 产物名带 -x64 / -aarch64 / -universal 平台后缀）
+              *.app.tar.gz)         cp "$f" "staging/$(basename "$base")" ;;
+              *.AppImage.tar.gz)    cp "$f" "staging/$(basename "$base")" ;;
+              *.sig)                cp "$f" "staging/$(basename "$base")" ;;
+              *)                    cp "$f" "staging/$base" ;;
             esac
           done
 
@@ -610,10 +625,47 @@ jobs:
           echo "Generated version.json:"
           cat version.json
 
+          # 7b) 组装 latest.json（Tauri updater 插件清单，Tauri v2 static JSON 格式）
+          #     平台 key 按运行平台选择；url 指向 Release 上带平台后缀的 updater 产物，
+          #     signature 为对应 .sig 文件内容（minisign 签名，原样内联）。
+          UPDATER_BASE="https://github.com/${PAGES_REPO}/releases/download/${TAG}"
+          MAC_UPD=$(ls staging/*macos*universal*.app.tar.gz 2>/dev/null | head -1 || true)
+          MAC_SIG=$(ls staging/*.app.tar.gz.sig 2>/dev/null | head -1 || true)
+          # Windows NSIS updater 产物：setup.exe 本体即更新包（.sig 同名）
+          WIN_EXE=$(ls staging/*windows*x64*setup.exe 2>/dev/null | head -1 || true)
+          WIN_SIG=$(ls staging/*windows*x64*setup.exe.sig 2>/dev/null | head -1 || true)
+          LIN_UPD=$(ls staging/*x86_64*.AppImage.tar.gz 2>/dev/null | head -1 || true)
+          LIN_SIG=$(ls staging/*.AppImage.tar.gz.sig 2>/dev/null | head -1 || true)
+
+          jq -n --arg v "$VERSION" --arg n "$NOTES" --arg t "$RELEASED_AT" \
+                --arg mac_url "${MAC_UPD:+$UPDATER_BASE/$(basename "$MAC_UPD")}" \
+                --arg mac_sig "$( [ -n "$MAC_SIG" ] && cat "$MAC_SIG" || echo '' )" \
+                --arg win_url "${WIN_EXE:+$UPDATER_BASE/$(basename "$WIN_EXE")}" \
+                --arg win_sig "$( [ -n "$WIN_SIG" ] && cat "$WIN_SIG" || echo '' )" \
+                --arg lin_url "${LIN_UPD:+$UPDATER_BASE/$(basename "$LIN_UPD")}" \
+                --arg lin_sig "$( [ -n "$LIN_SIG" ] && cat "$LIN_SIG" || echo '' )" \
+            '{version:$v, notes:$n, pub_date:$t,
+              platforms:(
+                (if $mac_url != "" then {
+                  "darwin-aarch64": {signature:$mac_sig, url:$mac_url},
+                  "darwin-x86_64": {signature:$mac_sig, url:$mac_url}
+                } else {} end)
+                + (if $win_url != "" then {
+                  "windows-x86_64": {signature:$win_sig, url:$win_url}
+                } else {} end)
+                + (if $lin_url != "" then {
+                  "linux-x86_64": {signature:$lin_sig, url:$lin_url}
+                } else {} end)
+              )}' \
+            > latest.json
+          echo "Generated latest.json:"
+          cat latest.json
+
           # 8) 推送 version.json + 更新 index.html 到 Pages 仓库
           export VERSION MAC WIN AND LIN_DEB LIN_RPM PAGES_BASE
           git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${PAGES_REPO}.git" pages
           cp version.json pages/version.json
+          cp latest.json pages/latest.json
 
           # 9) 替换 index.html 中的下载按钮 href 和版本标签
           if [ -f pages/index.html ]; then
