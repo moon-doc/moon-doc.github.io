@@ -1189,14 +1189,36 @@
   var frames = stage.querySelectorAll('.theme-frame');
   var dots = stage.querySelectorAll('.theme-dot');
   var nameEl = document.getElementById('themeName');
+  var poemEl = document.getElementById('themePoem');
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var cur = 0, timer = null, INTERVAL = 2600;
+
+  // 每个主题一句意境文案
+  var POEMS = {
+    '晨光': '晨光落纸页，一字一句皆初醒',
+    '米色': '素笺映暖阳，书香自悠长',
+    '护眼绿': '一屏青翠色，久读不倦眼',
+    '落瓣': '花落书页间，静读春意阑珊',
+    '极光': '极光垂夜幕，字里行间有星辉',
+    '樱吹雪': '樱吹雪落时，恰逢字句温柔',
+    '星夜': '星垂平野阔，书海共长明',
+    '琥珀': '暖光浸书页，旧卷亦生香',
+  };
 
   function show(i) {
     cur = (i + frames.length) % frames.length;
     frames.forEach(function (f, k) { f.classList.toggle('active', k === cur); });
     dots.forEach(function (d, k) { d.classList.toggle('active', k === cur); });
     if (nameEl) nameEl.textContent = dots[cur].getAttribute('aria-label') || '';
+    if (poemEl) {
+      // 淡出→换词→淡入，避免生硬跳变
+      poemEl.style.opacity = '0';
+      setTimeout(function () {
+        var label = dots[cur].getAttribute('aria-label') || '';
+        poemEl.textContent = POEMS[label] || '';
+        poemEl.style.opacity = '';
+      }, 200);
+    }
   }
   function play() {
     if (reduceMotion || frames.length < 2) return;

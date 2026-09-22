@@ -870,7 +870,14 @@ body {
   background: var(--card-bg, rgba(0,0,0,.25));
   border-top: 1px solid var(--card-brd, rgba(255,255,255,.08));
 }
+.theme-caption-left { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .theme-name { font-weight: 600; font-size: 15px; letter-spacing: .05em; }
+.theme-poem {
+  font-size: 12.5px;
+  letter-spacing: .08em;
+  opacity: .65;
+  transition: opacity .4s ease;
+}
 .theme-dots { display: flex; gap: 10px; }
 .theme-dot {
   width: 12px; height: 12px; border-radius: 50%;
