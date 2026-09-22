@@ -471,6 +471,8 @@ jobs:
             src-tauri/target/release/bundle/rpm/*.rpm
             src-tauri/target/release/bundle/appimage/*.AppImage
             src-tauri/target/release/bundle/appimage/*.AppImage.sig
+            src-tauri/target/release/bundle/appimage/*.AppImage.tar.gz
+            src-tauri/target/release/bundle/appimage/*.AppImage.tar.gz.sig
 
   release:
     name: Publish GitHub Release
@@ -526,10 +528,14 @@ jobs:
               *.deb)       cp "$f" "staging/MoonReader-${VERSION}-linux-amd64.deb" ;;
               *.rpm)       cp "$f" "staging/MoonReader-${VERSION}-linux-x86_64.rpm" ;;
               *.AppImage)  cp "$f" "staging/MoonReader-${VERSION}-linux-x86_64.AppImage" ;;
-              # updater 产物与签名（Tauri v2 产物名带 -x64 / -aarch64 / -universal 平台后缀）
-              *.app.tar.gz)         cp "$f" "staging/$(basename "$base")" ;;
-              *.AppImage.tar.gz)    cp "$f" "staging/$(basename "$base")" ;;
-              *.sig)                cp "$f" "staging/$(basename "$base")" ;;
+              # updater 产物与签名：统一重命名为含平台关键字的规范名，
+              # 下游 MAC_UPD/WIN_SIG 等 glob 与 latest.json 组装都依赖这些名字
+              *.app.tar.gz)         cp "$f" "staging/MoonReader-${VERSION}-macos-universal.app.tar.gz" ;;
+              *.app.tar.gz.sig)     cp "$f" "staging/MoonReader-${VERSION}-macos-universal.app.tar.gz.sig" ;;
+              *.AppImage.tar.gz)    cp "$f" "staging/MoonReader-${VERSION}-linux-x86_64.AppImage.tar.gz" ;;
+              *.AppImage.tar.gz.sig) cp "$f" "staging/MoonReader-${VERSION}-linux-x86_64.AppImage.tar.gz.sig" ;;
+              *.setup.exe.sig)      cp "$f" "staging/MoonReader-${VERSION}-windows-x64-setup.exe.sig" ;;
+              *.AppImage.sig)       cp "$f" "staging/MoonReader-${VERSION}-linux-x86_64.AppImage.sig" ;;
               *)                    cp "$f" "staging/$base" ;;
             esac
           done
