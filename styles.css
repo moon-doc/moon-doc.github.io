@@ -853,6 +853,33 @@ body {
   box-shadow: 0 20px 60px rgba(0,0,0,.4);
 }
 .theme-showcase img { width: 100%; height: auto; display: block; }
+.theme-showcase { position: relative; }
+.theme-frame {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity .8s ease;
+  pointer-events: none;
+}
+.theme-frame.active { opacity: 1; position: relative; }
+.theme-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--card-bg, rgba(0,0,0,.25));
+  border-top: 1px solid var(--card-brd, rgba(255,255,255,.08));
+}
+.theme-name { font-weight: 600; font-size: 15px; letter-spacing: .05em; }
+.theme-dots { display: flex; gap: 10px; }
+.theme-dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  border: 1px solid var(--card-brd, rgba(255,255,255,.25));
+  background: transparent; cursor: pointer; padding: 0;
+  transition: transform .2s ease, background .3s ease;
+}
+.theme-dot:hover { transform: scale(1.25); }
+.theme-dot.active { background: var(--accent, #fbbf24); border-color: var(--accent, #fbbf24); }
 
 /* ===== CTA ===== */
 .cta { text-align: center; }

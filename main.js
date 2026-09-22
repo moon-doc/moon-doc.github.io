@@ -1181,3 +1181,48 @@
   }, { threshold: 0.2 });
   obs.observe(pipe);
 })();
+
+/* ===== 主题预览:序列帧自动播放 + 手动切换 ===== */
+(function () {
+  var stage = document.getElementById('themeStage');
+  if (!stage) return;
+  var frames = stage.querySelectorAll('.theme-frame');
+  var dots = stage.querySelectorAll('.theme-dot');
+  var nameEl = document.getElementById('themeName');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cur = 0, timer = null, INTERVAL = 2600;
+
+  function show(i) {
+    cur = (i + frames.length) % frames.length;
+    frames.forEach(function (f, k) { f.classList.toggle('active', k === cur); });
+    dots.forEach(function (d, k) { d.classList.toggle('active', k === cur); });
+    if (nameEl) nameEl.textContent = dots[cur].getAttribute('aria-label') || '';
+  }
+  function play() {
+    if (reduceMotion || frames.length < 2) return;
+    stop();
+    timer = setInterval(function () { show(cur + 1); }, INTERVAL);
+  }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } }
+
+  dots.forEach(function (d, k) {
+    d.addEventListener('click', function () { show(k); play(); });
+  });
+  stage.addEventListener('mouseenter', stop);
+  stage.addEventListener('mouseleave', play);
+  document.addEventListener('visibilitychange', function () {
+    document.hidden ? stop() : (isInView() && play());
+  });
+
+  function isInView() {
+    var r = stage.getBoundingClientRect();
+    return r.top < window.innerHeight && r.bottom > 0;
+  }
+  // 进入视口才开始播,离屏即停,不空转
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      e.isIntersecting ? play() : stop();
+    });
+  }, { threshold: 0.25 });
+  io.observe(stage);
+})();
