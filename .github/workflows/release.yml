@@ -725,11 +725,24 @@ jobs:
           echo "::error::连续 5 次推送被拒（并发写同一分支），本次提交放弃"
           exit 1
 
-      - name: Prune old workflow runs (keep latest 10)
-        if: always()
+  cleanup:
+    name: Prune old runs & caches
+    # 无论发布成败都清理：构建失败时 release 被跳过，若清理挂在其下，
+    # 失败的构建会无限堆积（v1.0.172 即例证）。
+    if: always()
+    needs: [android, ios, macos, windows, linux, release]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      actions: write
+    steps:
+      - name: Prune old workflow runs (keep latest 20) & caches
+        env:
+          # cleanup 不依赖 app-token 步骤（构建失败时也需要能跑），直接用 GITHUB_TOKEN
+          GH_TOKEN: ${{ github.token }}
         run: |
-          # --- Prune old workflow runs (keep latest 10) ---
-          KEEP=10
+          # --- Prune old workflow runs (keep latest 20) ---
+          KEEP=20
           echo "Pruning workflow runs, keeping latest ${KEEP}..."
           RUNS=$(gh run list -R moon-doc/moon-doc.github.io --workflow release.yml --limit 100 --json databaseId --jq '
             . as $all
@@ -777,5 +790,3 @@ jobs:
               done
             fi
           fi
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
