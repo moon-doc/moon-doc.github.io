@@ -471,8 +471,6 @@ jobs:
             src-tauri/target/release/bundle/rpm/*.rpm
             src-tauri/target/release/bundle/appimage/*.AppImage
             src-tauri/target/release/bundle/appimage/*.AppImage.sig
-            src-tauri/target/release/bundle/appimage/*.AppImage.tar.gz
-            src-tauri/target/release/bundle/appimage/*.AppImage.tar.gz.sig
 
   release:
     name: Publish GitHub Release
@@ -532,9 +530,7 @@ jobs:
               # 下游 MAC_UPD/WIN_SIG 等 glob 与 latest.json 组装都依赖这些名字
               *.app.tar.gz)         cp "$f" "staging/MoonReader-${VERSION}-macos-universal.app.tar.gz" ;;
               *.app.tar.gz.sig)     cp "$f" "staging/MoonReader-${VERSION}-macos-universal.app.tar.gz.sig" ;;
-              *.AppImage.tar.gz)    cp "$f" "staging/MoonReader-${VERSION}-linux-x86_64.AppImage.tar.gz" ;;
-              *.AppImage.tar.gz.sig) cp "$f" "staging/MoonReader-${VERSION}-linux-x86_64.AppImage.tar.gz.sig" ;;
-              *.setup.exe.sig)      cp "$f" "staging/MoonReader-${VERSION}-windows-x64-setup.exe.sig" ;;
+              *-setup.exe.sig)      cp "$f" "staging/MoonReader-${VERSION}-windows-x64-setup.exe.sig" ;;
               *.AppImage.sig)       cp "$f" "staging/MoonReader-${VERSION}-linux-x86_64.AppImage.sig" ;;
               *)                    cp "$f" "staging/$base" ;;
             esac
@@ -640,8 +636,9 @@ jobs:
           # Windows NSIS updater 产物：setup.exe 本体即更新包（.sig 同名）
           WIN_EXE=$(ls staging/*windows*x64*setup.exe 2>/dev/null | head -1 || true)
           WIN_SIG=$(ls staging/*windows*x64*setup.exe.sig 2>/dev/null | head -1 || true)
-          LIN_UPD=$(ls staging/*x86_64*.AppImage.tar.gz 2>/dev/null | head -1 || true)
-          LIN_SIG=$(ls staging/*.AppImage.tar.gz.sig 2>/dev/null | head -1 || true)
+          # Tauri v2 Linux updater：更新包即 .AppImage 本体，签名 .AppImage.sig
+          LIN_UPD=$(ls staging/*linux-x86_64.AppImage 2>/dev/null | grep -v '\.sig$' | head -1 || true)
+          LIN_SIG=$(ls staging/*linux-x86_64.AppImage.sig 2>/dev/null | head -1 || true)
 
           jq -n --arg v "$VERSION" --arg n "$NOTES" --arg t "$RELEASED_AT" \
                 --arg mac_url "${MAC_UPD:+$UPDATER_BASE/$(basename "$MAC_UPD")}" \
