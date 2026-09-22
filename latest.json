@@ -1,11 +1,19 @@
 {
-  "version": "1.0.173",
-  "notes": "小月亮阅读器 v1.0.173 - 跨平台专业文档阅读器",
-  "pub_date": "2026-09-22T08:55:43Z",
+  "version": "1.0.174",
+  "notes": "小月亮阅读器 v1.0.174 - 跨平台专业文档阅读器",
+  "pub_date": "2026-09-22T09:50:05Z",
   "platforms": {
+    "darwin-aarch64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUWVBqdm1TRkE2dGxqZjQyNGdUcnhRb0tqcVpsZUwrOTJVVEdiQUUrU2ZFdjN2RWdHMW1maVljQngvSmJnT1d5Yk5jVFNlWlZHQUpCS1dXZU9lS1A3VHFGdi9HOGRnOGdRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkwMDcwNTE5CWZpbGU65bCP5pyI5Lqu6ZiF6K+75ZmoLmFwcC50YXIuZ3oKdUhjYUVLNUZjRStQckJoSUtPSWxsSUsyU2JmWjZxVVl6RjEyT2dvQVc5eUhTMnYzOHZFRXU4Z2xFejJCcXU0Nm9UdlZvZDJZcUpPNHJIZjFTNUhSQ1E9PQo=",
+      "url": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.174/MoonReader-1.0.174-macos-universal.app.tar.gz"
+    },
+    "darwin-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUWVBqdm1TRkE2dGxqZjQyNGdUcnhRb0tqcVpsZUwrOTJVVEdiQUUrU2ZFdjN2RWdHMW1maVljQngvSmJnT1d5Yk5jVFNlWlZHQUpCS1dXZU9lS1A3VHFGdi9HOGRnOGdRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkwMDcwNTE5CWZpbGU65bCP5pyI5Lqu6ZiF6K+75ZmoLmFwcC50YXIuZ3oKdUhjYUVLNUZjRStQckJoSUtPSWxsSUsyU2JmWjZxVVl6RjEyT2dvQVc5eUhTMnYzOHZFRXU4Z2xFejJCcXU0Nm9UdlZvZDJZcUpPNHJIZjFTNUhSQ1E9PQo=",
+      "url": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.174/MoonReader-1.0.174-macos-universal.app.tar.gz"
+    },
     "windows-x86_64": {
       "signature": "",
-      "url": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.173/MoonReader-1.0.173-windows-x64-setup.exe"
+      "url": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.174/MoonReader-1.0.174-windows-x64-setup.exe"
     }
   }
 }
