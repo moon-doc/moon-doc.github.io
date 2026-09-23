@@ -324,7 +324,7 @@ jobs:
         run: |
           pipx install dmgbuild
           export PATH="$HOME/.local/bin:$PATH"
-          APP="src-tauri/target/universal-apple-darwin/release/bundle/macos/小月亮阅读器.app"
+          APP="src-tauri/target/universal-apple-darwin/release/bundle/macos/小月亮.app"
           VERSION=$(node -p "require('./package.json').version")
           VERSION="$VERSION" ./scripts/build-dmg.sh "$APP"
           # 覆盖 tauri 原生 DMG 不存在;产物在 bundle/dmg/ 下,供下一步上传
@@ -572,7 +572,7 @@ jobs:
           else
             echo "Creating draft release..."
             gh release create "$TAG" -R "$PAGES_REPO" --draft \
-              --title "v${VERSION}" --notes "小月亮阅读器 v${VERSION} - 跨平台专业文档阅读器"
+              --title "v${VERSION}" --notes "小月亮 v${VERSION} - 跨平台专业文档阅读器"
             gh release upload "$TAG" -R "$PAGES_REPO" --clobber staging/*
             gh release edit "$TAG" -R "$PAGES_REPO" --draft=false
           fi
@@ -588,13 +588,13 @@ jobs:
             fi
           else
             gh release create "$TAG" -R "$PRIVATE_REPO" \
-              --title "v${VERSION}" --notes "小月亮阅读器 v${VERSION} - 跨平台专业文档阅读器" \
+              --title "v${VERSION}" --notes "小月亮 v${VERSION} - 跨平台专业文档阅读器" \
               staging/*
           fi
 
           # 5) 生成下载直链（指向公开仓库 Release）
           RELEASED_AT=$(gh release view "$TAG" -R "$PAGES_REPO" --json publishedAt -q '.publishedAt // ""')
-          NOTES="小月亮阅读器 v${VERSION} - 跨平台专业文档阅读器"
+          NOTES="小月亮 v${VERSION} - 跨平台专业文档阅读器"
           RELEASE_BASE="https://github.com/${PAGES_REPO}/releases/download/${TAG}"
           encode() { python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$1"; }
 
