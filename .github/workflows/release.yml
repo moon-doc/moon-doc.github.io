@@ -315,7 +315,19 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=8192
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-        run: npm run build:web && npx tauri build --ci --target universal-apple-darwin --bundles app,dmg
+        # 只产出 .app;DMG 由下一步用 dmgbuild 生成(tauri 内置 create-dmg
+        # 依赖 Finder AppleScript,headless CI 上静默失败 → 无 .DS_Store,
+        # 背景图/图标位置/SLA 弹窗全部丢失,见 scripts/build-dmg.sh 头注)
+        run: npm run build:web && npx tauri build --ci --target universal-apple-darwin --bundles app
+
+      - name: Build branded DMG (dmgbuild)
+        run: |
+          pipx install dmgbuild
+          export PATH="$HOME/.local/bin:$PATH"
+          APP="src-tauri/target/universal-apple-darwin/release/bundle/macos/小月亮阅读器.app"
+          VERSION=$(node -p "require('./package.json').version")
+          VERSION="$VERSION" ./scripts/build-dmg.sh "$APP"
+          # 覆盖 tauri 原生 DMG 不存在;产物在 bundle/dmg/ 下,供下一步上传
 
       - name: Package macOS artifacts
         run: |
