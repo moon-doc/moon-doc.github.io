@@ -205,48 +205,66 @@
       yGrad.addColorStop(0.8, `hsla(${l.hue}, ${l.sat - 10}%, 55%, ${l.alpha * 0.18})`);
       yGrad.addColorStop(1, 'transparent');
 
-      mctx.save();
-      // 长轴裁剪：用线性渐变做 mask，银心处亮、两端渐灭
-      mctx.beginPath();
-      mctx.rect(-halfW, -halfH, l.w, l.h);
-      mctx.clip();
+      // 每层独立 scratch canvas：destination-out 只擦本层，
+      // 否则会把下面各层已画好的光晕一并擦出矩形豁口
+      const layer = document.createElement('canvas');
+      layer.width = l.w;
+      layer.height = l.h;
+      const lctx = layer.getContext('2d');
+      lctx.translate(halfW, halfH);
 
-      mctx.fillStyle = yGrad;
       // 拉伸径向渐变覆盖长轴区域
-      mctx.save();
-      mctx.scale(halfW / halfH, 1);
-      mctx.beginPath();
-      mctx.arc(0, 0, halfH, 0, Math.PI * 2);
-      mctx.fillStyle = yGrad;
-      mctx.fill();
-      mctx.restore();
+      lctx.save();
+      lctx.scale(halfW / halfH, 1);
+      lctx.beginPath();
+      lctx.arc(0, 0, halfH, 0, Math.PI * 2);
+      lctx.fillStyle = yGrad;
+      lctx.fill();
+      lctx.restore();
 
-      // 长轴衰减：叠加一个横向线性渐变做透明度遮罩
-      const xMask = mctx.createLinearGradient(-halfW, 0, halfW, 0);
-      xMask.addColorStop(0, 'rgba(5,6,15,0.95)');
-      xMask.addColorStop(0.15, 'rgba(5,6,15,0.4)');
-      xMask.addColorStop(0.4, 'rgba(5,6,15,0)');
-      xMask.addColorStop(0.6, 'rgba(5,6,15,0)');
-      xMask.addColorStop(0.85, 'rgba(5,6,15,0.4)');
-      xMask.addColorStop(1, 'rgba(5,6,15,0.95)');
-      mctx.globalCompositeOperation = 'destination-out';
-      mctx.fillStyle = xMask;
-      mctx.fillRect(-halfW, -halfH, l.w, l.h);
-      mctx.globalCompositeOperation = 'source-over';
+      // 长轴衰减：横向线性渐变做透明度遮罩（只作用于本层）
+      const xMask = lctx.createLinearGradient(-halfW, 0, halfW, 0);
+      xMask.addColorStop(0, 'rgba(0,0,0,0.95)');
+      xMask.addColorStop(0.15, 'rgba(0,0,0,0.4)');
+      xMask.addColorStop(0.4, 'rgba(0,0,0,0)');
+      xMask.addColorStop(0.6, 'rgba(0,0,0,0)');
+      xMask.addColorStop(0.85, 'rgba(0,0,0,0.4)');
+      xMask.addColorStop(1, 'rgba(0,0,0,0.95)');
+      lctx.globalCompositeOperation = 'destination-out';
+      lctx.fillStyle = xMask;
+      lctx.fillRect(-halfW, -halfH, l.w, l.h);
+      lctx.globalCompositeOperation = 'source-over';
 
-      mctx.restore();
+      // 合成本层到银河画布（半像素重叠防止接缝）
+      mctx.drawImage(layer, -halfW, -halfH);
     }
 
     // ── 暗尘带（银河中部的暗纹）──
-    // 一条比银河稍窄的暗带，沿中线偏移
-    const dustGrad = mctx.createLinearGradient(0, -baseWidth * 0.15, 0, baseWidth * 0.15);
-    dustGrad.addColorStop(0, 'transparent');
+    // 一条比银河稍窄的暗带，沿中线偏移；纵横向都渐隐，避免 fillRect 硬边
+    const dustLayer = document.createElement('canvas');
+    dustLayer.width = Math.round(bandLen * 0.9);
+    dustLayer.height = Math.round(baseWidth * 0.3);
+    const dctx = dustLayer.getContext('2d');
+    // 纵向渐隐：以本层画布为坐标系（中线在高度一半处）
+    const dustGrad = dctx.createLinearGradient(0, 0, 0, dustLayer.height);
+    dustGrad.addColorStop(0, 'rgba(5, 6, 15, 0)');
     dustGrad.addColorStop(0.35, 'rgba(5, 6, 15, 0.12)');
     dustGrad.addColorStop(0.5, 'rgba(5, 6, 15, 0.18)');
     dustGrad.addColorStop(0.65, 'rgba(5, 6, 15, 0.12)');
-    dustGrad.addColorStop(1, 'transparent');
-    mctx.fillStyle = dustGrad;
-    mctx.fillRect(-bandLen * 0.45, -baseWidth * 0.15, bandLen * 0.9, baseWidth * 0.3);
+    dustGrad.addColorStop(1, 'rgba(5, 6, 15, 0)');
+    dctx.fillStyle = dustGrad;
+    dctx.fillRect(0, 0, dustLayer.width, dustLayer.height);
+    // 横向两端渐隐（各 15%）
+    dctx.globalCompositeOperation = 'destination-in';
+    const dustMask = dctx.createLinearGradient(0, 0, dustLayer.width, 0);
+    dustMask.addColorStop(0, 'rgba(0,0,0,0)');
+    dustMask.addColorStop(0.15, 'rgba(0,0,0,1)');
+    dustMask.addColorStop(0.85, 'rgba(0,0,0,1)');
+    dustMask.addColorStop(1, 'rgba(0,0,0,0)');
+    dctx.fillStyle = dustMask;
+    dctx.fillRect(0, 0, dustLayer.width, dustLayer.height);
+    dctx.globalCompositeOperation = 'source-over';
+    mctx.drawImage(dustLayer, -bandLen * 0.45, -baseWidth * 0.15);
 
     mctx.restore();
 
