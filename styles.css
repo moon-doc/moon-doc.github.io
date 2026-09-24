@@ -930,6 +930,12 @@ body {
 .dl-text { text-align: center; }
 .dl-text strong { display: block; font-size: 15px; }
 .dl-text small { color: var(--ink-dim); font-size: 12px; }
+.dl-badge {
+  display: inline-block; margin-left: 6px; padding: 1px 7px;
+  border-radius: 999px; vertical-align: 1px;
+  font-size: 10px; font-style: normal; font-weight: 600; letter-spacing: .5px;
+  color: #ffe9a8; background: rgba(255,233,168,.12); border: 1px solid rgba(255,233,168,.35);
+}
 
 .hero-actions { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
 
