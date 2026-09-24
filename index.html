@@ -7,7 +7,7 @@
   <meta name="description" content="小月亮 · moon.jdk.plus — Just Deep Knowledge。ArXiv 顶会论文一键阅读、双语对照、AI 论文解读智能问答、极致 EPUB 阅读体验、精美书架与向量化知识库；公版书书城三源聚合 13,198 册离线书目，附 21 个公版书站点导航。" />
   <link rel="icon" href="assets/moon.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="stylesheet" href="styles.css?v=20260922b" />
+  <link rel="stylesheet" href="styles.css?v=20260924" />
 </head>
 <body>
   <!-- 星空明月动画背景 -->
@@ -363,49 +363,70 @@
         </div>
       </article>
     </div>
+  </section>
 
-    <!-- 多智能体轨道：Copilot 实时委派四大专家 -->
-    <div class="ai-orbit reveal">
-      <canvas id="ai-canvas"></canvas>
-      <div class="ai-orbit-center">
-        <div class="ai-core-icon">
-          <img src="assets/moon.png" alt="小月亮" class="ai-core-img" />
+  <!-- 更多内建能力 -->
+  <section id="more" class="section">
+    <h2 class="section-title reveal">更多内建能力</h2>
+    <p class="section-lead reveal">阅读本业之外，小月亮把这些也打磨到位。</p>
+
+    <div class="ai-capabilities">
+      <article class="ai-cap reveal" data-i="0" style="--cap-accent:#42b983">
+        <div class="ai-cap-icon">📚</div>
+        <div class="ai-cap-body">
+          <h4>全格式阅读</h4>
+          <p>PDF / EPUB / Markdown / 代码文件统一入架，目录、进度、标注一套体系</p>
         </div>
-        <span class="ai-core-label">AI 共读 · Copilot</span>
-        <span class="ai-core-status" id="ai-core-status">正在委派 · 论文解读</span>
-      </div>
-      <div class="ai-node ai-node--reader" data-ai="reader">
-        <div class="ai-node-icon">📄</div>
-        <div class="ai-node-body">
-          <h4>论文解读</h4>
-          <p>拆解公式 · 梳理贡献</p>
+      </article>
+      <article class="ai-cap reveal" data-i="1" style="--cap-accent:#8ab4ff">
+        <div class="ai-cap-icon">🔄</div>
+        <div class="ai-cap-body">
+          <h4>PDF 版面重排</h4>
+          <p>神经网络版面识别，扫描件与双栏论文重排为流畅文本，小屏也易读</p>
         </div>
-        <span class="ai-node-dot" aria-hidden="true"></span>
-      </div>
-      <div class="ai-node ai-node--coder" data-ai="coder">
-        <div class="ai-node-icon">💻</div>
-        <div class="ai-node-body">
-          <h4>代码解释</h4>
-          <p>逐行讲解 · 厘清逻辑</p>
+      </article>
+      <article class="ai-cap reveal" data-i="2" style="--cap-accent:#c9a6ff">
+        <div class="ai-cap-icon">✍️</div>
+        <div class="ai-cap-body">
+          <h4>统一标注体系</h4>
+          <p>高亮、批注、书摘，PDF / EPUB 同一体系按书存储，随时回顾</p>
         </div>
-        <span class="ai-node-dot" aria-hidden="true"></span>
-      </div>
-      <div class="ai-node ai-node--translator" data-ai="translator">
-        <div class="ai-node-icon">🌐</div>
-        <div class="ai-node-body">
-          <h4>翻译</h4>
-          <p>双语对照 · 整页翻译</p>
+      </article>
+      <article class="ai-cap reveal" data-i="3" style="--cap-accent:#ffe9a8">
+        <div class="ai-cap-icon">🧩</div>
+        <div class="ai-cap-body">
+          <h4>代码工作区</h4>
+          <p>Monaco 编辑器 + 内嵌终端 + 文件树，逐文件精读代码仓库</p>
         </div>
-        <span class="ai-node-dot" aria-hidden="true"></span>
-      </div>
-      <div class="ai-node ai-node--navigator" data-ai="navigator">
-        <div class="ai-node-icon">🧭</div>
-        <div class="ai-node-body">
-          <h4>文档导航</h4>
-          <p>定位章节 · 直达内容</p>
+      </article>
+      <article class="ai-cap reveal" data-i="4" style="--cap-accent:#ffe9a8">
+        <div class="ai-cap-icon">🤖</div>
+        <div class="ai-cap-body">
+          <h4>自带模型钥匙</h4>
+          <p>DeepSeek / OpenAI / Anthropic / Ollama 兼容端点随心配，Key 只存本地</p>
         </div>
-        <span class="ai-node-dot" aria-hidden="true"></span>
-      </div>
+      </article>
+      <article class="ai-cap reveal" data-i="5" style="--cap-accent:#42b983">
+        <div class="ai-cap-icon">🤗</div>
+        <div class="ai-cap-body">
+          <h4>社区内容流</h4>
+          <p>Hugging Face 社区热门与 ArXiv 顶会同源聚合，发现即可打开共读</p>
+        </div>
+      </article>
+      <article class="ai-cap reveal" data-i="6" style="--cap-accent:#8ab4ff">
+        <div class="ai-cap-icon">🔒</div>
+        <div class="ai-cap-body">
+          <h4>本地优先</h4>
+          <p>阅读数据、AI 会话、向量库全落本地 SQLite，不联网也能读能用</p>
+        </div>
+      </article>
+      <article class="ai-cap reveal" data-i="7" style="--cap-accent:#c9a6ff">
+        <div class="ai-cap-icon">💻</div>
+        <div class="ai-cap-body">
+          <h4>四端覆盖</h4>
+          <p>macOS / Windows / Linux / Android 原生应用，同一套本地数据体验，iOS 在路上</p>
+        </div>
+      </article>
     </div>
   </section>
 
@@ -481,6 +502,6 @@
     <p class="footer-sub">© 2026 moon.jdk.plus · 在星夜之下，遇见更深的知识</p>
   </footer>
 
-  <script src="main.js?v=20260922b"></script>
+  <script src="main.js?v=20260924"></script>
 </body>
 </html>
