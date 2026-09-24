@@ -1081,6 +1081,11 @@
   dots.forEach(function (d, k) {
     d.addEventListener('click', function () { show(k); play(); });
   });
+  var prevBtn = stage.querySelector('.theme-nav.prev');
+  var nextBtn = stage.querySelector('.theme-nav.next');
+  if (prevBtn) prevBtn.addEventListener('click', function () { show(cur - 1); play(); });
+  if (nextBtn) nextBtn.addEventListener('click', function () { show(cur + 1); play(); });
+
   stage.addEventListener('mouseenter', stop);
   stage.addEventListener('mouseleave', play);
   document.addEventListener('visibilitychange', function () {

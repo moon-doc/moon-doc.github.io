@@ -888,6 +888,32 @@ body {
 .theme-dot:hover { transform: scale(1.25); }
 .theme-dot.active { background: var(--accent, #fbbf24); border-color: var(--accent, #fbbf24); }
 
+.theme-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.22);
+  background: rgba(10,10,18,.45);
+  color: #fff;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  z-index: 3;
+  backdrop-filter: blur(4px);
+  transition: opacity .25s ease, background .2s ease, transform .2s ease;
+}
+.theme-nav.prev { left: 14px; }
+.theme-nav.next { right: 14px; }
+.theme-showcase:hover .theme-nav,
+.theme-nav:focus-visible { opacity: 1; }
+.theme-nav:hover { background: rgba(10,10,18,.72); transform: translateY(-50%) scale(1.08); }
+@media (hover: none) { .theme-nav { opacity: .6; } }
+
 /* ===== CTA ===== */
 .cta { text-align: center; }
 .cta-card {
