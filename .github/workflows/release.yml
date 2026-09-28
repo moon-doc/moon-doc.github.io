@@ -310,6 +310,12 @@ jobs:
         with:
           workspaces: src-tauri -> target
 
+      - name: Purge stale bundle output
+        # rust-cache 会把上一轮 target/ 里的 bundle/ 一并还原:v1.0.181 / v1.0.183
+        # 的线上 257 KB 空壳 dmg 就是"打包脚本原样拷走缓存里的空壳 .app"。
+        # 先清干净,保证 DMG 只可能由本轮新构建的 .app 产出。
+        run: rm -rf src-tauri/target/universal-apple-darwin/release/bundle
+
       - name: Build macOS app
         env:
           NODE_OPTIONS: --max-old-space-size=8192
@@ -331,14 +337,32 @@ jobs:
 
       - name: Package macOS artifacts
         run: |
+          set -euo pipefail
+          BUNDLE=src-tauri/target/universal-apple-darwin/release/bundle
           mkdir -p release
-          find src-tauri/target/universal-apple-darwin/release/bundle -name "*.app" -print0 | while IFS= read -r -d '' app; do
+
+          # updater 链路前提:.app.tar.gz + .sig 必须存在且不是空壳
+          # (线上 latest.json 的 darwin-* 平台 URL 指向它,缺失=自动更新静默失效)
+          TARBALL="$(find "$BUNDLE" -name '*.app.tar.gz' -print -quit)"
+          [[ -n "$TARBALL" ]] || { echo "ERROR: 缺 updater 产物 .app.tar.gz"; exit 1; }
+          [[ -f "${TARBALL}.sig" ]] || { echo "ERROR: 缺 updater 签名 ${TARBALL}.sig"; exit 1; }
+          TSIZE_KB=$(du -sk "$TARBALL" | cut -f1)
+          (( TSIZE_KB >= 30720 )) || { echo "ERROR: updater 包体积异常(${TSIZE_KB} KB < 30 MB),疑似空壳"; exit 1; }
+
+          # 完整 .app → zip(工作流内部产物;源 app 的完整性由 build-dmg.sh 断言)
+          find "$BUNDLE" -maxdepth 3 -name '*.app' -type d -print0 | while IFS= read -r -d '' app; do
             ditto -c -k --sequesterRsrc --keepParent "$app" "release/$(basename "$app").zip"
           done
-          find src-tauri/target/universal-apple-darwin/release/bundle -name "*.dmg" -exec cp {} release/ \;
-          # updater 产物（.app.tar.gz + .sig）；macOS updater 只认 .app.tar.gz
-          find src-tauri/target/universal-apple-darwin/release/bundle -name "*.tar.gz" -exec cp {} release/ \;
-          find src-tauri/target/universal-apple-darwin/release/bundle -name "*.sig" -exec cp {} release/ \;
+
+          # DMG 必须来自 build-dmg.sh(自带"源 app + 挂载后 .app"双端断言),体积再兜一道
+          DMG="$(find "$BUNDLE" -name '*.dmg' -print -quit)"
+          [[ -n "$DMG" ]] || { echo "ERROR: 未找到 DMG(build-dmg.sh 未产出)"; exit 1; }
+          DSIZE_KB=$(du -sk "$DMG" | cut -f1)
+          (( DSIZE_KB >= 30720 )) || { echo "ERROR: DMG 体积异常(${DSIZE_KB} KB < 30 MB),疑似空壳"; exit 1; }
+          cp "$DMG" release/
+
+          cp "${TARBALL}" "${TARBALL}.sig" release/
+          echo "=== release/ ==="; ls -lh release/
 
       - name: Upload macOS artifacts
         uses: actions/upload-artifact@v4
