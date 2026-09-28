@@ -5,7 +5,7 @@
   "downloadUrl": "https://moon.jdk.plus#start",
   "minimumRequired": "1.0.163",
   "downloads": {
-    "macos": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.183/MoonReader-1.0.183-macos-universal.dmg",
+    "macos": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.183-dmg-hotfix/MoonReader-1.0.183-macos-universal.dmg",
     "windows": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.183/MoonReader-1.0.183-windows-x64-setup.exe",
     "android": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.183/MoonReader-1.0.183-android-arm64.apk",
     "linux": "https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.183/MoonReader-1.0.183-linux-amd64.deb",
