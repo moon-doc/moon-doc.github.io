@@ -660,34 +660,92 @@
   update();
 })();
 
-// ===== 图片点击放大 =====
+// ===== 首屏主题动效：静帧 poster 先上屏，动效（162KB）等关键资源下完再拉 =====
+(function initHeroMedia() {
+  const v = document.querySelector('.hero-shot-frame video');
+  if (!v) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; // 只保留静帧
+  v.muted = true;
+  let inView = true;
+  let armed = false; // 关键资源(poster/CSS/JS/首屏图)未就绪前不拉流：它 162KB，弱网下会拖慢静帧上屏
+  function resume() {
+    if (!armed || !inView || document.hidden || !v.paused) return;
+    const p = v.play();
+    if (p && p.catch) p.catch(() => {});
+  }
+  function arm() {
+    if (armed) return;
+    armed = true;
+    resume();
+  }
+  // load 已意味首屏关键资源全部下完（lazy 图不阻塞 load），此时拉动效不再抢带宽
+  const afterCritical = () => {
+    if ('requestIdleCallback' in window) requestIdleCallback(arm, { timeout: 1500 });
+    else setTimeout(arm, 800);
+  };
+  if (document.readyState === 'complete') afterCritical();
+  else window.addEventListener('load', afterCritical, { once: true });
+  setTimeout(arm, 5000); // 兜底：load 迟迟不来（资源卡住）也要让动效最终开播
+  document.addEventListener('visibilitychange', () => { document.hidden ? v.pause() : resume(); });
+  new IntersectionObserver((es) => {
+    es.forEach((e) => { inView = e.isIntersecting; inView ? resume() : v.pause(); });
+  }, { threshold: 0.05 }).observe(v);
+})();
+
+// ===== 图片/动效点击放大 =====
 (function initLightbox() {
   const overlay = document.createElement('div');
   overlay.className = 'lightbox';
-  overlay.innerHTML = '<img class="lightbox-img" /><button class="lightbox-close" aria-label="关闭">✕</button>';
+  overlay.innerHTML = '<img class="lightbox-img" alt="" /><video class="lightbox-video" muted loop playsinline controls></video><button class="lightbox-close" aria-label="关闭">✕</button>';
   document.body.appendChild(overlay);
 
   const img = overlay.querySelector('.lightbox-img');
+  const vid = overlay.querySelector('.lightbox-video');
   const close = overlay.querySelector('.lightbox-close');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function open(src) {
-    img.src = src;
+  function open(src, isVideo) {
+    if (isVideo) {
+      img.removeAttribute('src');
+      img.style.display = 'none';
+      vid.style.display = '';
+      if (vid.getAttribute('src') !== src) vid.setAttribute('src', src);
+      vid.currentTime = 0;
+      if (!reduceMotion) { const p = vid.play(); if (p && p.catch) p.catch(() => {}); }
+    } else {
+      vid.pause();
+      vid.removeAttribute('src');
+      vid.load();
+      vid.style.display = 'none';
+      img.style.display = '';
+      img.src = src;
+    }
     overlay.classList.add('active');
     document.body.style.overflow = 'hidden';
   }
   function closeBox() {
     overlay.classList.remove('active');
     document.body.style.overflow = '';
+    vid.pause();
   }
 
   document.addEventListener('click', (e) => {
-    const target = e.target.closest('img');
-    if (!target) return;
-    // 只对截图类图片放大
-    const src = target.currentSrc || target.src;
-    if (src && (target.closest('.show-media') || target.closest('.hero-shot-frame') || target.closest('.feature-visual') || target.closest('.theme-showcase'))) {
-      open(src);
+    const target = e.target.closest('img, video');
+    if (!target || overlay.contains(target)) return;
+    // 只对截图/主题预览类放大
+    if (!(target.closest('.show-media') || target.closest('.hero-shot-frame') || target.closest('.feature-visual') || target.closest('.theme-showcase'))) return;
+    if (target.tagName === 'VIDEO') {
+      const v = target.currentSrc || target.getAttribute('src');
+      if (v) open(v, true);
+      return;
     }
+    // 主题静帧 → 放大后播对应动效；其余按静态图放大
+    const frame = target.closest('.theme-frame');
+    const hero = target.closest('.hero-shot-frame');
+    const anim = (frame && frame.getAttribute('data-video')) || (hero && hero.querySelector('video') && (hero.querySelector('video').currentSrc || hero.querySelector('video').getAttribute('src')));
+    if (anim) { open(anim, true); return; }
+    const src = target.currentSrc || target.src;
+    if (src) open(src, false);
   });
 
   close.addEventListener('click', closeBox);
@@ -1039,6 +1097,7 @@
   if (!stage) return;
   var frames = stage.querySelectorAll('.theme-frame');
   var dots = stage.querySelectorAll('.theme-dot');
+  var video = stage.querySelector('.theme-video');
   var nameEl = document.getElementById('themeName');
   var poemEl = document.getElementById('themePoem');
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1070,13 +1129,42 @@
         poemEl.style.opacity = '';
       }, 200);
     }
+    syncVideo();
+  }
+  // 动效层：只加载当前帧的 WebM；无动效主题（极光/护眼绿）或 reduced-motion 时清空
+  function syncVideo() {
+    if (!video) return;
+    var src = reduceMotion ? null : frames[cur].getAttribute('data-video');
+    if (src && video.getAttribute('src') === src) {
+      if (video.paused) { var rp = video.play(); if (rp && rp.catch) rp.catch(function () {}); }
+      return;
+    }
+    video.classList.remove('on');
+    video.pause();
+    if (src) {
+      video.setAttribute('src', src);
+      video.load();
+      var p = video.play();
+      if (p && p.catch) p.catch(function () {});
+    } else if (video.getAttribute('src')) {
+      video.removeAttribute('src');
+      video.load();
+    }
+  }
+  if (video) {
+    // 首帧解码完再淡入，切换间隙露出下层静帧而不是黑屏
+    video.addEventListener('playing', function () { video.classList.add('on'); });
   }
   function play() {
+    syncVideo();
     if (reduceMotion || frames.length < 2) return;
     stop();
     timer = setInterval(function () { show(cur + 1); }, INTERVAL);
   }
-  function stop() { if (timer) { clearInterval(timer); timer = null; } }
+  function stop(pauseVideo) {
+    if (timer) { clearInterval(timer); timer = null; }
+    if (pauseVideo && video) video.pause();
+  }
 
   dots.forEach(function (d, k) {
     d.addEventListener('click', function () { show(k); play(); });
@@ -1086,10 +1174,11 @@
   if (prevBtn) prevBtn.addEventListener('click', function () { show(cur - 1); play(); });
   if (nextBtn) nextBtn.addEventListener('click', function () { show(cur + 1); play(); });
 
-  stage.addEventListener('mouseenter', stop);
+  // hover 只暂停自动轮播，动效照常循环（与原 GIF 行为一致）；离屏/切页才真正暂停
+  stage.addEventListener('mouseenter', function () { stop(); });
   stage.addEventListener('mouseleave', play);
   document.addEventListener('visibilitychange', function () {
-    document.hidden ? stop() : (isInView() && play());
+    document.hidden ? stop(true) : (isInView() && play());
   });
 
   function isInView() {
@@ -1099,7 +1188,7 @@
   // 进入视口才开始播,离屏即停,不空转
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {
-      e.isIntersecting ? play() : stop();
+      e.isIntersecting ? play() : stop(true);
     });
   }, { threshold: 0.25 });
   io.observe(stage);

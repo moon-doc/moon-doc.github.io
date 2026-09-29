@@ -209,11 +209,13 @@ body {
     0 0 0 1px rgba(201,166,255,.4),
     inset 0 0 0 1px rgba(255,255,255,.08);
 }
-.hero-shot-frame img {
+.hero-shot-frame img,
+.hero-shot-frame video {
   width: 100%; height: auto; display: block;
   transition: transform .6s cubic-bezier(.2,.7,.2,1);
 }
-.hero-shot-frame:hover img { transform: scale(1.04); }
+.hero-shot-frame:hover img,
+.hero-shot-frame:hover video { transform: scale(1.04); }
 
 .hero-shot-shine {
   position: absolute; inset: 0;
@@ -852,7 +854,9 @@ body {
   border: 1px solid var(--card-brd);
   box-shadow: 0 20px 60px rgba(0,0,0,.4);
 }
-.theme-showcase img { width: 100%; height: auto; display: block; }
+/* 统一取景框：8 张静帧源尺寸不一（动态源导出 1568×1004、静态源 1568×1006），
+   cover 锁死同一画幅，避免切帧时 1~2px 抖动；动效层复用同一比例才能与静帧逐像素对齐 */
+.theme-showcase img { width: 100%; height: auto; aspect-ratio: 1568 / 1006; object-fit: cover; display: block; }
 .theme-showcase { position: relative; }
 .theme-frame {
   position: absolute;
@@ -862,6 +866,16 @@ body {
   pointer-events: none;
 }
 .theme-frame.active { opacity: 1; position: relative; }
+/* 当前主题的动效层：与 .theme-showcase img 同比例同尺寸，只覆盖静帧区域（不遮 figcaption） */
+.theme-video {
+  position: absolute; top: 0; left: 0; width: 100%;
+  aspect-ratio: 1568 / 1006;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity .35s ease;
+  pointer-events: none;
+}
+.theme-video.on { opacity: 1; }
 .theme-caption {
   display: flex;
   align-items: center;
@@ -1006,14 +1020,16 @@ body {
   transition: opacity .35s, visibility .35s;
 }
 .lightbox.active { opacity: 1; visibility: visible; }
-.lightbox img {
+.lightbox img,
+.lightbox video {
   max-width: 90vw; max-height: 88vh;
   border-radius: 16px;
   box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08);
   transform: scale(.92);
   transition: transform .4s cubic-bezier(.2,.7,.2,1);
 }
-.lightbox.active img { transform: scale(1); }
+.lightbox.active img,
+.lightbox.active video { transform: scale(1); }
 .lightbox-close {
   position: absolute; top: 24px; right: 28px;
   width: 40px; height: 40px;

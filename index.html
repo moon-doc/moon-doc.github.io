@@ -5,14 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>小月亮 · JDK — Just Deep Knowledge</title>
   <meta name="description" content="小月亮 · moon.jdk.plus — Just Deep Knowledge。ArXiv 顶会论文一键阅读、双语对照、AI 论文解读智能问答、极致 EPUB 阅读体验、精美书架与向量化知识库；公版书书城三源聚合 13,198 册离线书目，附 21 个公版书站点导航。" />
-  <link rel="icon" href="assets/moon.png" type="image/png" />
-  <link rel="stylesheet" href="styles.css?v=20260924c" />
+  <link rel="icon" href="assets/favicon-moon.png" type="image/png" sizes="64x64" />
+  <link rel="preload" as="image" href="assets/theme-2.webp" fetchpriority="high" />
+  <link rel="stylesheet" href="styles.css?v=20260929a" />
 </head>
 <body>
   <!-- 星空明月动画背景 -->
   <canvas id="starfield"></canvas>
   <div class="moon-glow" aria-hidden="true">
-    <img src="assets/moon.png" alt="明月" class="moon-img" />
+    <img src="assets/moon.webp" alt="明月" class="moon-img" width="207" height="207" />
   </div>
   <div class="shooting-stars" aria-hidden="true"></div>
 
@@ -46,7 +47,8 @@
       <p class="hero-desc">小月亮 · moon.jdk.plus</p>
     </div>
     <div class="hero-shot-frame">
-      <img src="assets/theme-2.gif" alt="小月亮 · 星夜主题" width="1568" height="1006" fetchpriority="high" decoding="async" />
+      <!-- 动效 162KB（原 GIF 1900KB）；poster 128KB 先上屏，reduced-motion 时只保留静帧 -->
+      <video class="hero-shot" poster="assets/theme-2.webp" src="assets/theme-2.webm" width="1568" height="1006" muted loop playsinline preload="none" aria-label="小月亮 · 星夜主题动效"></video>
       <span class="hero-shot-shine" aria-hidden="true"></span>
     </div>
   </section>
@@ -434,14 +436,32 @@
     <h2 class="section-title reveal">八种主题，随心而变</h2>
     <p class="section-lead reveal">让阅读的每一刻都恰到好处。</p>
     <figure class="theme-showcase reveal" id="themeStage">
-      <img src="assets/theme-1.gif" alt="主题预览：琥珀" class="theme-frame active" width="1568" height="1006" />
-      <img src="assets/theme-2.gif" alt="主题预览：星夜" class="theme-frame" width="1568" height="1006" loading="lazy" />
-      <img src="assets/theme-3.gif" alt="主题预览：樱吹雪" class="theme-frame" width="1568" height="1006" loading="lazy" />
-      <img src="assets/theme-4.png" alt="主题预览：极光" class="theme-frame" width="1568" height="1006" loading="lazy" />
-      <img src="assets/theme-5.gif" alt="主题预览：落瓣" class="theme-frame" width="1568" height="1006" loading="lazy" />
-      <img src="assets/theme-6.png" alt="主题预览：护眼绿" class="theme-frame" width="1568" height="1006" loading="lazy" />
-      <img src="assets/theme-7.gif" alt="主题预览：米色" class="theme-frame" width="1568" height="1006" loading="lazy" />
-      <img src="assets/theme-8.gif" alt="主题预览：晨光" class="theme-frame" width="1568" height="1006" loading="lazy" />
+      <!-- 每帧静帧 WebP（~100KB）先上屏，当前帧再按需播 WebM（~140KB）；原 8 张 GIF/PNG 合计 18MB -->
+      <div class="theme-frame active" data-video="assets/theme-1.webm">
+        <img src="assets/theme-1.webp" alt="主题预览：琥珀" width="1568" height="1006" loading="lazy" decoding="async" />
+      </div>
+      <div class="theme-frame" data-video="assets/theme-2.webm">
+        <img src="assets/theme-2.webp" alt="主题预览：星夜" width="1568" height="1006" loading="lazy" decoding="async" />
+      </div>
+      <div class="theme-frame" data-video="assets/theme-3.webm">
+        <img src="assets/theme-3.webp" alt="主题预览：樱吹雪" width="1568" height="1006" loading="lazy" decoding="async" />
+      </div>
+      <div class="theme-frame">
+        <img src="assets/theme-4.webp" alt="主题预览：极光" width="1568" height="1006" loading="lazy" decoding="async" />
+      </div>
+      <div class="theme-frame" data-video="assets/theme-5.webm">
+        <img src="assets/theme-5.webp" alt="主题预览：落瓣" width="1568" height="1006" loading="lazy" decoding="async" />
+      </div>
+      <div class="theme-frame">
+        <img src="assets/theme-6.webp" alt="主题预览：护眼绿" width="1568" height="1006" loading="lazy" decoding="async" />
+      </div>
+      <div class="theme-frame" data-video="assets/theme-7.webm">
+        <img src="assets/theme-7.webp" alt="主题预览：米色" width="1568" height="1006" loading="lazy" decoding="async" />
+      </div>
+      <div class="theme-frame" data-video="assets/theme-8.webm">
+        <img src="assets/theme-8.webp" alt="主题预览：晨光" width="1568" height="1006" loading="lazy" decoding="async" />
+      </div>
+      <video class="theme-video" muted loop playsinline preload="none" aria-hidden="true"></video>
       <button class="theme-nav prev" aria-label="上一个主题" title="上一个主题"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
       <button class="theme-nav next" aria-label="下一个主题" title="下一个主题"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button>
       <figcaption class="theme-caption">
@@ -466,7 +486,7 @@
   <!-- CTA -->
   <section id="start" class="section cta">
     <div class="cta-card reveal">
-      <img src="assets/moon.png" alt="moon" class="cta-moon" />
+      <img src="assets/moon.webp" alt="moon" class="cta-moon" width="207" height="207" />
       <h2>今夜，从一篇论文开始</h2>
       <p>选择你的平台，开启深度阅读之旅。</p>
       <div class="download-grid">
@@ -499,11 +519,11 @@
   </section>
 
   <footer class="footer">
-    <img src="assets/moon.png" alt="moon" class="footer-moon" />
+    <img src="assets/moon.webp" alt="moon" class="footer-moon" width="207" height="207" />
     <p><strong>小月亮</strong> · JDK = <em>Journey Drives Knowledge</em></p>
     <p class="footer-sub">© 2026 moon.jdk.plus · 在星夜之下，遇见更深的知识</p>
   </footer>
 
-  <script src="main.js?v=20260924d"></script>
+  <script src="main.js?v=20260929a"></script>
 </body>
 </html>
