@@ -4,8 +4,8 @@
  "source_label": "书格",
  "homepage": "https://www.shuge.org",
  "note": "书目元数据索引，非全文；图片与书籍文件仍在书格官网，版权遵循各书页声明的许可协议",
- "generated_at": "2026-09-28T04:15:33Z",
- "count": 758,
+ "generated_at": "2026-09-29T13:21:36Z",
+ "count": 760,
  "books": [
   {
    "id": "afong_bei_jing_she_ying_ji",
@@ -7841,6 +7841,30 @@
    ]
   },
   {
+   "id": "lu_ban_mu_jing",
+   "title": "工师雕斫正式鲁班木经匠家镜",
+   "url": "https://www.shuge.org/view/lu_ban_mu_jing/",
+   "lastmod": "2026-09-28T13:43:02+00:00",
+   "cover": "https://www.shuge.org/wp-content/uploads/2026/09/lu_ban_mu_jing23.jpg",
+   "summary": "此《工师雕斫鲁班木经匠家镜》（鲁班经）由明代午荣汇编。全书分三卷，卷一详述各类房屋的营造法则、大木作工序及吉日选择；卷二载录农具及日常家具的形制尺寸；卷三及附录则收录风水宅建吉凶图式与工匠厌胜辟邪符咒。前附修造各图，后附秘诀仙机。此为清同治九年刊本。",
+   "categories": [
+    "子部",
+    "应用科学类",
+    "明代"
+   ],
+   "tags": [],
+   "file_name": "工师雕斫正式鲁班木经匠家镜. 三卷. 附卷首. 修造各图. 后附秘诀仙机. 明. 午荣编. 清同治九年刊本",
+   "archive_path": "书格文件\\PDF\\科学及工艺",
+   "format": "PDF 高清 PDF 文件包含分卷书签 原色版：138M 手机优化版：54.2M 黑白版：6.68M",
+   "size": "",
+   "size_bw": "",
+   "source_library": "早稻田大学图书馆 藏",
+   "license": "CC BY 4.0 *本归档文件相对原始文件有适当修改",
+   "downloads": [
+    "https://s.shuge.org/tzlbmj"
+   ]
+  },
+  {
    "id": "lun_hua_ce",
    "title": "论画册",
    "url": "https://www.shuge.org/view/lun_hua_ce/",
@@ -8078,6 +8102,30 @@
    "license": "",
    "downloads": [
     "https://s.shuge.org/mzbzmy"
+   ]
+  },
+  {
+   "id": "mannerheim_photographs_of_asia",
+   "title": "马达汉亚洲旅行摄影集",
+   "url": "https://www.shuge.org/view/mannerheim_photographs_of_asia/",
+   "lastmod": "2026-09-29T19:33:59+00:00",
+   "cover": "https://www.shuge.org/wp-content/uploads/2026/09/mannerheim_photographs_of_asia00.jpg",
+   "summary": "此套《马达汉亚洲旅行摄影集》由芬兰探险家 Carl Gustaf Emil Mannerheim（中文名：马达汉，或译名曼纳海姆）拍摄。此次共整理了 1164 幅，记录了其 1906-1908 年在中国西部的探险考察（军事侦察任务），涉及新疆、甘肃、陕西、河南、山西、内蒙古等地。此套现藏于芬兰国家遗产局。",
+   "categories": [
+    "影像",
+    "清代",
+    "艺术类"
+   ],
+   "tags": [],
+   "file_name": "马达汉亚洲旅行摄影集.BY.Mannerheim.Carl.Gustaf.Emil.1906–1908 年",
+   "archive_path": "书格文件\\PDF\\影像类\\马达汉亚洲旅行摄影集",
+   "format": "PDF 高清+ *PDF 文件包含简单书签标记，书签使用机器翻译为中文 来源文件记录 1206 条，除去 42 条其他地区（1909–1911）拍摄的照片，文件收录 1164 条亚洲旅行（1906-1908）的照片，其中有四幅来源清晰度不佳 PDF",
+   "size": "3.81G",
+   "size_bw": "",
+   "source_library": "芬兰国家遗产局 藏",
+   "license": "CC BY 4.0 *本归档文件相对原始文件有适当修改",
+   "downloads": [
+    "https://s.shuge.org/mdhyzsy"
    ]
   },
   {
