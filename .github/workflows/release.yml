@@ -548,6 +548,19 @@ jobs:
           TAG="${{ github.event.client_payload.tag || github.event.inputs.tag }}"
           VERSION="${TAG#v}"
 
+          # 0) tag 名与源码内嵌版本一致性断言（防回归：v1.0.189~191 没做 bump 就打 tag，
+          #    构建产物内嵌 1.0.188 而 latest.json 写 1.0.191，导致 Windows 更新死循环
+          #    「更新成功→重启还是旧版本」。tag≠内嵌版本时这里必须红灯拦下。）
+          CONF_VERSION=$(gh api "repos/${PRIVATE_REPO}/contents/src-tauri/tauri.conf.json?ref=${TAG}" \
+            --jq '.content' | base64 -d | jq -r '.version')
+          if [ "$CONF_VERSION" != "$VERSION" ]; then
+            echo "::error::tag ${TAG} 与源码版本不一致: tauri.conf.json=${CONF_VERSION}, tag=${VERSION}"
+            echo "该 tag 的构建产物内嵌版本是 ${CONF_VERSION}，装入后应用版本不变，updater 会永远提示更新。"
+            echo "修法：先合入 chore(release) 版本 bump 提交，把 tag 指向 bump 后的提交再重发。"
+            exit 1
+          fi
+          echo "✓ tag ${TAG} == 源码版本 ${CONF_VERSION}"
+
           # 1) 重命名安装包（ASCII 文件名，避免 locale/gh CLI 截断）
           mkdir -p staging
           find release-artifacts -type f -print0 | while IFS= read -r -d '' f; do
