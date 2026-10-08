@@ -4,8 +4,8 @@
  "source_label": "书格",
  "homepage": "https://www.shuge.org",
  "note": "书目元数据索引，非全文；图片与书籍文件仍在书格官网，版权遵循各书页声明的许可协议",
- "generated_at": "2026-10-08T06:25:05Z",
- "count": 760,
+ "generated_at": "2026-10-08T12:06:46Z",
+ "count": 761,
  "books": [
   {
    "id": "afong_bei_jing_she_ying_ji",
@@ -8736,6 +8736,30 @@
    "license": "",
    "downloads": [
     "https://s.shuge.org/mshptp"
+   ]
+  },
+  {
+   "id": "mu_tian_zi_zhuan",
+   "title": "穆天子传",
+   "url": "https://www.shuge.org/view/mu_tian_zi_zhuan/",
+   "lastmod": "2026-10-08T15:40:55+00:00",
+   "cover": "https://www.shuge.org/wp-content/uploads/2026/10/mu_tian_zi_zhuan22.jpg",
+   "summary": "此《穆天子传》由东晋郭璞注，明代范钦订。全书共六卷，主要记载了周穆王向西、向北巡游所见的社会风貌、风土人情、神话传说，以及与边疆部族交往、在瑶池与西王母相会的事迹。此为明嘉靖时期范氏天一阁刊《范氏奇书》本，经清代藏书家顾之逵手校，现藏于俄罗斯国家图书馆。",
+   "categories": [
+    "先秦",
+    "子部",
+    "宗教玄学类"
+   ],
+   "tags": [],
+   "file_name": "穆天子传. 六卷. 晋. 郭璞注. 明. 范钦订. 明嘉靖时期范氏天一阁刊本. 清代顾之逵手校",
+   "archive_path": "书格文件\\PDF\\史料纪传",
+   "format": "PDF 高清+ PDF 文件包含分卷书签",
+   "size": "137M",
+   "size_bw": "14.3M",
+   "source_library": "俄罗斯国家图书馆 藏",
+   "license": "未作说明（或可参照 CC BY-NC 4.0 ）",
+   "downloads": [
+    "https://s.shuge.org/mtzztyg"
    ]
   },
   {
