@@ -78,7 +78,12 @@ body {
   padding: 22px 24px;
 }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); }
-.brand-logo { width: 38px; height: 38px; border-radius: 50%; filter: drop-shadow(0 0 10px rgba(255,233,168,.4)); }
+/* 圆角只能取小值:旧标是透明底字形,50% 圆形裁只是切掉透明角落;新标是 100% 不透明的满幅方图,
+   四角是暗底(12x12 块均色 ≈RGB 40,46,46)、亮边框在外圈(亮像素半径 95 分位 ≈139px,画布 256px)。
+   圆形裁会沿对角切掉 21.5% 的画面,被切区里 39.4% 的像素亮度 >150 —— 外圈亮边框被切断。
+   圆角矩形只切四角:实测 18% 裁掉 2.8% 面积、亮像素零损失;亮像素损失到 0.15% 的阈值在 ≈32%,
+   故取 18% 既读起来像 app 图标、又离「开始切到亮边框」留了一倍余量。 */
+.brand-logo { width: 38px; height: 38px; border-radius: 18%; filter: drop-shadow(0 0 10px rgba(255,233,168,.4)); }
 .brand-name { font-size: 20px; font-weight: 700; letter-spacing: .5px; }
 .nav-links { display: flex; align-items: center; gap: 26px; }
 .nav-links a { color: var(--ink-dim); text-decoration: none; font-size: 15px; transition: color .25s; }
