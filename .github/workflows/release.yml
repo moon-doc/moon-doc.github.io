@@ -543,6 +543,14 @@ jobs:
           PAGES_REPO: moon-doc/moon-doc.github.io
           PAGES_BASE: https://moon.jdk.plus
           PRIVATE_REPO: moon-doc/moon-reader
+          # 发布资产下载前缀。GitHub Release 资产域名(github.com → objects.githubusercontent.com)
+          # 在中国大陆不可达（curl 拿到 JSON 错误体或超时），所以清单里的 URL 前面套一层镜像；
+          # 清单本身托管在 Pages(Fastly)，大陆可达，因此「检查更新能过、下载必然失败」的老问题
+          # 就是这一处造成的。换镜像只改这一行（或在 Pages 仓库跑
+          # `python3 scripts/set-dl-mirror.py --mirror <新前缀>` 热修已发布的清单，无需重发版）。
+          # 已实测（2026-10-10）：ghfast.top 字节数一致 5.5MB/s；gh-proxy.com 一致 4.2MB/s；
+          # ghproxy.net 返回半截响应（1.3MB/21MB，必须避开）；gh.llkk.cc 不通。
+          DL_PREFIX: https://ghfast.top/
         run: |
           set -e
           TAG="${{ github.event.client_payload.tag || github.event.inputs.tag }}"
@@ -632,7 +640,7 @@ jobs:
           # 5) 生成下载直链（指向公开仓库 Release）
           RELEASED_AT=$(gh release view "$TAG" -R "$PAGES_REPO" --json publishedAt -q '.publishedAt // ""')
           NOTES="小月亮 v${VERSION} - 跨平台专业文档阅读器"
-          RELEASE_BASE="https://github.com/${PAGES_REPO}/releases/download/${TAG}"
+          RELEASE_BASE="${DL_PREFIX}https://github.com/${PAGES_REPO}/releases/download/${TAG}"
           encode() { python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$1"; }
 
           MAC=""; WIN=""; AND=""; LIN_DEB=""; LIN_RPM=""; LIN_APP=""; LIN=""
@@ -679,7 +687,7 @@ jobs:
           # 7b) 组装 latest.json（Tauri updater 插件清单，Tauri v2 static JSON 格式）
           #     平台 key 按运行平台选择；url 指向 Release 上带平台后缀的 updater 产物，
           #     signature 为对应 .sig 文件内容（minisign 签名，原样内联）。
-          UPDATER_BASE="https://github.com/${PAGES_REPO}/releases/download/${TAG}"
+          UPDATER_BASE="${DL_PREFIX}https://github.com/${PAGES_REPO}/releases/download/${TAG}"
           MAC_UPD=$(ls staging/*macos*universal*.app.tar.gz 2>/dev/null | head -1 || true)
           MAC_SIG=$(ls staging/*.app.tar.gz.sig 2>/dev/null | head -1 || true)
           # Windows NSIS updater 产物：setup.exe 本体即更新包（.sig 同名）
@@ -718,6 +726,15 @@ jobs:
           git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${PAGES_REPO}.git" pages
           cp version.json pages/version.json
           cp latest.json pages/latest.json
+
+          # 8b) 下载链路自检（警告级，刻意不阻断发布）
+          #     清单托管在 Pages(Fastly)，大陆可达；清单里的资产 URL 走 DL_PREFIX 镜像。而
+          #     GitHub runner 在美国，它看到的镜像状态 ≠ 大陆用户看到的状态，所以这里只把
+          #     「HTTP 不通 / 字节数与 Release API 报告不一致」打成警告。它能抓住镜像返回半截
+          #     响应这类事故（ghproxy.net 实测 HTTP 200 但只给 1.3MB/21MB），但不能作为阻断条件：
+          #     真正的兜底是安装前的 minisign 校验（fail-closed，坏包装不上，只会报更新失败）。
+          python3 pages/scripts/set-dl-mirror.py --verify \
+            || echo "::warning::下载镜像自检未全绿 —— 大陆用户可能拿不到更新包；改 DL_PREFIX 或对已发布清单跑 python3 scripts/set-dl-mirror.py --mirror <新前缀> 热修"
 
           # 9) 替换 index.html 中的下载按钮 href 和版本标签
           if [ -f pages/index.html ]; then
