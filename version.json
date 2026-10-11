@@ -1,19 +1,19 @@
 {
-  "version": "1.0.203",
-  "releasedAt": "2026-10-11T13:06:16Z",
-  "notes": "小月亮 v1.0.203 - 跨平台专业文档阅读器",
+  "version": "1.0.204",
+  "releasedAt": "2026-10-11T14:48:13Z",
+  "notes": "小月亮 v1.0.204 - 跨平台专业文档阅读器",
   "downloadUrl": "https://moon.jdk.plus#start",
-  "minimumRequired": "1.0.183",
+  "minimumRequired": "1.0.184",
   "downloads": {
-    "macos": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.203/MoonReader-1.0.203-macos-universal.dmg",
-    "windows": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.203/MoonReader-1.0.203-windows-x64-setup.exe",
-    "android": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.203/MoonReader-1.0.203-android-arm64.apk",
-    "linux": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.203/MoonReader-1.0.203-linux-amd64.deb",
+    "macos": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.204/MoonReader-1.0.204-macos-universal.dmg",
+    "windows": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.204/MoonReader-1.0.204-windows-x64-setup.exe",
+    "android": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.204/MoonReader-1.0.204-android-arm64.apk",
+    "linux": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.204/MoonReader-1.0.204-linux-amd64.deb",
     "ios": ""
   },
   "linuxDownloads": {
-    "deb": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.203/MoonReader-1.0.203-linux-amd64.deb",
-    "rpm": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.203/MoonReader-1.0.203-linux-x86_64.rpm",
-    "appimage": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.203/MoonReader-1.0.203-linux-x86_64.AppImage"
+    "deb": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.204/MoonReader-1.0.204-linux-amd64.deb",
+    "rpm": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.204/MoonReader-1.0.204-linux-x86_64.rpm",
+    "appimage": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.204/MoonReader-1.0.204-linux-x86_64.AppImage"
   }
 }

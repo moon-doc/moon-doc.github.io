@@ -1,23 +1,23 @@
 {
-  "version": "1.0.203",
-  "notes": "小月亮 v1.0.203 - 跨平台专业文档阅读器",
-  "pub_date": "2026-10-11T13:06:16Z",
+  "version": "1.0.204",
+  "notes": "小月亮 v1.0.204 - 跨平台专业文档阅读器",
+  "pub_date": "2026-10-11T14:48:13Z",
   "platforms": {
     "darwin-aarch64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUWVBqdm1TRkE2dGhpR2I4SzFva0p1bWRpUVMrdldQVElQdW9rY2U1TnM1Sy8yaXBuQ3JpWUpzaThDR3dwWWxCdG0rRStraDdzNTRvK0JlQVY0dWJKQ2J5dlc5VWZlTXcwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzIzNzkxCWZpbGU65bCP5pyI5LquLmFwcC50YXIuZ3oKUXpRc2k4L2Zld2hwQVU2cHg3aUVtMEZjQ0s1YTFSVWNJK1VVRHlZWlBEU3NMNERHYWdneHE4R2NHQms1eU5PdmpPTDRaSjA3QVMweXprdHU1YmtiQXc9PQo=",
-      "url": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.203/MoonReader-1.0.203-macos-universal.app.tar.gz"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUWVBqdm1TRkE2dG84WXpmUjlubEIvTkNxZ21xd3VkbUN1Q3dmWkE3TWZUdUJEQmswR2t1cFQxVTNTbWVFQ0R0akl6eEk5TnIwUXh4aHorZmhoZm15Q3JXMkVKS2xkckFRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzI5OTcxCWZpbGU65bCP5pyI5LquLmFwcC50YXIuZ3oKc1gwQWV6QndiSm5nYUFmT1VyNGN4WDJ3ZGdsOGdMUXZkdUcrVytxcHRZYk9pZk5OSHlmM3hzR21IMFpxNmdXaEo2TWw0YkNOc05nVDZtOG1UVDNDQnc9PQo=",
+      "url": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.204/MoonReader-1.0.204-macos-universal.app.tar.gz"
     },
     "darwin-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUWVBqdm1TRkE2dGhpR2I4SzFva0p1bWRpUVMrdldQVElQdW9rY2U1TnM1Sy8yaXBuQ3JpWUpzaThDR3dwWWxCdG0rRStraDdzNTRvK0JlQVY0dWJKQ2J5dlc5VWZlTXcwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzIzNzkxCWZpbGU65bCP5pyI5LquLmFwcC50YXIuZ3oKUXpRc2k4L2Zld2hwQVU2cHg3aUVtMEZjQ0s1YTFSVWNJK1VVRHlZWlBEU3NMNERHYWdneHE4R2NHQms1eU5PdmpPTDRaSjA3QVMweXprdHU1YmtiQXc9PQo=",
-      "url": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.203/MoonReader-1.0.203-macos-universal.app.tar.gz"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUWVBqdm1TRkE2dG84WXpmUjlubEIvTkNxZ21xd3VkbUN1Q3dmWkE3TWZUdUJEQmswR2t1cFQxVTNTbWVFQ0R0akl6eEk5TnIwUXh4aHorZmhoZm15Q3JXMkVKS2xkckFRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzI5OTcxCWZpbGU65bCP5pyI5LquLmFwcC50YXIuZ3oKc1gwQWV6QndiSm5nYUFmT1VyNGN4WDJ3ZGdsOGdMUXZkdUcrVytxcHRZYk9pZk5OSHlmM3hzR21IMFpxNmdXaEo2TWw0YkNOc05nVDZtOG1UVDNDQnc9PQo=",
+      "url": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.204/MoonReader-1.0.204-macos-universal.app.tar.gz"
     },
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUWVBqdm1TRkE2dHNNZVpXaWFSTVppajB2MUNJNkxvQmIwTlFPZWtiekp1N0hJMmNxelZSU00wcGtHblE4VzZ0ME5rVlNGMGIvZEluTVlPOWpPNjVmQXBiUldQNHdmeFE0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzIzNjY0CWZpbGU65bCP5pyI5LquXzEuMC4yMDNfeDY0LXNldHVwLmV4ZQo3NmZ3WFJaQVY4VlNLTFJLQWhSakVNODl4Uks5azRxbVU3N3YwVVJuWTRpYkRnN0lHQk5DNzFLVG9xVzI5dlJFU1JqaWIya0hHTHJxVk5vMnVyOHJEUT09Cg==",
-      "url": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.203/MoonReader-1.0.203-windows-x64-setup.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUWVBqdm1TRkE2dGxLM2htNURDcCtTdkJBM24zVkM3ZHdGTGc5KzB5WDV4M1pxM3NLQ3JTSnZxd29kNGQya0FTejRxeFZnek10LzdoZERPa3ZKWUN5MVF4a2JRU0NGOWdRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzI5NTI0CWZpbGU65bCP5pyI5LquXzEuMC4yMDRfeDY0LXNldHVwLmV4ZQp4WWFxRk1lb2FMWDh3NWpGb3RMSHpSY3MyZWx3T1BJeEpjRXRhQWJWVzRNZnA2VXhsaTNLR1BvczZlb3FqeEdVVWZrSThKV0wxTyt3Y3NQQzRMd21BUT09Cg==",
+      "url": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.204/MoonReader-1.0.204-windows-x64-setup.exe"
     },
     "linux-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUWVBqdm1TRkE2dGx6WFBncituSitwcnYybytHcm9QU1NIT2RocVlqQ2VWZlQ1ZFYyUFh5K2RaY3NBMjZMYVV2MzY5dzUzb29UazZRZWhkMGlWckJMSmJDa2RiZTdFNGdnPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzIzNjQwCWZpbGU65bCP5pyI5LquXzEuMC4yMDNfYW1kNjQuQXBwSW1hZ2UKS1dHZUlBekpITmk3SlppTStiWjdiZjU1MStmSnd5NnNjejZSa3FZSzYzaDRqbkZHWlZVcEpVMnZVVmcxVm8xckMvY09MdG9nWXU1L01ERk9Cd1h6Q2c9PQo=",
-      "url": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.203/MoonReader-1.0.203-linux-x86_64.AppImage"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUWVBqdm1TRkE2dGdQTXhHQmZLcGtuSzVoZ1poSTBkK1dUY0VaQWcrblhaV1RNaXMxT1RnRHFUVlpoT2d5WFhjcjNjNGJKMCszQVhWSXo2WlZlUnd6NTFzdkxyUkhpaUFBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNzI5NTUxCWZpbGU65bCP5pyI5LquXzEuMC4yMDRfYW1kNjQuQXBwSW1hZ2UKWG9EK0RkUkVzYkg2M09xY3ZaQXFsS3hFeW5TcnVQSWwyenNKU0NaZ2UwMTFSa3pvU0N1ck5TdS9ZM1NJMTVlMGFoZ2NNajlVbjZUS0lOWnU1b2VmQnc9PQo=",
+      "url": "https://ghfast.top/https://github.com/moon-doc/moon-doc.github.io/releases/download/v1.0.204/MoonReader-1.0.204-linux-x86_64.AppImage"
     }
   }
 }
