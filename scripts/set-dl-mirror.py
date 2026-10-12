@@ -15,6 +15,15 @@ App 内自动更新的 *清单* 托管在 GitHub Pages（moon.jdk.plus → Fastl
 官网 index.html 的下载按钮走同一批 URL（发版时由 release.yml 按序重写，所以**只在热修
 清单时**会落后于清单——点官网下载同样下不动），本脚本一并改写与校验。
 
+三份清单，两种前缀策略
+----------------------
+- `latest.json` / `version.json`：套 `--mirror` 前缀（App 与官网下载都走镜像）。
+- `latest-direct.json`：**恒定直链**。它是 Tauri updater 的第二个 endpoint
+  （`src-tauri/tauri.conf.json` 的 `plugins.updater.endpoints`），与 `latest.json`
+  同源同版本、只是 URL 无前缀——镜像域名整体挂掉时插件落到它，用 GitHub 直链继续。
+  因此本脚本对它的 `--mirror` 是空操作（不会把镜像前缀写进去），校验时也不参与网络探测
+  （直链在大陆必然不通，计入失败会让自检恒红、警告失效）。
+
 用法
 ----
     # 换到某个镜像（改写两份清单 + 官网下载按钮，然后校验）
@@ -53,7 +62,14 @@ import urllib.request
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-MANIFESTS = ("latest.json", "version.json")
+# 套镜像前缀的清单（App 的 version.json + Tauri updater 的主 endpoint）。
+MIRROR_MANIFESTS = ("latest.json", "version.json")
+# 直链清单：Tauri updater 的第二个 endpoint。它与 latest.json 同源同版本，唯一区别是
+# URL **不带任何前缀**——镜像域名整体挂掉（DNS 被污染 / 证书过期 / 服务下线）时，插件按
+# endpoint 顺序落到这一份，用 GitHub 直链继续（海外/VPN 用户可用；大陆仍不通，但至少不是
+# 死循环报错）。因此这份文件必须恒为直链：本脚本改写时强制清前缀，且校验时不计入网络失败。
+DIRECT_MANIFEST = "latest-direct.json"
+MANIFESTS = MIRROR_MANIFESTS + (DIRECT_MANIFEST,)
 CANONICAL = "https://github.com/moon-doc/moon-doc.github.io/releases/download/"
 
 # index.html 的下载按钮：与 release.yml 里重写 href 的正则保持一致（同一形状）
@@ -136,6 +152,8 @@ def rewrite(prefix: str) -> int:
     架构共用一个 tarball）时一并替换——值相同，替换结果一致。
     """
     for name in MANIFESTS:
+        # latest-direct.json 的存在意义就是「没有前缀」：强制写直链，忽略 --mirror
+        eff = "" if name == DIRECT_MANIFEST else prefix
         path = REPO_ROOT / name
         raw = path.read_text(encoding="utf-8")
         obj = json.loads(raw)
@@ -145,7 +163,7 @@ def rewrite(prefix: str) -> int:
         # 处理时找不到原文而误报「找不到」。
         for url in dict.fromkeys(u for _f, u in _urls_of(obj)):
             canonical = _strip(url)
-            new_url = prefix + canonical if prefix else canonical
+            new_url = eff + canonical if eff else canonical
             if new_url == url:
                 continue
             old_lit = json.dumps(url, ensure_ascii=False)
@@ -158,7 +176,7 @@ def rewrite(prefix: str) -> int:
             replaced += 1
             hits += n
         path.write_text(raw, encoding="utf-8")
-        print(f"[改写] {name}: {replaced} 个 URL（{hits} 处）→ 前缀 {'(直链)' if not prefix else prefix}")
+        print(f"[改写] {name}: {replaced} 个 URL（{hits} 处）→ 前缀 {'(直链)' if not eff else eff}")
     if (REPO_ROOT / HTML).exists():
         _rewrite_html(prefix)
     return 0
@@ -209,6 +227,7 @@ def verify(deep: bool = False) -> int:
     # 逐字段下载会重复拉一遍大文件。顺带把「官网按钮是否跟上了清单」一并暴露出来
     # ——按钮落后时它会以 github 直链出现，在大陆网络下必然校验失败。
     entries: dict[str, list[str]] = {}
+    raw_urls: dict[str, list[str]] = {}
     for name in MANIFESTS:
         path = REPO_ROOT / name
         if not path.exists():
@@ -216,10 +235,13 @@ def verify(deep: bool = False) -> int:
             continue
         obj = json.loads(path.read_text(encoding="utf-8"))
         urls = _urls_of(obj)
+        raw_urls[name] = [u for _f, u in urls]
         if urls and tag == "?":
             tag = _strip(urls[0][1]).split("/releases/download/")[-1].split("/")[0]
         for field, url in urls:
             entries.setdefault(url, []).append(f"{name}:{field}")
+
+    # latest-direct.json 的校验放在下面「=== 校验 ===」段内（只做结构校验，不做网络探测）。
     if (REPO_ROOT / HTML).exists():
         for field, url in _html_urls((REPO_ROOT / HTML).read_text(encoding="utf-8")):
             entries.setdefault(url, []).append(field)
@@ -231,9 +253,37 @@ def verify(deep: bool = False) -> int:
             print(f"[警告] 无法取 Releases API 基准（{exc}），仅校验 HTTP 状态")
 
     print(f"\n=== 校验 {len(entries)} 个资产 URL（去重后，tag {tag}）===")
+
+    # latest-direct.json：镜像全挂时的降级清单（Tauri updater 第二个 endpoint），
+    # 只做结构校验、不做网络探测——直链在大陆必然不通，计入失败会让这份自检恒红、警告失效。
+    # ① 必须恒为直链（带了前缀 = 和 latest.json 一样依赖镜像，降级失去意义）；
+    # ② 资产集合必须与 latest.json 剥离前缀后逐一对上（清单换了 tag 而它没跟着换 = 降级清单
+    #    会把上一版的包当更新包推出去，比不通更糟）。
+    if DIRECT_MANIFEST in raw_urls:
+        checked += 1
+        prefixed = [u for u in raw_urls[DIRECT_MANIFEST] if _strip(u) != u]
+        direct_set = set(raw_urls[DIRECT_MANIFEST])
+        mirror_canon = {_strip(u) for u in raw_urls.get("latest.json", [])}
+        drift = sorted(mirror_canon - direct_set) + sorted(direct_set - mirror_canon)
+        if prefixed or drift:
+            failures += 1
+            print(f"  ✗ {DIRECT_MANIFEST}: 降级清单不合法")
+            for u in prefixed:
+                print(f"      带前缀（应恒为直链）: {u}")
+            for u in drift:
+                print(f"      与 latest.json 资产集合不一致: {u}")
+        else:
+            print(
+                f"  ✓ {DIRECT_MANIFEST}: {len(direct_set)} 个资产与 latest.json 一一对应且无前缀"
+            )
+
     for url, fields in entries.items():
         where = "|".join(fields)
         if not url.startswith("http"):
+            continue
+        if all(f.startswith(f"{DIRECT_MANIFEST}:") for f in fields):
+            checked += 1
+            print(f"  – {where}: 直链清单专用（大陆不可达属预期），跳过网络探测")
             continue
         checked += 1
         fname = url.rsplit("/", 1)[-1]

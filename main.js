@@ -1193,3 +1193,45 @@
   }, { threshold: 0.25 });
   io.observe(stage);
 })();
+
+// ===== 下载按钮的镜像降级 =====
+// 按钮 href 在发版时由 release.yml 重写为「镜像前缀 + GitHub 直链」（见 scripts/set-dl-mirror.py）。
+// 镜像域名整体挂掉（DNS 污染 / 证书过期 / 服务下线）时，点按钮只会等到超时；这里在页面加载后
+// 对每个镜像链接做一次 HEAD 探针，不可达就换回 GitHub 直链，按钮至少还有一条路。
+// 跨域读不到状态码，只能发 no-cors 请求：拿到响应（opaque）即算可达；3s 无响应按不可达处理。
+(function initDownloadMirrorFallback() {
+  var CANONICAL = 'https://github.com/';
+  var TIMEOUT_MS = 3000;
+  var buttons = document.querySelectorAll('a.download-btn[href]');
+  if (!buttons.length) return;
+
+  // 去掉镜像前缀 → 直链；已经是直链/站点锚点的原样返回（indexOf > 0 保证不误伤开头的 https://github.com/）
+  function toDirect(url) {
+    var i = url.indexOf(CANONICAL);
+    return i > 0 ? url.slice(i) : url;
+  }
+
+  function probe(url) {
+    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timer = setTimeout(function () { ctrl && ctrl.abort(); }, TIMEOUT_MS);
+    return fetch(url, {
+      method: 'HEAD',
+      mode: 'no-cors',
+      cache: 'no-store',
+      signal: ctrl ? ctrl.signal : undefined,
+    }).then(function () { return true; }, function () { return false; })
+      .then(function (ok) { clearTimeout(timer); return ok; });
+  }
+
+  Array.prototype.forEach.call(buttons, function (a) {
+    var url = a.getAttribute('href') || '';
+    var direct = toDirect(url);
+    if (direct === url) return; // 非镜像链接，无需探测
+    probe(url).then(function (ok) {
+      if (ok) return;
+      a.setAttribute('href', direct);
+      // 供 e2e 断言/排查用：标出这个按钮已降级到直链
+      a.setAttribute('data-mirror-fallback', 'direct');
+    });
+  });
+})();

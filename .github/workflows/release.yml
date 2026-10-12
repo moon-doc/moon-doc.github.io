@@ -550,6 +550,8 @@ jobs:
           # `python3 scripts/set-dl-mirror.py --mirror <新前缀>` 热修已发布的清单，无需重发版）。
           # 已实测（2026-10-10）：ghfast.top 字节数一致 5.5MB/s；gh-proxy.com 一致 4.2MB/s；
           # ghproxy.net 返回半截响应（1.3MB/21MB，必须避开）；gh.llkk.cc 不通。
+          # 镜像域名整体挂掉时不能把用户卡死：同一份清单另出一份无前缀的 latest-direct.json，
+          # 作为 Tauri updater 的备用 endpoint（见下方 gen_latest 与 tauri.conf.json）。
           DL_PREFIX: https://ghfast.top/
         run: |
           set -e
@@ -687,7 +689,12 @@ jobs:
           # 7b) 组装 latest.json（Tauri updater 插件清单，Tauri v2 static JSON 格式）
           #     平台 key 按运行平台选择；url 指向 Release 上带平台后缀的 updater 产物，
           #     signature 为对应 .sig 文件内容（minisign 签名，原样内联）。
-          UPDATER_BASE="${DL_PREFIX}https://github.com/${PAGES_REPO}/releases/download/${TAG}"
+          #     同一份内容出两份清单，只差 URL 前缀：latest.json（套 DL_PREFIX，Tauri updater 的
+          #     主 endpoint）与 latest-direct.json（恒无前缀，备用 endpoint）。备用清单独什么用、
+          #     何时生效：见 scripts/set-dl-mirror.py 的「三份清单，两种前缀策略」。两份必须逐字节
+          #     同源（只差前缀），所以共用下面这一个函数生成——各写一遍 jq 必然漂移。
+          UPDATER_DIRECT="https://github.com/${PAGES_REPO}/releases/download/${TAG}"
+          UPDATER_BASE="${DL_PREFIX}${UPDATER_DIRECT}"
           MAC_UPD=$(ls staging/*macos*universal*.app.tar.gz 2>/dev/null | head -1 || true)
           MAC_SIG=$(ls staging/*.app.tar.gz.sig 2>/dev/null | head -1 || true)
           # Windows NSIS updater 产物：setup.exe 本体即更新包（.sig 同名）
@@ -697,12 +704,14 @@ jobs:
           LIN_UPD=$(ls staging/*linux-x86_64.AppImage 2>/dev/null | grep -v '\.sig$' | head -1 || true)
           LIN_SIG=$(ls staging/*linux-x86_64.AppImage.sig 2>/dev/null | head -1 || true)
 
-          jq -n --arg v "$VERSION" --arg n "$NOTES" --arg t "$RELEASED_AT" \
-                --arg mac_url "${MAC_UPD:+$UPDATER_BASE/$(basename "$MAC_UPD")}" \
+          # $1 = 资源 URL 基址（镜像前缀版 / 直链版）
+          gen_latest() {
+            jq -n --arg v "$VERSION" --arg n "$NOTES" --arg t "$RELEASED_AT" \
+                --arg mac_url "${MAC_UPD:+$1/$(basename "$MAC_UPD")}" \
                 --arg mac_sig "$( [ -n "$MAC_SIG" ] && cat "$MAC_SIG" || echo '' )" \
-                --arg win_url "${WIN_EXE:+$UPDATER_BASE/$(basename "$WIN_EXE")}" \
+                --arg win_url "${WIN_EXE:+$1/$(basename "$WIN_EXE")}" \
                 --arg win_sig "$( [ -n "$WIN_SIG" ] && cat "$WIN_SIG" || echo '' )" \
-                --arg lin_url "${LIN_UPD:+$UPDATER_BASE/$(basename "$LIN_UPD")}" \
+                --arg lin_url "${LIN_UPD:+$1/$(basename "$LIN_UPD")}" \
                 --arg lin_sig "$( [ -n "$LIN_SIG" ] && cat "$LIN_SIG" || echo '' )" \
             '{version:$v, notes:$n, pub_date:$t,
               platforms:(
@@ -716,9 +725,11 @@ jobs:
                 + (if $lin_url != "" then {
                   "linux-x86_64": {signature:$lin_sig, url:$lin_url}
                 } else {} end)
-              )}' \
-            > latest.json
-          echo "Generated latest.json:"
+              )}'
+          }
+          gen_latest "$UPDATER_BASE"   > latest.json
+          gen_latest "$UPDATER_DIRECT" > latest-direct.json
+          echo "Generated latest.json / latest-direct.json:"
           cat latest.json
 
           # 8) 推送 version.json + 更新 index.html 到 Pages 仓库
@@ -726,6 +737,7 @@ jobs:
           git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${PAGES_REPO}.git" pages
           cp version.json pages/version.json
           cp latest.json pages/latest.json
+          cp latest-direct.json pages/latest-direct.json
 
           # 9) 替换 index.html 中的下载按钮 href 和版本标签
           if [ -f pages/index.html ]; then
