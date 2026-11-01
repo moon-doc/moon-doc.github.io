@@ -4,8 +4,8 @@
  "source_label": "书格",
  "homepage": "https://www.shuge.org",
  "note": "书目元数据索引，非全文；图片与书籍文件仍在书格官网，版权遵循各书页声明的许可协议",
- "generated_at": "2026-10-25T22:14:53Z",
- "count": 761,
+ "generated_at": "2026-11-01T23:19:05Z",
+ "count": 762,
  "books": [
   {
    "id": "afong_bei_jing_she_ying_ji",
@@ -5020,6 +5020,30 @@
    "downloads": [
     "https://s.shuge.org/jnsgjgg",
     "https://www.shuge.org/meet/topic/17985/"
+   ]
+  },
+  {
+   "id": "jiang_feng_qiu_ting_tu_juan",
+   "title": "江枫秋艇图卷",
+   "url": "https://www.shuge.org/view/jiang_feng_qiu_ting_tu_juan/",
+   "lastmod": "2026-10-29T16:01:02+00:00",
+   "cover": "https://www.shuge.org/wp-content/uploads/2026/10/jiang_feng_qiu_ting_tu_juan08.jpg",
+   "summary": "此《江枫秋艇图》卷由元代盛懋所绘。全卷以 “渔隐” 为主题，描绘了开阔的江面、两岸霜林以及渔舟中闲谈的文士。其中山石用长披麻皴交互描画，形成网状的皴纹。树木以浓墨化用 “介” 字法点叶，而藤萝与枫叶点缀其间，水光潋滟，尤显浓郁的秋日氛围。此卷现藏于台北故宫博物院。",
+   "categories": [
+    "元代",
+    "绘画",
+    "艺术类"
+   ],
+   "tags": [],
+   "file_name": "江枫秋艇图卷. 元. 盛懋. 绘. 纸本设色（24.7x111 厘米）51292x5425 像素",
+   "archive_path": "书格文件\\PDF\\绘画设计类\\江枫秋艇图卷",
+   "format": "PDF 、 JPG 高清+ PDF 文件包含书签注释",
+   "size": "247M",
+   "size_bw": "",
+   "source_library": "台北故宫博物院 藏（故畫 001021）",
+   "license": "CC BY 4.0 *本归档文件相对原始文件有适当修改",
+   "downloads": [
+    "https://s.shuge.org/jfqttj"
    ]
   },
   {
