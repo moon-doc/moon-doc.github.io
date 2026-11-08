@@ -4,8 +4,8 @@
  "source_label": "书格",
  "homepage": "https://www.shuge.org",
  "note": "书目元数据索引，非全文；图片与书籍文件仍在书格官网，版权遵循各书页声明的许可协议",
- "generated_at": "2026-11-01T23:19:05Z",
- "count": 762,
+ "generated_at": "2026-11-08T23:23:46Z",
+ "count": 763,
  "books": [
   {
    "id": "afong_bei_jing_she_ying_ji",
@@ -7429,7 +7429,7 @@
    "id": "liao_zhai_zhi_yi_xin_ping",
    "title": "聊斋志异新评",
    "url": "https://www.shuge.org/view/liao_zhai_zhi_yi_xin_ping/",
-   "lastmod": "2019-11-08T22:20:24+00:00",
+   "lastmod": "2026-11-05T09:18:23+00:00",
    "cover": "",
    "summary": "《聊斋志异》是清代蒲松龄所著的短篇小说集。此《聊斋志异新评》由清代王士正（祯）评，但明伦批点。全书共十六卷，内含狐仙鬼妖题材短篇故事约四百二十多篇（如：考城隍、画皮、聂小倩、鲁公女、劳山道士、黄九郎、促织、细柳、胭脂、四十千、偷桃、花神等等）。此为清末广顺但氏朱墨套印本。",
    "categories": [
@@ -16262,6 +16262,30 @@
    "license": "CC0 1.0",
    "downloads": [
     "https://s.shuge.org/yishi"
+   ]
+  },
+  {
+   "id": "yi_shuo",
+   "title": "医说",
+   "url": "https://www.shuge.org/view/yi_shuo/",
+   "lastmod": "2026-11-07T17:06:03+00:00",
+   "cover": "https://www.shuge.org/wp-content/uploads/2026/11/yi_shuo23.jpg",
+   "summary": "此《医说》为南宋新安医家张杲 gǎo 著，约成书于南宋嘉定十七年。全书共十卷，分为四十九门，内容系收集南宋以前多种文史著作及医籍中有关医学人物、典故、传说、轶事、方药、疗法等文献而撰成。此处包含南宋时期刊本、明嘉靖二十三年上海顾定芳刊本、影宋朱墨钞本三种。",
+   "categories": [
+    "子部",
+    "宋辽金",
+    "应用科学类"
+   ],
+   "tags": [],
+   "file_name": "医说. 十卷. 宋. 张杲撰. 南宋时期刊本. 黄丕烈. 丁丙. 柳诒徵. 跋 医说. 十卷. 宋. 张杲撰. 宋. 彭方跋. 宋李以制跋. 影宋朱墨钞本 医说. 十卷. 宋. 张杲. 辑. 明嘉靖二十三年上海顾定芳刊本",
+   "archive_path": "书格文件\\PDF\\医学类\\医说",
+   "format": "PDF 高清+ PDF 文件包含分卷书签",
+   "size": "1.17G",
+   "size_bw": "76.3M",
+   "source_library": "南京图书馆 藏（国家珍贵古籍名录号 00667）",
+   "license": "未知。商业出版或需馆藏机构授权",
+   "downloads": [
+    "https://s.shuge.org/yishuo"
    ]
   },
   {
