@@ -4,8 +4,8 @@
  "source_label": "书格",
  "homepage": "https://www.shuge.org",
  "note": "书目元数据索引，非全文；图片与书籍文件仍在书格官网，版权遵循各书页声明的许可协议",
- "generated_at": "2026-11-08T23:23:46Z",
- "count": 763,
+ "generated_at": "2026-11-23T00:34:47Z",
+ "count": 767,
  "books": [
   {
    "id": "afong_bei_jing_she_ying_ji",
@@ -1029,6 +1029,30 @@
    ]
   },
   {
+   "id": "bucklin-family-collection",
+   "title": "白克令的摄影集",
+   "url": "https://www.shuge.org/view/bucklin-family-collection/",
+   "lastmod": "2026-11-09T11:27:50+00:00",
+   "cover": "https://www.shuge.org/wp-content/uploads/2026/11/bucklin-family-collection61.jpg",
+   "summary": "此套《白克令的摄影集》（Bucklin Family Collection）由美国布朗大学社会学教授 Harold S. Bucklin（白克令）拍摄。 1923 年至 1924 年间，他受聘于沪江大学担任社会学系教授，其间拍摄了大量（约 751 幅）记录当时上海、南京、苏州、福州、北京等地的纪实照片。此套胶片现藏于菲利普斯图书馆。",
+   "categories": [
+    "影像",
+    "民国",
+    "艺术类"
+   ],
+   "tags": [],
+   "file_name": "白克令的摄影集（Bucklin Family Collection）BY Harold S. Bucklin. 约 1923-1924 年",
+   "archive_path": "书格文件\\PDF\\影像类\\白克令的摄影集",
+   "format": "PDF 高清+ （可选）JPG 压缩包高清+ *PDF 文件包含简单书签标记 PDF",
+   "size": "2.45G",
+   "size_bw": "",
+   "source_library": "菲利普斯图书馆 藏",
+   "license": "CC BY-SA 4.0",
+   "downloads": [
+    "https://s.shuge.org/bklsyj"
+   ]
+  },
+  {
    "id": "bupiao_cun_gao",
    "title": "补瓢存稿",
    "url": "https://www.shuge.org/view/bupiao_cun_gao/",
@@ -1801,6 +1825,30 @@
    "license": "未知。商业出版或需馆藏机构授权",
    "downloads": [
     "https://s.shuge.org/cqjzjj"
+   ]
+  },
+  {
+   "id": "chun_qiu_jing_zhuan_ji_jie_yuan_xiang_tai_ben",
+   "title": "春秋经传集解（元相台本）",
+   "url": "https://www.shuge.org/view/chun_qiu_jing_zhuan_ji_jie_yuan_xiang_tai_ben/",
+   "lastmod": "2026-11-20T19:54:38+00:00",
+   "cover": "https://www.shuge.org/wp-content/uploads/2026/11/chun_qiu_jing_zhuan_ji_jie_yuan_xiang_tai_ben22.jpg",
+   "summary": "此《春秋经传集解》由魏晋时期杜预撰。全书共三十卷，记叙起自鲁隐公元年，迄于鲁哀公二十七年。其内容将《春秋》与《左传》两本编年体史书以时间（年）为序加以编次，并将经传注整合为一体（并附唐代陆德明《春秋左氏传》中音释内容）。此为元相台岳氏荆溪家塾刊本（周叔弢旧藏）。",
+   "categories": [
+    "哲学类",
+    "经部",
+    "魏晋南北朝"
+   ],
+   "tags": [],
+   "file_name": "春秋经传集解. 三十卷. 晋. 杜预撰. 唐. 陆德明释文. 春秋名号归一图二卷. 蜀. 冯继先撰. 年表一卷. 元相台岳氏荆溪家塾刊本（卷十九至二十配明刻本）",
+   "archive_path": "书格文件\\PDF\\哲学经学\\春秋经传集解\\元相台岳氏荆溪家塾刊本",
+   "format": "PDF 高清+ PDF 文件包含分卷书签",
+   "size": "2.8G",
+   "size_bw": "200M",
+   "source_library": "中国国家图书馆 藏（国家珍贵古籍名录号 00286）",
+   "license": "未知。商业出版或需馆藏机构授权",
+   "downloads": [
+    "https://s.shuge.org/xtbcqjz"
    ]
   },
   {
@@ -9537,6 +9585,31 @@
    ]
   },
   {
+   "id": "qin_ding_shou_yi_guang_xun",
+   "title": "钦定授衣广训",
+   "url": "https://www.shuge.org/view/qin_ding_shou_yi_guang_xun/",
+   "lastmod": "2026-11-11T16:04:19+00:00",
+   "cover": "https://www.shuge.org/wp-content/uploads/2026/11/qin_ding_shou_yi_guang_xun01.jpg",
+   "summary": "此《钦定授衣广训》由清代董诰等奉敕编纂。全书共两卷，其内容改编自清乾隆三十年直隶总督方观承向乾隆帝进呈的《棉花图》，含十六幅白描图，系统记录了从种棉到制成衣物的全过程，并附方观承的详细解说，以及乾隆帝与嘉庆帝的御制诗。此为清嘉庆十三年武英殿刊本。",
+   "categories": [
+    "子部",
+    "清代",
+    "科学类",
+    "艺术类"
+   ],
+   "tags": [],
+   "file_name": "钦定授衣广训. 二卷. 清. 董诰等奉敕编. 清嘉庆十三年武英殿刊本",
+   "archive_path": "书格文件\\PDF\\科学及工艺",
+   "format": "PDF 高清+ PDF 文件包含分卷书签",
+   "size": "656M",
+   "size_bw": "25.5M",
+   "source_library": "哥伦比亚大学图书馆 藏",
+   "license": "CC BY 4.0 *本归档文件相对原始文件有适当修改",
+   "downloads": [
+    "https://s.shuge.org/qdsygx"
+   ]
+  },
+  {
    "id": "qin_ding_shu_jing_tu_shuo",
    "title": "钦定书经图说",
    "url": "https://www.shuge.org/view/qin_ding_shu_jing_tu_shuo/",
@@ -13955,6 +14028,30 @@
    "license": "CC BY 4.0 *本归档文件相对原始文件有适当修改",
    "downloads": [
     "https://s.shuge.org/wscjzlw"
+   ]
+  },
+  {
+   "id": "wang_hui_tu_juan",
+   "title": "王会图卷",
+   "url": "https://www.shuge.org/view/wang_hui_tu_juan/",
+   "lastmod": "2026-11-20T11:30:32+00:00",
+   "cover": "https://www.shuge.org/wp-content/uploads/2026/11/wang_hui_tu_juan12.jpg",
+   "summary": "此《王会图》卷传为唐代阎立本所绘。画卷描绘了唐贞观三年四方诸国及边地部族使节齐聚长安朝觐唐太宗的盛况。全卷不设山水与建筑背景，除最右端首组（题签残损）绘有一主二随从共三人外，其余二十三国均各绘使者一人，全卷共二十六人。此卷现藏于台北故宫博物院。",
+   "categories": [
+    "绘画",
+    "艺术类",
+    "隋唐五代"
+   ],
+   "tags": [],
+   "file_name": "王会图卷. 传唐. 阎立本绘. 绢本设色（28.1x238.1 厘米）",
+   "archive_path": "书格文件\\PDF\\绘画设计类\\王会图卷",
+   "format": "PDF 、 TIF 高清+ JPG 高清 方便快速预览 PDF 文件包含书签注释",
+   "size": "717M",
+   "size_bw": "",
+   "source_library": "台北故宫博物院 藏（故畫 001379）",
+   "license": "CC BY 4.0 *本归档文件相对原始文件有适当修改",
+   "downloads": [
+    "https://s.shuge.org/ylbwhtj"
    ]
   },
   {
